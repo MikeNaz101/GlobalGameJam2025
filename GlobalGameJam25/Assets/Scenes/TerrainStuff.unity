@@ -659,7 +659,7 @@ GameObject:
   - component: {fileID: 1089364890}
   - component: {fileID: 1089364889}
   m_Layer: 0
-  m_Name: Capsule
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -997,7 +997,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1530251413}
   m_Father: {fileID: 776473270}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1403445479
@@ -1108,7 +1109,7 @@ GameObject:
   - component: {fileID: 1530251411}
   - component: {fileID: 1530251410}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: HUD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1190,7 +1191,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7926377640331463350}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1403445478}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1300,15 +1301,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 597356636540245228, guid: 28f5d98954c00ee4aae2c06256591a9c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.686
+      value: -5.05
       objectReference: {fileID: 0}
     - target: {fileID: 597356636540245228, guid: 28f5d98954c00ee4aae2c06256591a9c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.682
+      value: -2.02
       objectReference: {fileID: 0}
     - target: {fileID: 597356636540245228, guid: 28f5d98954c00ee4aae2c06256591a9c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -272.93
+      value: -311.03
       objectReference: {fileID: 0}
     - target: {fileID: 597356636540245228, guid: 28f5d98954c00ee4aae2c06256591a9c, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1363,4 +1364,3 @@ SceneRoots:
   - {fileID: 2127873481}
   - {fileID: 1089364893}
   - {fileID: 718293984}
-  - {fileID: 1530251413}
