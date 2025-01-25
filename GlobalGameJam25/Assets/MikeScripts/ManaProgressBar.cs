@@ -43,8 +43,8 @@ public class ManaProgressBar : MonoBehaviour
         float currentOffset = current - minimum;
         float maximumOffset = maximum - minimum;
         float fillAmount = currentOffset / maximumOffset;
-        //mask.fillAmount = fillAmount;
+        mask.fillAmount = fillAmount;
 
-        //fill.color = color;
+        fill.color = color;
     }
 }
