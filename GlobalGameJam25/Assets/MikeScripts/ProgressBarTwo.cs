@@ -52,7 +52,7 @@ public class ProgressBarTwo : MonoBehaviour
     {
         if (maximum <= minimum) 
         {
-            Debug.LogError("Maximum mana must be greater than minimum mana!");
+            Debug.LogError("Maximum mana must be greater than minimum mana!!");
             return;
         }
 
