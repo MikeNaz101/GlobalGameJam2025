@@ -1,8 +1,8 @@
 using UnityEngine;
 
-/*public class PlayerStateMachine : StateManager<PlayerStateMachine.EPlayerState>
+public class PlayerStateMachine : StateManager<PlayerStateMachine.PlayerState>
 {
-    public enum EPlayerState
+    public enum PlayerState
     {
         Idle,
         Walk,
@@ -12,5 +12,10 @@ using UnityEngine;
         Hit,
         Dead
     }
+    
+    public override PlayerState GetNextState()
+    {
+        throw new System.NotImplementedException();
+    }
 }
-*/
+
