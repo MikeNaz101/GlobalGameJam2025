@@ -6,7 +6,7 @@ using UnityEditor;
 #endif
 
 [ExecuteInEditMode()]
-public class ManaProgressBar : MonoBehaviour
+public class ProgressBarTwo : MonoBehaviour
 {
     #if UNITY_EDITOR
         [MenuItem("GameObject/UI/Linear Progress Bar")]
@@ -34,6 +34,11 @@ public class ManaProgressBar : MonoBehaviour
     {
         current = newCurrentMana;
         GetCurrentFill(); 
+    }
+
+    void Update()
+    {
+        GetCurrentFill();
     }
 
     // Call this function if the maximum mana needs to be updated
