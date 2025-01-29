@@ -2,18 +2,18 @@ using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ProgressBar : MonoBehaviour
+public class HealthBar : MonoBehaviour
 {
-    public Slider slider;
+    public Slider healthSlider;
 
     public void SetMaxStats(int health)
     {
-        slider.maxValue = health;
-        slider.value = health;
+        healthSlider.maxValue = health;
+        healthSlider.value = health;
     }
 
     public void SetHealth(int health)
     {
-        slider.value = health;
+        healthSlider.value = health;
     }
 }

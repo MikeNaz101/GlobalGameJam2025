@@ -7,7 +7,7 @@ public class EnemyBubble : MonoBehaviour
     public int maxHealth = 100;
     public int speed = 20;
     public int currentHealth;
-    public ProgressBar healthBar;
+    public HealthBar healthBar;
     public GameObject projectilePrefab;
     public Transform firePoint;        // A child GameObject or position where the projectile spawns
     public float projectileSpeed = 10f;

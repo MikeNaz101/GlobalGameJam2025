@@ -9,6 +9,8 @@ public class MouseLookAndMove : MonoBehaviour
     public float jumpForce = 10f; // Force of the jump
     private float xRotation = 0f; // For clamping vertical rotation
 
+    public Player player;
+
     void Start()
     {
         // Lock the cursor to the game window
@@ -36,9 +38,10 @@ public class MouseLookAndMove : MonoBehaviour
         }
 
         // --- Dash ---
-        if (Input.GetButtonDown("Dash"))
+        if (player.currentStamina > 8 && Input.GetButtonDown("Dash"))
         {
             Dash();
+            player.ConsumeStamina(8); // Decrease stamina by 8
         }
     }
 
