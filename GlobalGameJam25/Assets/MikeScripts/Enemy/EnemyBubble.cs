@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class EnemyBubble : MonoBehaviour
 {
+    public float detectionRadius = 5f;  // Range to detect player
+    public LayerMask playerLayer;  // Set this to a layer that only includes the player
     public int size = 20;
     public int maxHealth = 100;
     public int speed = 5;  // Slower speed to balance chasing behavior
@@ -15,14 +17,15 @@ public class EnemyBubble : MonoBehaviour
     public float attackRange = 10f;    // Distance at which enemy starts shooting
     public float fireCooldown = 2f;    // Cooldown between shots
     private float fireTimer = 0f;      // Timer to track fire cooldown
-
-    private Transform player;          // Reference to the player's transform
+    public PlayerManager player;
+    private Transform playerTransform;          // Reference to the player's transform
 
     void Start()
     {
+
         // Find the player in the scene (Assuming the player has "Player" tag)
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
-        Debug.Log("Player's position is:" + player.position);
+        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+        Debug.Log("Player's position is:" + playerTransform.position);
         currentHealth = maxHealth;
         healthBar.SetMaxStats(maxHealth); // Initialize health bar
     }
@@ -31,7 +34,7 @@ public class EnemyBubble : MonoBehaviour
     {
         if (player == null) return; // Exit if player not found
 
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
 
         // Chase player if within detection range
         if (distanceToPlayer < detectionRange)
@@ -101,21 +104,15 @@ public class EnemyBubble : MonoBehaviour
 
     void Die()
     {
+        player.currentMana = player.maxMana;
         Debug.Log(gameObject.name + " has been destroyed!");
         Destroy(gameObject); // Destroy the enemy GameObject
     }
-
-    /*private void OnTriggerEnter(Collider other)
+    
+    private void OnDrawGizmosSelected()
     {
-        if (other.CompareTag("PProjectile")) // Make sure the player's projectile has this tag
-        {
-            PlayerProjectile projectile = other.GetComponent<PlayerProjectile>();
-            if (projectile != null)
-            {
-                TakeDamage(projectile.damage);
-                Destroy(other.gameObject); // Destroy the player's projectile on impact
-            }
-        }
-    }*/
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+    }
 }
 

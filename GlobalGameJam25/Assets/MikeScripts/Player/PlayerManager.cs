@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 //using namespace ProgressBar;
-public class Player : MonoBehaviour
+public class PlayerManager : MonoBehaviour
 {
     public int maxHealth = 100;
     public int currentHealth;

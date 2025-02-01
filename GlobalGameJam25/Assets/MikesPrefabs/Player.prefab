@@ -207,7 +207,7 @@ GameObject:
   - component: {fileID: 7317156024649500383}
   - component: {fileID: 3308787583656688179}
   - component: {fileID: 7651946037992586950}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -350,13 +350,14 @@ MonoBehaviour:
   currentHealth: 50
   healthRecoveryRate: 2
   maxMana: 100
-  currentMana: 50
+  currentMana: 100
   manaRecoveryRate: 5
   maxSpeed: 100
   currentSpeed: 5
   staminaRecoveryRate: 10
   maxStamina: 100
   currentStamina: 50
+  position: {x: 0, y: 0, z: 0}
   projectilePrefab: {fileID: 5535924560927195969, guid: b362a71fd0839eb4bb8378e0960a8ed6, type: 3}
   firePoint: {fileID: 6845110514318120425}
 --- !u!81 &7651946037992586950

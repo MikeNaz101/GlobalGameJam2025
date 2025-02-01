@@ -9,7 +9,7 @@ public class MouseLookAndMove : MonoBehaviour
     public float jumpForce = 10f; // Force of the jump
     private float xRotation = 0f; // For clamping vertical rotation
 
-    public Player player;
+    public PlayerManager player;
 
     void Start()
     {

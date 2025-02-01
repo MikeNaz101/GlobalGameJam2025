@@ -3,7 +3,7 @@ using UnityEngine;
 public class EnemyProjectile : MonoBehaviour
 {
     public EnemyBubble enemyBubble; // Reference to the EnemyBubble that created this projectile
-    public Player player;           // Reference to the player
+    public PlayerManager player;           // Reference to the player
 
     private int damageAmount;
     private float speed = 10f;      // Speed of the projectile
