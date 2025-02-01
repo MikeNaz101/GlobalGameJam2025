@@ -39,9 +39,9 @@ public class EnemyProjectile : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.CompareTag("Player")) // Ensure the Player has the "Player" tag
+        if (other.CompareTag("Player")) // Ensure the Player has the "Player" tag
         {
             Debug.Log("Projectile hit the player!");
             if (player != null)

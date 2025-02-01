@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 3517663839446579919}
   - component: {fileID: 6078441537723927670}
   - component: {fileID: 2192397398275592593}
-  - component: {fileID: 5809694802442997137}
   - component: {fileID: 6518669622564335423}
+  - component: {fileID: 7095956371266543578}
+  - component: {fileID: 2778291770994577196}
   m_Layer: 0
   m_Name: EProjectile
   m_TagString: Untagged
@@ -104,27 +105,12 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5809694802442997137
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5535924560927195969}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9cce6cc2a589b64087fc8ba74cb0175, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damage: 10
-  speed: 20
-  lifetime: 3
 --- !u!82 &6518669622564335423
 AudioSource:
   m_ObjectHideFlags: 0
@@ -258,3 +244,44 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!54 &7095956371266543578
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5535924560927195969}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &2778291770994577196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5535924560927195969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08b3c0cf5a54fe842b4df82c8197c159, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyBubble: {fileID: 7700973093407317718, guid: 624f50e723a3507479aad22372f200df, type: 3}
+  player: {fileID: 3308787583656688179, guid: 63e240f6e2f6a674eafc098298d6122a, type: 3}

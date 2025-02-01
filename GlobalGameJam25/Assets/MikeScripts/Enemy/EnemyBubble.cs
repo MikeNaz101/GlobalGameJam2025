@@ -5,43 +5,78 @@ public class EnemyBubble : MonoBehaviour
 {
     public int size = 20;
     public int maxHealth = 100;
-    public int speed = 20;
+    public int speed = 5;  // Slower speed to balance chasing behavior
     public int currentHealth;
     public HealthBar healthBar;
     public GameObject projectilePrefab;
     public Transform firePoint;        // A child GameObject or position where the projectile spawns
     public float projectileSpeed = 10f;
+    public float detectionRange = 15f; // Distance at which enemy starts chasing
+    public float attackRange = 10f;    // Distance at which enemy starts shooting
+    public float fireCooldown = 2f;    // Cooldown between shots
+    private float fireTimer = 0f;      // Timer to track fire cooldown
 
-    public int Size()
+    private Transform player;          // Reference to the player's transform
+
+    void Start()
     {
-        return this.size; // Reference its own size
+        // Find the player in the scene (Assuming the player has "Player" tag)
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        Debug.Log("Player's position is:" + player.position);
+        currentHealth = maxHealth;
+        healthBar.SetMaxStats(maxHealth); // Initialize health bar
     }
+
     void Update()
     {
-        if (Time.time % 2 < 0.1f) // Fires every 2 seconds
+        if (player == null) return; // Exit if player not found
+
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        // Chase player if within detection range
+        if (distanceToPlayer < detectionRange)
         {
-            FireProjectile();
+            ChasePlayer(distanceToPlayer);
+        }
+
+        // Fire projectiles if within attack range
+        if (distanceToPlayer < attackRange)
+        {
+            fireTimer += Time.deltaTime;
+            if (fireTimer >= fireCooldown)
+            {
+                FireProjectile();
+                fireTimer = 0f; // Reset fire timer
+            }
         }
     }
 
-    public void TakeDamage(int damage)
+    void ChasePlayer(float distance)
     {
-        currentHealth -= damage;
-        currentHealth = Mathf.Max(0, currentHealth); // Ensure health doesn't go below 0
-        healthBar.SetHealth(currentHealth);
+        // Rotate to face the player
+        Vector3 direction = (player.position - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z)); // Keep upright
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+
+        // Move towards the player
+        if (distance > attackRange) // Stop moving when in attack range
+        {
+            transform.position += direction * speed * Time.deltaTime;
+        }
     }
 
     public void FireProjectile()
     {
-        // Instantiate the projectile
-        GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+        // Instantiate the projectile at the fire point
+        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
 
         // Get the Rigidbody of the projectile
         Rigidbody rb = projectile.GetComponent<Rigidbody>();
         if (rb != null)
         {
-            // Apply force to move the projectile
-            rb.linearVelocity = firePoint.forward * projectileSpeed; // Forward direction
+            // Aim the projectile at the player
+            Vector3 shootDirection = (player.position - firePoint.position).normalized;
+            rb.linearVelocity = shootDirection * projectileSpeed;
         }
 
         // Assign this EnemyBubble instance to the projectile
@@ -51,4 +86,36 @@ public class EnemyBubble : MonoBehaviour
             projectileScript.enemyBubble = this; // Pass itself as a reference
         }
     }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        currentHealth = Mathf.Max(0, currentHealth); // Ensure health doesn't go below 0
+        healthBar.SetHealth(currentHealth);
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        Debug.Log(gameObject.name + " has been destroyed!");
+        Destroy(gameObject); // Destroy the enemy GameObject
+    }
+
+    /*private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("PProjectile")) // Make sure the player's projectile has this tag
+        {
+            PlayerProjectile projectile = other.GetComponent<PlayerProjectile>();
+            if (projectile != null)
+            {
+                TakeDamage(projectile.damage);
+                Destroy(other.gameObject); // Destroy the player's projectile on impact
+            }
+        }
+    }*/
 }
+

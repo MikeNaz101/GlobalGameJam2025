@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
 
     public int maxStamina;
     public int currentStamina;
+    public Vector3 position;
     
     
     
@@ -32,6 +33,7 @@ public class Player : MonoBehaviour
         currentMana = maxMana;
         currentSpeed = maxSpeed;
         currentStamina = maxStamina;
+        position = transform.position;
         
         // Start recovery for all stats
         StartCoroutine(RecoverHealthOverTime());
@@ -91,7 +93,8 @@ public class Player : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
-        currentHealth = Mathf.Max(0, currentHealth); // Ensure health doesn't go below 0
+        //currentHealth = Mathf.Max(0, currentHealth); // Ensure health doesn't go below 0
+        Debug.Log("Player Took  " + damage + " damage!");
         //healthBar.SetHealth(currentHealth);
     }
 
@@ -124,6 +127,11 @@ public class Player : MonoBehaviour
         if (projectilePrefab != null && firePoint != null)
         {
             GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+            //PlayerProjectile playerProjectile = projectile.GetComponent<PlayerProjectile>();
+            // Aim the projectile at the player
+            //Vector3 shootDirection = (firePoint.position).normalized;
+            //rb.linearVelocity = shootDirection * projectileSpeed;
+        
             
             // Optionally, you could set the speed of the projectile here if needed
             // projectile.GetComponent<PlayerProjectile>().speed = 20f;  // Or any value you want to set dynamically
