@@ -6,7 +6,7 @@ public class ProgressBarManager : MonoBehaviour
     public ManaBar manaBar;  // Reference to the Mana progress bar
     public StaminaBar staminaBar; // Reference to the Stamina progress bar
 
-    public PlayerManager player; // Reference to the PlayerCharacter class
+    public Player player; // Reference to the PlayerCharacter class
 
     void Start()
     {
@@ -21,7 +21,7 @@ public class ProgressBarManager : MonoBehaviour
 
     void Update()
     {
-        // Continuously update the progress bars (or trigger this in events for optimization)
+        // Continuously update the progress bars
         UpdateProgressBars();
     }
 

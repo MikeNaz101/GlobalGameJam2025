@@ -7,7 +7,7 @@ public class EnemyBubble : MonoBehaviour
     public LayerMask playerLayer;  // Set this to a layer that only includes the player
     public int size = 20;
     public int maxHealth = 100;
-    public int speed = 5;  // Slower speed to balance chasing behavior
+    public int speed = 2;  // Slower speed to balance chasing behavior
     public int currentHealth;
     public HealthBar healthBar;
     public GameObject projectilePrefab;
@@ -17,13 +17,13 @@ public class EnemyBubble : MonoBehaviour
     public float attackRange = 10f;    // Distance at which enemy starts shooting
     public float fireCooldown = 2f;    // Cooldown between shots
     private float fireTimer = 0f;      // Timer to track fire cooldown
-    public PlayerManager player;
-    private Transform playerTransform;          // Reference to the player's transform
+    public Player player;
+    public Transform playerTransform;   // Reference to the player's transform
 
     void Start()
     {
-
-        // Find the player in the scene (Assuming the player has "Player" tag)
+        player = GameObject.FindGameObjectWithTag("Player")?.GetComponent<Player>();
+        // Finds player in the scene using "Player" tag
         playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
         Debug.Log("Player's position is:" + playerTransform.position);
         currentHealth = maxHealth;
@@ -57,7 +57,7 @@ public class EnemyBubble : MonoBehaviour
     void ChasePlayer(float distance)
     {
         // Rotate to face the player
-        Vector3 direction = (player.position - transform.position).normalized;
+        Vector3 direction = (playerTransform.position - transform.position).normalized;
         Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z)); // Keep upright
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
 
@@ -70,17 +70,21 @@ public class EnemyBubble : MonoBehaviour
 
     public void FireProjectile()
     {
+        // Rotate to face the player
+        Vector3 direction = (playerTransform.position - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z)); // Keep upright
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
         // Instantiate the projectile at the fire point
-        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
+        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
 
-        // Get the Rigidbody of the projectile
+        /* Get the Rigidbody of the projectile
         Rigidbody rb = projectile.GetComponent<Rigidbody>();
         if (rb != null)
         {
             // Aim the projectile at the player
-            Vector3 shootDirection = (player.position - firePoint.position).normalized;
+            Vector3 shootDirection = (playerTransform.position - firePoint.position).normalized;
             rb.linearVelocity = shootDirection * projectileSpeed;
-        }
+        }*/
 
         // Assign this EnemyBubble instance to the projectile
         EnemyProjectile projectileScript = projectile.GetComponent<EnemyProjectile>();

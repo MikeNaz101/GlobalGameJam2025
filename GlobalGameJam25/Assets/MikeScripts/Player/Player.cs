@@ -3,26 +3,24 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 //using namespace ProgressBar;
-public class PlayerManager : MonoBehaviour
+public class Player : MonoBehaviour
 {
     public int maxHealth = 100;
     public int currentHealth;
     public int healthRecoveryRate = 2; // Health points per second
+
     public int maxMana = 100;
     public int currentMana;
-     public int manaRecoveryRate = 5; // Mana points per second
+    public int manaRecoveryRate = 5; // Mana points per second
 
-    public int maxSpeed;
-    public int currentSpeed;
+    public int maxStamina = 100;
+    public int currentStamina;
     public int staminaRecoveryRate = 10; // Stamina points per second
 
-    public int maxStamina;
-    public int currentStamina;
-    public Vector3 position;
-    
-    
-    
-    
+    public int maxSpeed = 10;
+    public int currentSpeed = 5;
+
+    private Vector3 position;
     public ProgressBar healthBar;
     public GameObject projectilePrefab;  // Drag your projectile prefab here
     public Transform firePoint;  // Point from which the projectile will fire
@@ -34,7 +32,8 @@ public class PlayerManager : MonoBehaviour
         currentSpeed = maxSpeed;
         currentStamina = maxStamina;
         position = transform.position;
-        
+        Debug.Log("Your currentHealth starts as: " + currentHealth);
+
         // Start recovery for all stats
         StartCoroutine(RecoverHealthOverTime());
         StartCoroutine(RecoverManaOverTime());
@@ -45,8 +44,8 @@ public class PlayerManager : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(1f); // Wait 1 second between recovery
-            RecoverHealth(healthRecoveryRate);
+            yield return new WaitForSeconds(5f); // Wait 1 second between recovery
+            currentHealth += healthRecoveryRate;
         }
     }
 
@@ -54,8 +53,8 @@ public class PlayerManager : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(1f); // Wait 1 second between recovery
-            RecoverMana(manaRecoveryRate);
+            yield return new WaitForSeconds(5f); // Wait 1 second between recovery
+            currentMana += manaRecoveryRate;
         }
     }
 
@@ -63,24 +62,9 @@ public class PlayerManager : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(1f); // Wait 1 second between recovery
-            RecoverStamina(staminaRecoveryRate);
+            yield return new WaitForSeconds(5f); // Wait 1 second between recovery
+            currentStamina += staminaRecoveryRate;
         }
-    }
-
-    private void RecoverHealth(int amount)
-    {
-        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
-    }
-
-    private void RecoverMana(int amount)
-    {
-        currentMana = Mathf.Clamp(currentMana + amount, 0, maxMana);
-    }
-
-    private void RecoverStamina(int amount)
-    {
-        currentStamina = Mathf.Clamp(currentStamina + amount, 0, maxStamina);
     }
 
     // Update is called once per frame
@@ -92,25 +76,29 @@ public class PlayerManager : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        Debug.Log("Your currentHealth before calculating damage is: " + currentHealth);
+        
         currentHealth -= damage;
-        //currentHealth = Mathf.Max(0, currentHealth); // Ensure health doesn't go below 0
-        Debug.Log("Player Took  " + damage + " damage!");
-        //healthBar.SetHealth(currentHealth);
+        currentHealth = Mathf.Max(0, currentHealth); // Ensure health doesn't go below 0
+        Debug.Log("Player Took  " + damage + " damage! Your health is now: " + currentHealth);
+
     }
 
     // Example method to use mana
     public void UseMana(int manaCost)
     {
-        currentMana = Mathf.Clamp(currentMana - manaCost, 0, maxMana);
+        currentMana -= manaCost;
+        //currentMana = Mathf.Clamp(currentMana - manaCost, 0, maxMana);
     }
 
     // Example method to consume stamina
     public void ConsumeStamina(int staminaCost)
     {
-        currentStamina = Mathf.Clamp(currentStamina - staminaCost, 0, maxStamina);
+        currentStamina -= staminaCost;
+        //currentStamina = Mathf.Clamp(currentStamina - staminaCost, 0, maxStamina);
     }
 
-    
+
     void Attck()
     {
         if (currentMana > 10 && Input.GetMouseButtonDown((int)MouseButton.LeftMouse)) // Left-click attack
@@ -131,8 +119,8 @@ public class PlayerManager : MonoBehaviour
             // Aim the projectile at the player
             //Vector3 shootDirection = (firePoint.position).normalized;
             //rb.linearVelocity = shootDirection * projectileSpeed;
-        
-            
+
+
             // Optionally, you could set the speed of the projectile here if needed
             // projectile.GetComponent<PlayerProjectile>().speed = 20f;  // Or any value you want to set dynamically
         }

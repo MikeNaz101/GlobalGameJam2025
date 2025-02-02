@@ -3,7 +3,7 @@ using UnityEngine;
 public class EnemyProjectile : MonoBehaviour
 {
     public EnemyBubble enemyBubble; // Reference to the EnemyBubble that created this projectile
-    public PlayerManager player;           // Reference to the player
+    public Player player;           // Reference to the player
 
     private int damageAmount;
     private float speed = 10f;      // Speed of the projectile
@@ -34,8 +34,7 @@ public class EnemyProjectile : MonoBehaviour
         // Move the projectile forward every frame
         if (rb != null)
         {
-            rb.linearVelocity = transform.forward * speed; //added linear velocity instead of velocity  // Apply velocity to move the projectile
-            //rb.velocity = transform.forward * speed;  // Apply velocity to move the projectile
+            rb.linearVelocity = transform.forward * speed; // Apply velocity to move the projectile
         }
     }
 

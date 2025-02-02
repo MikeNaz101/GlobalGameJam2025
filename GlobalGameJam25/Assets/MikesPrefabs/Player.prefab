@@ -191,7 +191,7 @@ MonoBehaviour:
   playerRigidbody: {fileID: 7317156024649500383}
   movementSpeed: 5
   jumpForce: 10
-  player: {fileID: 3308787583656688179}
+  player: {fileID: 2976872392325954143}
 --- !u!1 &4579322978128425371
 GameObject:
   m_ObjectHideFlags: 0
@@ -205,8 +205,8 @@ GameObject:
   - component: {fileID: 1536303519251226114}
   - component: {fileID: 7545035135016734744}
   - component: {fileID: 7317156024649500383}
-  - component: {fileID: 3308787583656688179}
   - component: {fileID: 7651946037992586950}
+  - component: {fileID: 2976872392325954143}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -334,32 +334,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &3308787583656688179
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4579322978128425371}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4b8276f3a888404682d7ad44fd2c5a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 100
-  currentHealth: 50
-  healthRecoveryRate: 2
-  maxMana: 100
-  currentMana: 100
-  manaRecoveryRate: 5
-  maxSpeed: 100
-  currentSpeed: 5
-  staminaRecoveryRate: 10
-  maxStamina: 100
-  currentStamina: 50
-  position: {x: 0, y: 0, z: 0}
-  projectilePrefab: {fileID: 5535924560927195969, guid: b362a71fd0839eb4bb8378e0960a8ed6, type: 3}
-  firePoint: {fileID: 6845110514318120425}
 --- !u!81 &7651946037992586950
 AudioListener:
   m_ObjectHideFlags: 0
@@ -368,6 +342,31 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4579322978128425371}
   m_Enabled: 1
+--- !u!114 &2976872392325954143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4579322978128425371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba95a11abc8e06e4fa137a56d50a1c29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 50
+  healthRecoveryRate: 2
+  maxMana: 100
+  currentMana: 100
+  manaRecoveryRate: 5
+  maxStamina: 100
+  currentStamina: 70
+  staminaRecoveryRate: 10
+  maxSpeed: 10
+  currentSpeed: 5
+  projectilePrefab: {fileID: 5535924560927195969, guid: b362a71fd0839eb4bb8378e0960a8ed6, type: 3}
+  firePoint: {fileID: 6845110514318120425}
 --- !u!1 &5762611343522776658
 GameObject:
   m_ObjectHideFlags: 0
@@ -592,7 +591,7 @@ MonoBehaviour:
   healthBar: {fileID: 1743698446185817275}
   manaBar: {fileID: 8371605687840482046}
   staminaBar: {fileID: 9047094498569299871}
-  player: {fileID: 3308787583656688179}
+  player: {fileID: 2976872392325954143}
 --- !u!1 &8074507859978457870
 GameObject:
   m_ObjectHideFlags: 0

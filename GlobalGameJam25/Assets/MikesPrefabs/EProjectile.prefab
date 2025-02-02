@@ -284,4 +284,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyBubble: {fileID: 7700973093407317718, guid: 624f50e723a3507479aad22372f200df, type: 3}
-  player: {fileID: 3308787583656688179, guid: 63e240f6e2f6a674eafc098298d6122a, type: 3}
+  player: {fileID: 2976872392325954143, guid: 63e240f6e2f6a674eafc098298d6122a, type: 3}
