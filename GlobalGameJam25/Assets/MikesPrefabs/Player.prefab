@@ -366,7 +366,11 @@ MonoBehaviour:
   maxSpeed: 10
   currentSpeed: 5
   projectilePrefab: {fileID: 5535924560927195969, guid: b362a71fd0839eb4bb8378e0960a8ed6, type: 3}
+  shellPrefab: {fileID: 5535924560927195969, guid: e60666857a9c0e14bbbbfc6a24c1418c, type: 3}
   firePoint: {fileID: 6845110514318120425}
+  orbitRadius: 2
+  orbitSpeed: 50
+  maxShells: 19
 --- !u!1 &5762611343522776658
 GameObject:
   m_ObjectHideFlags: 0
