@@ -96,7 +96,7 @@ public class Player : MonoBehaviour
     public void TakeDamage(int damage)
     {
         Debug.Log("Your currentHealth before calculating damage is: " + currentHealth);
-        currentHealth -= damage;
+        currentHealth = currentHealth - damage;
         currentHealth = Mathf.Max(0, currentHealth); // Ensure health doesn't go below 0
         Debug.Log("Player Took  " + damage + " damage! Your health is now: " + currentHealth);
 
