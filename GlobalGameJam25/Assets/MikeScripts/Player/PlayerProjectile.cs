@@ -31,7 +31,7 @@ public class PlayerProjectile : MonoBehaviour
             EnemyBubble enemy = other.GetComponent<EnemyBubble>();
             if (enemy != null)
             {
-                enemy.TakeDamage(damage);
+                enemy.EnemyTakeDamage(damage);
                 Destroy(gameObject); // Destroy projectile on impact
             }
         }

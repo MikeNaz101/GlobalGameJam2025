@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-
-//using namespace ProgressBar;
 public class Player : MonoBehaviour
 {
     public int maxHealth = 100;
@@ -45,6 +43,7 @@ public class Player : MonoBehaviour
         currentShells = maxShells;
         SpawnSpiritBubbleShells();
         Debug.Log("Your currentHealth starts as: " + currentHealth);
+        Debug.Log("Your currentHealth starts as: " + currentHealth.ToString());
 
         // Start recovery for all stats
         StartCoroutine(RecoverHealthOverTime());
@@ -58,6 +57,8 @@ public class Player : MonoBehaviour
         {
             yield return new WaitForSeconds(5f); // Wait 1 second between recovery
             currentHealth += healthRecoveryRate;
+            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+            Debug.Log("current Health"+ currentHealth.ToString());
         }
     }
 
@@ -70,6 +71,7 @@ public class Player : MonoBehaviour
             if (currentShells < (currentMana/manaCost))
             {
                 currentShells++;
+                //this where spawn of bubble problem lives
                 orbitingShells[currentShells - 1].GetComponent<MeshRenderer>().enabled = true;
                 
             }
@@ -84,8 +86,6 @@ public class Player : MonoBehaviour
             currentStamina += staminaRecoveryRate;
         }
     }
-
-    // Update is called once per frame
     void Update()
     {
         UpdateShellPositions();
@@ -93,11 +93,12 @@ public class Player : MonoBehaviour
         Attck();
     }
 
+    // Calculates the damage to the player
     public void TakeDamage(int damage)
     {
         Debug.Log("Your currentHealth before calculating damage is: " + currentHealth);
-        currentHealth = currentHealth - damage;
-        currentHealth = Mathf.Max(0, currentHealth); // Ensure health doesn't go below 0
+        currentHealth -= damage;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth); // Ensure health doesn't go below 0
         Debug.Log("Player Took  " + damage + " damage! Your health is now: " + currentHealth);
 
     }
@@ -106,7 +107,7 @@ public class Player : MonoBehaviour
     public void UseMana(int mCost)
     {
         currentMana -= mCost;
-        currentMana = Mathf.Clamp(currentMana - manaCost, 0, maxMana);
+        currentMana = Mathf.Clamp(currentMana, 0, maxMana);
     }
 
     // Method to consume stamina
@@ -116,7 +117,7 @@ public class Player : MonoBehaviour
         currentStamina = Mathf.Clamp(currentStamina - staminaCost, 0, maxStamina);
     }
 
-
+    // Tests if player has enough mana to fire spirit bubble, then calls FireProjectile()
     void Attck()
     {
         if (currentMana > manaCost && Input.GetMouseButtonDown((int)MouseButton.LeftMouse)) // Left-click attack
@@ -140,13 +141,10 @@ public class Player : MonoBehaviour
             // Aim the projectile at the player
             //Vector3 shootDirection = (firePoint.position).normalized;
             //rb.linearVelocity = shootDirection * projectileSpeed;
-
-
-            // Optionally, you could set the speed of the projectile here if needed
-            // projectile.GetComponent<PlayerProjectile>().speed = 20f;  // Or any value you want to set dynamically
         }
     }
 
+    // Creates the orbiting spirit bubbles
     void SpawnSpiritBubbleShells()
     {
         for (int i = 0; i < maxShells; i++)
@@ -157,6 +155,7 @@ public class Player : MonoBehaviour
         }
     }
 
+    // Makes the spirit bubbles orbit around player.
     void UpdateShellPositions()
     {
         for (int i = 0; i < orbitingShells.Count; i++)
@@ -164,9 +163,14 @@ public class Player : MonoBehaviour
             if (orbitingShells[i] != null)
             {
                 float angle = Time.time * orbitSpeed + (i * 360f / maxShells);
+                //float orbitHeight = Time.time * orbitSpeed + (i * 360f / maxShells);
                 float x = firePoint.position.x + orbitRadius * Mathf.Cos(angle * Mathf.Deg2Rad);
                 float z = firePoint.position.z + orbitRadius * Mathf.Sin(angle * Mathf.Deg2Rad);
-                orbitingShells[i].transform.position = new Vector3(x, firePoint.position.y, z);
+                orbitingShells[i].transform.position = new Vector3(x, Mathf.Cos(firePoint.position.y), z);
+                /*if(i%2 == 0)
+                {
+                    orbitingShells[i].transform.position = new Vector3(x, Mathf.Cos(firePoint.position.y), z);
+                }*/
             }
         }
     }

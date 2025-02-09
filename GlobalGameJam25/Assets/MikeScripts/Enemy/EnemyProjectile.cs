@@ -3,6 +3,7 @@ using UnityEngine;
 public class EnemyProjectile : MonoBehaviour
 {
     public EnemyBubble enemyBubble; // Reference to the EnemyBubble that created this projectile
+    //public GameObject player;
     public Player player;           // Reference to the player
 
     private int damageAmount;

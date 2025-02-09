@@ -94,7 +94,7 @@ public class EnemyBubble : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage)
+    public void EnemyTakeDamage(int damage)
     {
         currentHealth -= damage;
         currentHealth = Mathf.Max(0, currentHealth); // Ensure health doesn't go below 0
