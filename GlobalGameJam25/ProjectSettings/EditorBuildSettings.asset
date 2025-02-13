@@ -9,8 +9,17 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
+    path: Assets/JamesScripts/JamesStartScreen.unity
+    guid: 5fc0f6d0b3eee1542b39a6751ad8c2d3
+  - enabled: 1
     path: Assets/Scenes/TerrainStuff.unity
     guid: 4121c7759fa23d949a621b5314cd4678
+  - enabled: 1
+    path: Assets/Scenes/MainGame.unity
+    guid: 0e753c1d8ee62cb4ab4aae7eb6d52f43
+  - enabled: 1
+    path: Assets/JamesScripts/options.unity
+    guid: 2a2b64121f5d50b4e83b18c4cceea52c
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

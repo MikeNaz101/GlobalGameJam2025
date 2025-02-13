@@ -7,7 +7,12 @@ public class MainMenu : MonoBehaviour
 {
     public void Play()
     {
-        SceneManager.LoadScene("MainGame");
+        SceneManager.LoadScene("TerrainStuff");
+    }
+
+    public void Options()
+    {
+        SceneManager.LoadScene("options");
     }
 
     public void Quit()
