@@ -43,7 +43,7 @@ public class Player : MonoBehaviour
         currentShells = maxShells;
         SpawnSpiritBubbleShells();
         Debug.Log("Your currentHealth starts as: " + currentHealth);
-        Debug.Log("Your currentHealth starts as: " + currentHealth.ToString());
+        //Debug.Log("Your currentHealth starts as: " + currentHealth.ToString());
 
         // Start recovery for all stats
         StartCoroutine(RecoverHealthOverTime());
@@ -88,6 +88,7 @@ public class Player : MonoBehaviour
     }
     void Update()
     {
+        Debug.Log("Your currentHealth is: " + currentHealth);
         UpdateShellPositions();
         // Call the Attack method to handle mouse input
         Attck();
