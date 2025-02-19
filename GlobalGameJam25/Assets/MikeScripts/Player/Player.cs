@@ -68,7 +68,7 @@ public class Player : MonoBehaviour
         {
             yield return new WaitForSeconds(1f); // Wait 1 second between recovery
             currentMana += manaRecoveryRate;
-            if (currentShells < (currentMana/manaCost))
+            if (currentShells < (maxMana/manaCost) && currentShells < (currentMana/manaCost))
             {
                 currentShells++;
                 //this where spawn of bubble problem lives
@@ -115,7 +115,7 @@ public class Player : MonoBehaviour
     public void ConsumeStamina(int staminaCost)
     {
         currentStamina -= staminaCost;
-        currentStamina = Mathf.Clamp(currentStamina - staminaCost, 0, maxStamina);
+        currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
     }
 
     // Tests if player has enough mana to fire spirit bubble, then calls FireProjectile()
@@ -151,6 +151,7 @@ public class Player : MonoBehaviour
         for (int i = 0; i < maxShells; i++)
         {
             Vector3 spawnPosition = transform.position + new Vector3(orbitRadius, 0, 0);
+            Debug.Log("spawnPosition.y is " + spawnPosition.y);
             GameObject shell = Instantiate(shellPrefab, spawnPosition, Quaternion.identity);
             orbitingShells.Add(shell);
         }
@@ -164,10 +165,11 @@ public class Player : MonoBehaviour
             if (orbitingShells[i] != null)
             {
                 float angle = Time.time * orbitSpeed + (i * 360f / maxShells);
-                //float orbitHeight = Time.time * orbitSpeed + (i * 360f / maxShells);
+                float orbitHeight = Time.time * orbitSpeed + (i * 360f / maxShells);
                 float x = firePoint.position.x + orbitRadius * Mathf.Cos(angle * Mathf.Deg2Rad);
                 float z = firePoint.position.z + orbitRadius * Mathf.Sin(angle * Mathf.Deg2Rad);
-                orbitingShells[i].transform.position = new Vector3(x, Mathf.Cos(firePoint.position.y), z);
+                orbitingShells[i].transform.position = new Vector3(x, transform.position.y, z);
+                //orbitingShells[i].transform.position = new Vector3(x, Mathf.Cos(firePoint.position.y), z);
                 /*if(i%2 == 0)
                 {
                     orbitingShells[i].transform.position = new Vector3(x, Mathf.Cos(firePoint.position.y), z);
