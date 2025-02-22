@@ -1,8 +1,4 @@
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEngine;
-
-public abstract class PlayerBaseState
+public abstract class EnemyBaseState
 {
     public abstract void EnterState(PlayerStateManager player);
 
