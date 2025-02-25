@@ -23,8 +23,5 @@ public class PlayerIdleState : PlayerBaseState
             }
         }
 
-
-        // When 
-
     }
 }

@@ -4,7 +4,7 @@ public class PlayerWalkingState : PlayerBaseState
 {
     public override void EnterState(PlayerStateManager player)
     {
-        Debug.Log("im Moving!");
+        Debug.Log("im WALKING!!!!!!!!!");
     }
 
     public override void UpdateState(PlayerStateManager player)

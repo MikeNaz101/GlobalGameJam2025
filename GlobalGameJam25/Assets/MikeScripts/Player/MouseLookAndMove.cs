@@ -4,12 +4,12 @@ public class MouseLookAndMove : MonoBehaviour
 {
     public float mouseSensitivity = 100f; // Sensitivity for mouse input
     public Transform playerBody; // Reference to the player body
-    public Rigidbody playerRigidbody; // Rigidbody reference for physics-based movement
+    //public CharacterController player; // Rigidbody reference for physics-based movement
     public float movementSpeed = 5f; // Speed of movement
     public float jumpForce = 10f; // Force of the jump
     private float xRotation = 0f; // For clamping vertical rotation
 
-    public Player player;
+    public PlayerStateManager player;
 
     void Start()
     {
@@ -34,14 +34,14 @@ public class MouseLookAndMove : MonoBehaviour
         // --- Jump ---
         if (Input.GetButtonDown("Jump"))
         {
-            playerRigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            player.MovePlayer(movementSpeed);
         }
 
         // --- Dash ---
         if (player.currentStamina > 8 && Input.GetButtonDown("Dash"))
         {
             Dash();
-            player.ConsumeStamina(8); // Decrease stamina by 8
+            //player.ConsumeStamina(8); // Decrease stamina by 8
         }
     }
 
@@ -55,8 +55,8 @@ public class MouseLookAndMove : MonoBehaviour
         Vector3 movement = (transform.forward * moveZ + transform.right * moveX).normalized * movementSpeed;
 
         // Apply movement using Rigidbody's velocity
-        Vector3 newVelocity = new Vector3(movement.x, playerRigidbody.linearVelocity.y, movement.z);
-        playerRigidbody.linearVelocity = newVelocity;
+        //Vector3 newVelocity = new Vector3(movement.x, playerRigidbody.linearVelocity.y, movement.z);
+        //playerRigidbody.linearVelocity = newVelocity;
     }
 
     void Dash()
@@ -79,7 +79,7 @@ public class MouseLookAndMove : MonoBehaviour
         Vector3 dashDirection = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
 
         // Apply the dash force horizontally
-        playerRigidbody.AddForce(dashDirection * dashSpeed, ForceMode.Impulse);
+        //playerRigidbody.AddForce(dashDirection * dashSpeed, ForceMode.Impulse);
     }
 }
 
