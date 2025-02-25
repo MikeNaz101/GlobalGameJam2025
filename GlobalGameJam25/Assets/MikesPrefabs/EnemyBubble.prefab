@@ -5183,8 +5183,8 @@ MonoBehaviour:
   detectionRange: 15
   attackRange: 10
   fireCooldown: 2
-  player: {fileID: 2976872392325954143, guid: 63e240f6e2f6a674eafc098298d6122a, type: 3}
-  playerTransform: {fileID: 3380065001293202011, guid: 63e240f6e2f6a674eafc098298d6122a, type: 3}
+  player: {fileID: 0}
+  playerTransform: {fileID: 7574001101456263496, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
 --- !u!54 &398414287492612374
 Rigidbody:
   m_ObjectHideFlags: 0

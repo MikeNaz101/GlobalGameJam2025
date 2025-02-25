@@ -17,12 +17,12 @@ public class EnemyBubble : MonoBehaviour
     public float attackRange = 10f;    // Distance at which enemy starts shooting
     public float fireCooldown = 2f;    // Cooldown between shots
     private float fireTimer = 0f;      // Timer to track fire cooldown
-    public Player player;
+    public PlayerStateManager player;
     public Transform playerTransform;   // Reference to the player's transform
 
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player")?.GetComponent<Player>();
+        player = GameObject.FindGameObjectWithTag("Player")?.GetComponent<PlayerStateManager>();
         // Finds player in the scene using "Player" tag
         playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
         Debug.Log("Player's position is:" + playerTransform.position);

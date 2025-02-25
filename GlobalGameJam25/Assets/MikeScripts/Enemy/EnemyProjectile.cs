@@ -2,16 +2,16 @@ using UnityEngine;
 
 public class EnemyProjectile : MonoBehaviour
 {
-    public EnemyBubble enemyBubble; // Reference to the EnemyBubble that created this projectile
-    //public GameObject player;
-    public Player player;           // Reference to the player
+    public EnemyBubble enemyBubble;
+    private PlayerStateManager player; 
 
     private int damageAmount;
-    private float speed = 10f;      // Speed of the projectile
+    private float speed = 10f; // Speed of the projectile
     private Rigidbody rb;
 
     void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player")?.GetComponent<PlayerStateManager>();
         if (enemyBubble != null)
         {
             damageAmount = enemyBubble.size; // Get size from the EnemyBubble instance

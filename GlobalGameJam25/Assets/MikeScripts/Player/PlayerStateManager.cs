@@ -53,6 +53,7 @@ public class PlayerStateManager : MonoBehaviour
     [HideInInspector]
     public PlayerDeathState deathState = new PlayerDeathState();
     [HideInInspector]
+    public PlayerFlyingState flyingState = new PlayerFlyingState();
     public Vector2 movement;
     [HideInInspector]
     public CharacterController controller;
@@ -62,9 +63,9 @@ public class PlayerStateManager : MonoBehaviour
     public LayerMask groundLayer; // Set this to the layer(s) you consider as ground
     private bool isGrounded; // To track if the player is on the ground
     private bool hasJumped = false; // Track if the player has jumped
-    public float jumpForce = 10f; // Adjustable jump force
+    public float jumpForce = 40f; // Adjustable jump force
     public float verticalVelocity = 0f; // Tracks falling speed
-    public float gravityScale = -9.81f;
+    public float gravity = -9.81f;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -131,7 +132,7 @@ public class PlayerStateManager : MonoBehaviour
     void Update()
     {
         // Ground check using Sphere Cast
-        isGrounded = Physics.SphereCast(groundCheck.position, groundCheckRadius, Vector3.down, out RaycastHit hitInfo, groundCheckRadius + 0.1f, groundLayer);
+        isGrounded = IsGrounded(); //Physics.SphereCast(groundCheck.position, groundCheckRadius, Vector3.down, out RaycastHit hitInfo, groundCheckRadius + 0.1f, groundLayer);
         // Check for jump input
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -144,7 +145,7 @@ public class PlayerStateManager : MonoBehaviour
             {
                 // Second jump (double jump) - enter flying state
                 hasJumped = true; // Mark that the player has jumped once
-                SwitchState(attackState); // or SwitchState(flyingState);
+                SwitchState(flyingState); // or SwitchState(flyingState);
             }
         }
         isGrounded = IsGrounded(); // Check if the player is on the ground
@@ -155,11 +156,15 @@ public class PlayerStateManager : MonoBehaviour
         }
 
         // Apply gravity when airborne
-        verticalVelocity += gravityScale * Time.deltaTime;
+        verticalVelocity += gravity * Time.deltaTime;
 
         // Move the character
-        //Vector3 movement = new Vector3(movement.x, verticalVelocity, movement.y);
-        controller.Move(movement * Time.deltaTime);
+        // Convert movement from 2D (input) to 3D
+        Vector3 moveDirection = new Vector3(movement.x, 0, movement.y);
+
+        // Move the character with gravity
+        Vector3 finalMovement = (moveDirection * currentSpeed) + new Vector3(0, verticalVelocity, 0);
+        controller.Move(finalMovement * Time.deltaTime);
         currentState.UpdateState(this);
         UpdateShellPositions();
     }
@@ -179,8 +184,9 @@ public class PlayerStateManager : MonoBehaviour
         float moveX = movement.x;
         float moveY = movement.y;
 
-        Vector3 actual_movement = new Vector3(moveX, 0, moveY);
-        controller.Move(actual_movement*speed*Time.deltaTime);
+        Vector3 moveDirection = (transform.right * moveX) + (transform.forward * moveY);
+        //Vector3 actual_movement = new Vector3(moveX, 0, moveY);
+        controller.Move(moveDirection.normalized * speed*Time.deltaTime);
     }
     public void Jump()
     {
@@ -194,6 +200,14 @@ public class PlayerStateManager : MonoBehaviour
         controller.Move(jumpVelocity * Time.deltaTime);
 
         Debug.Log("Player Jumped!");
+    }
+    void OnAttack()
+    {
+        if (currentState != attackState) // Prevent spamming attacks
+        {
+            SwitchState(attackState);
+            Debug.Log("Player Attacked!");
+        }
     }
     public void TakeDamage(int damage)
     {

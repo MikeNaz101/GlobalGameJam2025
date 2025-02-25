@@ -3,40 +3,60 @@
   "WorkspaceRootPath": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\player\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\player\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\globalgamejam2024\\globalgamejam25\\assets\\mikescripts\\player\\statemachine\\playerstates\\playerflyingstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\player\\statemachine\\playerstates\\playerflyingstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\globalgamejam2024\\globalgamejam25\\assets\\mikescripts\\player\\dummyplayerprojectile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\player\\dummyplayerprojectile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\player\\playerstatemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\player\\playerstatemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\globalgamejam2024\\globalgamejam25\\assets\\mikescripts\\progressbars\\manabar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\progressbars\\manabar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\globalgamejam2024\\globalgamejam25\\assets\\mikescripts\\player\\playerprojectile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\player\\playerprojectile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\progressbars\\progressbarmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\progressbars\\progressbarmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\enemy\\enemybubble.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\enemy\\enemybubble.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\globalgamejam2024\\globalgamejam25\\assets\\mikescripts\\player\\statemachine\\playerstates\\playerhitstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\player\\statemachine\\playerstates\\playerhitstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\enemy\\enemyprojectile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\enemy\\enemyprojectile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\player\\mouselookandmove.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\enemy\\enemybubble.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\enemy\\enemybubble.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\globalgamejam2024\\globalgamejam25\\assets\\mikescripts\\player\\statemachine\\playerstates\\playerattackingstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\player\\statemachine\\playerstates\\playerattackingstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\globalgamejam2024\\globalgamejam25\\assets\\mikescripts\\player\\statemachine\\playerstates\\playerwalkingstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\player\\statemachine\\playerstates\\playerwalkingstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\player\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\player\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\globalgamejam2024\\globalgamejam25\\assets\\mikescripts\\player\\mouselookandmove.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\player\\mouselookandmove.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\player\\statemachine\\playerstates\\playeridlestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\player\\statemachine\\playerstates\\playeridlestate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\enemy\\enemyspawner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\enemy\\enemyspawner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\progressbars\\manabar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\progressbars\\manabar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\player\\playerprojectile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\player\\playerprojectile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\progressbars\\progressbarmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|solutionrelative:assets\\mikescripts\\progressbars\\progressbarmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A5803C28-BD42-7589-D121-F7F3094AD353}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\assets\\mikescripts\\progressbars\\staminabar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -54,11 +74,114 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "PlayerHitState.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerHitState.cs",
+              "RelativeDocumentMoniker": "Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerHitState.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerHitState.cs",
+              "RelativeToolTip": "Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerHitState.cs",
+              "ViewState": "AQIAAAIAAAAAAAAAAAAxwAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T06:14:57.822Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PlayerFlyingState.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerFlyingState.cs",
+              "RelativeDocumentMoniker": "Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerFlyingState.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerFlyingState.cs",
+              "RelativeToolTip": "Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerFlyingState.cs",
+              "ViewState": "AQIAAAIAAAAAAAAAAAAxwAYAAAA5AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T06:06:11.27Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "PlayerWalkingState.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerWalkingState.cs",
+              "RelativeDocumentMoniker": "Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerWalkingState.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerWalkingState.cs",
+              "RelativeToolTip": "Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerWalkingState.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T05:12:23.359Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "PlayerAttackingState.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerAttackingState.cs",
+              "RelativeDocumentMoniker": "Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerAttackingState.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerAttackingState.cs",
+              "RelativeToolTip": "Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerAttackingState.cs",
+              "ViewState": "AQIAACcAAAAAAAAAAAAowAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T05:05:58.216Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "PlayerStateManager.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\PlayerStateManager.cs",
+              "RelativeDocumentMoniker": "Assets\\MikeScripts\\Player\\PlayerStateManager.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\PlayerStateManager.cs",
+              "RelativeToolTip": "Assets\\MikeScripts\\Player\\PlayerStateManager.cs",
+              "ViewState": "AQIAAPoAAAAAAAAAAAAUwBABAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T04:41:21.857Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "EnemyBubble.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Enemy\\EnemyBubble.cs",
+              "RelativeDocumentMoniker": "Assets\\MikeScripts\\Enemy\\EnemyBubble.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Enemy\\EnemyBubble.cs",
+              "RelativeToolTip": "Assets\\MikeScripts\\Enemy\\EnemyBubble.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABgAAABgAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-02T01:43:06.826Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "EnemyProjectile.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Enemy\\EnemyProjectile.cs",
+              "RelativeDocumentMoniker": "Assets\\MikeScripts\\Enemy\\EnemyProjectile.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Enemy\\EnemyProjectile.cs",
+              "RelativeToolTip": "Assets\\MikeScripts\\Enemy\\EnemyProjectile.cs",
+              "ViewState": "AQIAAA0AAAAAAAAAAAAgwAUAAAALAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-02T01:43:07.99Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "PlayerIdleState.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerIdleState.cs",
+              "RelativeDocumentMoniker": "Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerIdleState.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerIdleState.cs",
+              "RelativeToolTip": "Assets\\MikeScripts\\Player\\StateMachine\\PlayerStates\\PlayerIdleState.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-25T04:51:02.671Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
               "Title": "ManaBar.cs",
               "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\ProgressBars\\ManaBar.cs",
               "RelativeDocumentMoniker": "Assets\\MikeScripts\\ProgressBars\\ManaBar.cs",
@@ -66,37 +189,24 @@
               "RelativeToolTip": "Assets\\MikeScripts\\ProgressBars\\ManaBar.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-03T03:22:34.817Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-02-03T03:22:34.817Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "DummyPlayerProjectile.cs",
-              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\DummyPlayerProjectile.cs",
-              "RelativeDocumentMoniker": "Assets\\MikeScripts\\Player\\DummyPlayerProjectile.cs",
-              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\DummyPlayerProjectile.cs",
-              "RelativeToolTip": "Assets\\MikeScripts\\Player\\DummyPlayerProjectile.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAcAAAAFAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-03T03:07:55.727Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "MouseLookAndMove.cs",
               "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\MouseLookAndMove.cs",
               "RelativeDocumentMoniker": "Assets\\MikeScripts\\Player\\MouseLookAndMove.cs",
               "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\MouseLookAndMove.cs",
               "RelativeToolTip": "Assets\\MikeScripts\\Player\\MouseLookAndMove.cs",
-              "ViewState": "AQIAAAgAAAAAAAAAAAAQwCgAAABFAAAA",
+              "ViewState": "AQIAACgAAAAAAAAAAAAAAFUAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-02T01:56:32.737Z"
+              "WhenOpened": "2025-02-02T01:56:32.737Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 10,
               "Title": "EnemySpawner.cs",
               "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Enemy\\EnemySpawner.cs",
               "RelativeDocumentMoniker": "Assets\\MikeScripts\\Enemy\\EnemySpawner.cs",
@@ -108,44 +218,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "EnemyProjectile.cs",
-              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Enemy\\EnemyProjectile.cs",
-              "RelativeDocumentMoniker": "Assets\\MikeScripts\\Enemy\\EnemyProjectile.cs",
-              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Enemy\\EnemyProjectile.cs",
-              "RelativeToolTip": "Assets\\MikeScripts\\Enemy\\EnemyProjectile.cs",
-              "ViewState": "AQIAAA0AAAAAAAAAAAAgwCQAAABjAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-02T01:43:07.99Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "EnemyBubble.cs",
-              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Enemy\\EnemyBubble.cs",
-              "RelativeDocumentMoniker": "Assets\\MikeScripts\\Enemy\\EnemyBubble.cs",
-              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Enemy\\EnemyBubble.cs",
-              "RelativeToolTip": "Assets\\MikeScripts\\Enemy\\EnemyBubble.cs",
-              "ViewState": "AQIAAEcAAAAAAAAAAAAIwEsAAABlAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-02T01:43:06.826Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 7,
               "Title": "Player.cs",
               "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\Player.cs",
               "RelativeDocumentMoniker": "Assets\\MikeScripts\\Player\\Player.cs",
               "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\Player.cs",
               "RelativeToolTip": "Assets\\MikeScripts\\Player\\Player.cs",
-              "ViewState": "AQIAAIoAAAAAAAAAAAAkwJQAAAAAAAAA",
+              "ViewState": "AQIAAGYAAAAAAAAAAAAmwJQAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-02-02T01:45:14.101Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 14,
               "Title": "StaminaBar.cs",
               "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\ProgressBars\\StaminaBar.cs",
               "RelativeDocumentMoniker": "Assets\\MikeScripts\\ProgressBars\\StaminaBar.cs",
@@ -157,7 +243,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 12,
               "Title": "PlayerProjectile.cs",
               "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\PlayerProjectile.cs",
               "RelativeDocumentMoniker": "Assets\\MikeScripts\\Player\\PlayerProjectile.cs",
@@ -165,12 +251,11 @@
               "RelativeToolTip": "Assets\\MikeScripts\\Player\\PlayerProjectile.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-02T01:40:35.208Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-02-02T01:40:35.208Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 13,
               "Title": "ProgressBarManager.cs",
               "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\ProgressBars\\ProgressBarManager.cs",
               "RelativeDocumentMoniker": "Assets\\MikeScripts\\ProgressBars\\ProgressBarManager.cs",
@@ -182,7 +267,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 15,
               "Title": "PlayerManager.cs",
               "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\GlobalGameJam25\\Assets\\MikeScripts\\Player\\PlayerManager.cs",
               "RelativeDocumentMoniker": "Assets\\MikeScripts\\Player\\PlayerManager.cs",

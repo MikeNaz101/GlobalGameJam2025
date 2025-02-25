@@ -146,7 +146,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1008702686815894688}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.17148325, y: 0.0000000071033206, z: -0.0000000012364157, w: 0.98518705}
+  m_LocalRotation: {x: 0.17148325, y: -0, z: -0, w: 0.98518705}
   m_LocalPosition: {x: 0, y: 3.5900002, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -205,11 +205,11 @@ GameObject:
   - component: {fileID: 7857398673879363350}
   - component: {fileID: 2981537281595090051}
   - component: {fileID: 8035038640235261739}
+  - component: {fileID: 866071114804737417}
   - component: {fileID: 5651398936488166161}
   - component: {fileID: 1374008068171115440}
   - component: {fileID: 2190287204476014412}
   - component: {fileID: 589144313248318070}
-  - component: {fileID: 866071114804737417}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -233,6 +233,7 @@ Transform:
   - {fileID: 7335547498233184104}
   - {fileID: 1262399931295126955}
   - {fileID: 1197767527498041069}
+  - {fileID: 9184776978381332160}
   - {fileID: 7279541352019418828}
   m_Father: {fileID: 7574001101456263496}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -289,6 +290,54 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &866071114804737417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1257317970713162194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd683ccfc2d9ab44dbf07c7173e0bd47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 100
+  healthRecoveryRate: 2
+  maxMana: 100
+  manaCost: 10
+  currentMana: 0
+  manaRecoveryRate: 5
+  maxStamina: 100
+  currentStamina: 0
+  staminaRecoveryRate: 10
+  maxSpeed: 10
+  currentSpeed: 5
+  projectilePrefab: {fileID: 5535924560927195969, guid: b362a71fd0839eb4bb8378e0960a8ed6, type: 3}
+  shellPrefab: {fileID: 5535924560927195969, guid: e60666857a9c0e14bbbbfc6a24c1418c, type: 3}
+  rWingPrefab: {fileID: 3219426992458083526, guid: 637779f12e6aefe4bb857f0ca2f209e2, type: 3}
+  lWingPrefab: {fileID: 3219426992458083526, guid: 6229fafd5a7781c478a9952798017c60, type: 3}
+  firePoint: {fileID: 7335547498233184104}
+  lWingPoint: {fileID: 1262399931295126955}
+  rWingPoint: {fileID: 1197767527498041069}
+  orbitRadius: 2
+  orbitSpeed: 50
+  maxShells: 10
+  currentShells: 0
+  orbitingShells: []
+  default_speed: 100
+  isSneaking: 0
+  movement: {x: 0, y: 0}
+  controller: {fileID: 0}
+  groundCheck: {fileID: 9184776978381332160}
+  groundCheckRadius: 0.2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  jumpForce: 50
+  verticalVelocity: 0
+  gravity: -9.81
 --- !u!136 &5651398936488166161
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -304,7 +353,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -375,53 +424,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &866071114804737417
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1257317970713162194}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd683ccfc2d9ab44dbf07c7173e0bd47, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 100
-  currentHealth: 100
-  healthRecoveryRate: 2
-  maxMana: 100
-  manaCost: 10
-  currentMana: 0
-  manaRecoveryRate: 5
-  maxStamina: 100
-  currentStamina: 0
-  staminaRecoveryRate: 10
-  maxSpeed: 10
-  currentSpeed: 5
-  projectilePrefab: {fileID: 5535924560927195969, guid: b362a71fd0839eb4bb8378e0960a8ed6, type: 3}
-  shellPrefab: {fileID: 5535924560927195969, guid: e60666857a9c0e14bbbbfc6a24c1418c, type: 3}
-  rWingPrefab: {fileID: 3219426992458083526, guid: 637779f12e6aefe4bb857f0ca2f209e2, type: 3}
-  lWingPrefab: {fileID: 3219426992458083526, guid: 6229fafd5a7781c478a9952798017c60, type: 3}
-  firePoint: {fileID: 7335547498233184104}
-  lWingPoint: {fileID: 1262399931295126955}
-  rWingPoint: {fileID: 1197767527498041069}
-  orbitRadius: 2
-  orbitSpeed: 50
-  maxShells: 10
-  currentShells: 0
-  orbitingShells: []
-  default_speed: 100
-  isSneaking: 0
-  movement: {x: 0, y: 0}
-  controller: {fileID: 0}
-  groundCheck: {fileID: 7857398673879363350}
-  groundCheckRadius: 0.2
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  jumpForce: 10
-  gravityScale: 1
 --- !u!1 &1909221523740618788
 GameObject:
   m_ObjectHideFlags: 0
@@ -811,6 +813,7 @@ GameObject:
   - component: {fileID: 4968164413231381485}
   - component: {fileID: 6471429270704423464}
   - component: {fileID: 2484720859893853188}
+  - component: {fileID: 7013390690750403283}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -826,7 +829,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3260947380370268792}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0.000000014680431, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -971,6 +974,20 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7013390690750403283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3260947380370268792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61fb6b76e5e176e40b793e069091245f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mouseSensitivity: 100
+  playerBody: {fileID: 7857398673879363350}
 --- !u!1 &3273635208848082329
 GameObject:
   m_ObjectHideFlags: 0
@@ -1060,19 +1077,7 @@ MonoBehaviour:
   m_Value: 100
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5689398456803188605}
-        m_TargetAssemblyTypeName: UnityEngine.UI.Slider, UnityEngine.UI
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &5689398456803188605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1236,6 +1241,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &5130365277010406439
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9184776978381332160}
+  m_Layer: 0
+  m_Name: GroundCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9184776978381332160
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5130365277010406439}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1.02, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7857398673879363350}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6742343455602328897
 GameObject:
   m_ObjectHideFlags: 0
