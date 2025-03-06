@@ -18,11 +18,16 @@ public class PlayerAttackingState : PlayerBaseState
             UseMana(player.manaCost, player);
         }
 
-        // If no more shells, exit attack state
-        if (player.currentShells <= 0)
+        // Transition back if no movement or out of shells
+        if (player.movement.magnitude < 0.1 && player.currentShells <= 0)
         {
             player.SwitchState(player.idleState);
         }
+        else if (player.currentShells <= 0)
+        {
+            player.SwitchState(player.walkState);
+        }
+        //else
     }
 
     public override void UpdateState(PlayerStateManager player)
@@ -36,14 +41,18 @@ public class PlayerAttackingState : PlayerBaseState
                 FireProjectile(player);
                 UseMana(player.manaCost, player);
             }
-    }
+        }
 
-    // Transition back if no movement or out of shells
-    if (player.movement.magnitude < 0.1 || player.currentShells <= 0)
-    {
-        player.SwitchState(player.idleState);
+        // Transition back if no movement or out of shells
+        if (player.movement.magnitude < 0.1 || player.currentShells <= 0)
+        {
+            player.SwitchState(player.idleState);
+        }
+        else
+        {
+
+        }
     }
-}
     void FireProjectile(PlayerStateManager player)
     {
         // Instantiate the projectile at the firePoint

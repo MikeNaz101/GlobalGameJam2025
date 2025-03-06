@@ -5,6 +5,7 @@ public class PlayerWalkingState : PlayerBaseState
     public override void EnterState(PlayerStateManager player)
     {
         Debug.Log("im WALKING!!!!!!!!!");
+        player.MovePlayer(player.default_speed);
     }
 
     public override void UpdateState(PlayerStateManager player)

@@ -69,7 +69,7 @@ public class PlayerFlyingState : PlayerBaseState
         Debug.Log("Flapped wings!");
     }
 
-    public void ExitState(PlayerStateManager player)
+    public override void ExitState(PlayerStateManager player)
     {
         // Clean up
         GameObject.Destroy(rWing); // Remove wings from the player

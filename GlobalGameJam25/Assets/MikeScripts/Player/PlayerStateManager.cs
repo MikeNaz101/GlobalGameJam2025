@@ -47,8 +47,8 @@ public class PlayerStateManager : MonoBehaviour
     [HideInInspector]
     public PlayerSneakState sneakState = new PlayerSneakState();
     [HideInInspector]
-    public PlayerAttackingState attackState = new PlayerAttackingState();
-    [HideInInspector]
+    //public PlayerAttackingState attackState = new PlayerAttackingState();
+    //[HideInInspector]
     public PlayerHitState hitState = new PlayerHitState();
     [HideInInspector]
     public PlayerDeathState deathState = new PlayerDeathState();
@@ -63,7 +63,7 @@ public class PlayerStateManager : MonoBehaviour
     public LayerMask groundLayer; // Set this to the layer(s) you consider as ground
     private bool isGrounded; // To track if the player is on the ground
     private bool hasJumped = false; // Track if the player has jumped
-    public float jumpForce = 40f; // Adjustable jump force
+    public float jumpForce = 20f; // Adjustable jump force
     public float verticalVelocity = 0f; // Tracks falling speed
     public float gravity = -9.81f;
 
@@ -131,11 +131,13 @@ public class PlayerStateManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         // Ground check using Sphere Cast
         isGrounded = IsGrounded(); //Physics.SphereCast(groundCheck.position, groundCheckRadius, Vector3.down, out RaycastHit hitInfo, groundCheckRadius + 0.1f, groundLayer);
         // Check for jump input
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            print("IsGrounded = "+ IsGrounded());
             if (isGrounded)
             {
                 // First jump
@@ -203,11 +205,34 @@ public class PlayerStateManager : MonoBehaviour
     }
     void OnAttack()
     {
-        if (currentState != attackState) // Prevent spamming attacks
+        if (Input.GetMouseButtonDown((int)MouseButton.LeftMouse) && currentMana > manaCost)
         {
-            SwitchState(attackState);
-            Debug.Log("Player Attacked!");
+            if (currentShells > 0)
+            {
+                orbitingShells[currentShells - 1].GetComponent<MeshRenderer>().enabled = false;
+                currentShells -= 1;
+                FireProjectile(this);
+                UseMana(manaCost, this);
+            }
         }
+        /*if (currentState != attackState) // Prevent spamming attacks
+        {
+            //SwitchState(attackState);
+            Debug.Log("Player Attacked!");
+        }*/
+    }
+    void FireProjectile(PlayerStateManager player)
+    {
+        // Instantiate the projectile at the firePoint
+        if (player.projectilePrefab != null && player.firePoint != null)
+        {
+            GameObject projectile = GameObject.Instantiate(player.projectilePrefab, player.firePoint.position, player.firePoint.rotation);
+        }
+    }
+    public void UseMana(int mCost, PlayerStateManager player)
+    {
+        player.currentMana -= mCost;
+        player.currentMana = Mathf.Clamp(player.currentMana, 0, player.maxMana);
     }
     public void TakeDamage(int damage)
     {
@@ -273,6 +298,7 @@ public class PlayerStateManager : MonoBehaviour
 
     public void SwitchState(PlayerBaseState newState)
     {
+        currentState?.ExitState(this); // Calls ExitState only if it exists
         currentState = newState;
         currentState.EnterState(this);
     }
