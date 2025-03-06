@@ -1,22 +1,22 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\sethk\\Documents\\GitHub\\GlobalGameJam2024\\Prototype4 (INF496)\\",
+  "WorkspaceRootPath": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\Prototype4 (INF496)\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|c:\\users\\sethk\\documents\\github\\globalgamejam2024\\prototype4 (inf496)\\assets\\scripts\\enemy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\enemy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|c:\\users\\sethk\\documents\\github\\globalgamejam2024\\prototype4 (inf496)\\assets\\scripts\\spawnmaneger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\spawnmaneger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|C:\\Users\\sethk\\Documents\\GitHub\\GlobalGameJam2024\\Prototype4 (INF496)\\assets\\scripts\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\globalgamejam2024\\prototype4 (inf496)\\assets\\scripts\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|C:\\Users\\sethk\\Documents\\GitHub\\GlobalGameJam2024\\Prototype4 (INF496)\\assets\\rotatecamera.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|solutionrelative:assets\\rotatecamera.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\globalgamejam2024\\prototype4 (inf496)\\assets\\scripts\\spawnmaneger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\spawnmaneger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\globalgamejam2024\\prototype4 (inf496)\\assets\\scripts\\enemy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\enemy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\globalgamejam2024\\prototype4 (inf496)\\assets\\scripts\\rotatecamera.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{69D518F0-4B1F-8C92-FF95-1336678E9143}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\rotatecamera.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,57 +26,59 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "SpawnManeger.cs",
-              "DocumentMoniker": "C:\\Users\\sethk\\Documents\\GitHub\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\SpawnManeger.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\SpawnManeger.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\SpawnManeger.cs",
-              "ToolTip": "C:\\Users\\sethk\\Documents\\GitHub\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\SpawnManeger.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\SpawnManeger.cs",
               "RelativeToolTip": "Assets\\Scripts\\SpawnManeger.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAAwA0AAAAAAAAAAAAAAA==",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-06T05:06:03.257Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Enemy.cs",
-              "DocumentMoniker": "C:\\Users\\sethk\\Documents\\GitHub\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\Enemy.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\Enemy.cs",
-              "ToolTip": "C:\\Users\\sethk\\Documents\\GitHub\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\Enemy.cs",
-              "RelativeToolTip": "Assets\\Scripts\\Enemy.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-06T05:00:14.132Z",
+              "WhenOpened": "2025-03-06T06:21:02.554Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "PlayerController.cs",
-              "DocumentMoniker": "C:\\Users\\sethk\\Documents\\GitHub\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\PlayerController.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerController.cs",
-              "ToolTip": "C:\\Users\\sethk\\Documents\\GitHub\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\PlayerController.cs",
-              "RelativeToolTip": "Assets\\Scripts\\PlayerController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAARAAAAAAAAAA==",
+              "Title": "Enemy.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\Enemy.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Enemy.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\Enemy.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Enemy.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-06T04:54:16.35Z"
+              "WhenOpened": "2025-03-06T06:20:39.313Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PlayerController.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\PlayerController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerController.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\PlayerController.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PlayerController.cs",
+              "ViewState": "AQIAAAgAAAAAAAAAAAAQwB0AAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-06T06:19:38.587Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
               "Title": "RotateCamera.cs",
-              "DocumentMoniker": "C:\\Users\\sethk\\Documents\\GitHub\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\RotateCamera.cs",
-              "RelativeDocumentMoniker": "Assets\\RotateCamera.cs",
-              "ToolTip": "C:\\Users\\sethk\\Documents\\GitHub\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\RotateCamera.cs",
-              "RelativeToolTip": "Assets\\RotateCamera.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAABWAAAAAAAAAA==",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\RotateCamera.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\RotateCamera.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GlobalGameJam2024\\Prototype4 (INF496)\\Assets\\Scripts\\RotateCamera.cs",
+              "RelativeToolTip": "Assets\\Scripts\\RotateCamera.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-06T04:52:25.312Z"
+              "WhenOpened": "2025-03-06T06:18:12.106Z",
+              "EditorCaption": ""
             }
           ]
         }
