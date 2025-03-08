@@ -9,19 +9,15 @@ public class PlayerStateManager : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
     public int healthRecoveryRate = 2; // Health points per second
-
     public int maxMana = 100;
     public int manaCost = 10;
     public int currentMana;
     public int manaRecoveryRate = 5; // Mana points per second
-
     public int maxStamina = 100;
     public int currentStamina;
     public int staminaRecoveryRate = 10; // Stamina points per second
-
     public int maxSpeed = 10;
     public int currentSpeed = 5;
-
     private Vector3 position;
     //public ProgressBar healthBar;
     public GameObject projectilePrefab;  // projectile prefab here
@@ -65,7 +61,7 @@ public class PlayerStateManager : MonoBehaviour
     private bool hasJumped = false; // Track if the player has jumped
     public float jumpForce = 20f; // Adjustable jump force
     public float verticalVelocity = 0f; // Tracks falling speed
-    public float gravity = -9.81f;
+    public float gravity = -4.81f;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -81,7 +77,6 @@ public class PlayerStateManager : MonoBehaviour
         currentShells = maxShells;
         SpawnSpiritBubbleShells();
         Debug.Log("Your currentHealth starts as: " + currentHealth);
-        //Debug.Log("Your currentHealth starts as: " + currentHealth.ToString());
 
         // Start recovery for all stats
         StartCoroutine(RecoverHealthOverTime());
@@ -133,11 +128,11 @@ public class PlayerStateManager : MonoBehaviour
     {
 
         // Ground check using Sphere Cast
-        isGrounded = IsGrounded(); //Physics.SphereCast(groundCheck.position, groundCheckRadius, Vector3.down, out RaycastHit hitInfo, groundCheckRadius + 0.1f, groundLayer);
+        isGrounded = controller.isGrounded;
         // Check for jump input
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            print("IsGrounded = "+ IsGrounded());
+            print("IsGrounded = "+ controller.isGrounded);
             if (isGrounded)
             {
                 // First jump
@@ -146,11 +141,11 @@ public class PlayerStateManager : MonoBehaviour
             else if (!hasJumped)
             {
                 // Second jump (double jump) - enter flying state
-                hasJumped = true; // Mark that the player has jumped once
-                SwitchState(flyingState); // or SwitchState(flyingState);
+                hasJumped = true;
+                SwitchState(flyingState);
             }
         }
-        isGrounded = IsGrounded(); // Check if the player is on the ground
+        isGrounded = controller.isGrounded;
 
         if (isGrounded && verticalVelocity < 0)
         {
@@ -215,11 +210,6 @@ public class PlayerStateManager : MonoBehaviour
                 UseMana(manaCost, this);
             }
         }
-        /*if (currentState != attackState) // Prevent spamming attacks
-        {
-            //SwitchState(attackState);
-            Debug.Log("Player Attacked!");
-        }*/
     }
     void FireProjectile(PlayerStateManager player)
     {
@@ -275,26 +265,6 @@ public class PlayerStateManager : MonoBehaviour
             }
         }
     }
-
-    /*public bool CanDoubleJump()
-    {
-        if (!isGrounded) // Implement your ground check logic
-        {
-            if (!canDoubleJump)
-            {
-                canDoubleJump = true; // Allow one double jump
-                return true;
-            }
-        }
-        return false;
-    }*/
-    public bool IsGrounded()
-    {
-        // Implement your ground detection logic, e.g., using raycasting or collider checks
-        return Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer);
-    }
-
-
 
     public void SwitchState(PlayerBaseState newState)
     {

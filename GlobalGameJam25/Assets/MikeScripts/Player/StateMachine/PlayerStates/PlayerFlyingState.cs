@@ -27,7 +27,7 @@ public class PlayerFlyingState : PlayerBaseState
         FlyPlayer(player);
 
         // Check if player lands
-        if (player.IsGrounded())
+        if (player.controller.isGrounded)
         {
             player.SwitchState(player.idleState); // Return to idle state when landing
         }
@@ -36,7 +36,7 @@ public class PlayerFlyingState : PlayerBaseState
     private void FlyPlayer(PlayerStateManager player)
     {
         // Apply gravity when airborne
-        if (!player.IsGrounded())
+        if (!player.controller.isGrounded)
         {
             player.verticalVelocity += player.gravity * Time.deltaTime;
         }

@@ -877,6 +877,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 866071114804737417, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: gravity
+      value: -9
+      objectReference: {fileID: 0}
+    - target: {fileID: 866071114804737417, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: jumpForce
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 866071114804737417, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: default_speed
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 1909221523740618788, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
       propertyPath: m_Name
       value: PlayerPrefab
