@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class EnemyBubble : MonoBehaviour
 {
+    private bool _isFrozen = false;
+    private float _freezeEndTime = 0f;
     public float detectionRadius = 5f;  // Range to detect player
     public LayerMask playerLayer;  // Set this to a layer that only includes the player
     public int size = 20;
@@ -33,6 +35,21 @@ public class EnemyBubble : MonoBehaviour
     void Update()
     {
         if (player == null) return; // Exit if player not found
+        if (_isFrozen)
+        {
+            if (Time.time >= _freezeEndTime)
+            {
+                _isFrozen = false;
+                // Optionally, revert material/color change.
+                GetComponent<Renderer>().material.color = Color.white; // Example: back to white.
+            }
+            else
+            {
+                GetComponent<Renderer>().material.color = Color.white; // Example: back to white.
+                // Enemy is frozen - prevent movement, attacking, etc.  You'd likely disable AI scripts here.
+                return; // Early return to prevent any other actions.
+            }
+        }
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
 
@@ -93,6 +110,15 @@ public class EnemyBubble : MonoBehaviour
             projectileScript.enemyBubble = this; // Pass itself as a reference
         }
     }
+
+    public void Freeze(float duration)
+    {
+        _isFrozen = true;
+        _freezeEndTime = Time.time + duration;
+        // Optionally, change the enemy's material/color to indicate they are frozen.
+        GetComponent<Renderer>().material.color = Color.cyan; // Example: turn cyan when frozen.
+    }
+
 
     public void EnemyTakeDamage(int damage)
     {

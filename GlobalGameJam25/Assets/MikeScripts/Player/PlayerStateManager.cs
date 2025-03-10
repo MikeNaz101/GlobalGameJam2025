@@ -6,6 +6,10 @@ using System.Collections.Generic;
 
 public class PlayerStateManager : MonoBehaviour
 {
+    // Input System fields
+    private PlayerInput playerInput; // Reference to the PlayerInput component
+    private InputAction rightClickAction;
+
     public int maxHealth = 100;
     public int currentHealth;
     public int healthRecoveryRate = 2; // Health points per second
@@ -16,8 +20,8 @@ public class PlayerStateManager : MonoBehaviour
     public int maxStamina = 100;
     public int currentStamina;
     public int staminaRecoveryRate = 10; // Stamina points per second
-    public int maxSpeed = 10;
-    public int currentSpeed = 5;
+    public int maxSpeed = 15;
+    public int currentSpeed = 10;
     private Vector3 position;
     //public ProgressBar healthBar;
     public GameObject projectilePrefab;  // projectile prefab here
@@ -28,13 +32,16 @@ public class PlayerStateManager : MonoBehaviour
     public Transform lWingPoint;  // Point from which the Left Wing will spawn
     public Transform rWingPoint;  // Point from which the Right Wing will spawn
 
+    public float bulletTypeChangeCooldown = 0.1f; // Minimum time between bullet type changes
+    private float lastBulletTypeChangeTime = -1000f;
     public float orbitRadius = 2f;       // Distance from player
     public float orbitSpeed = 50f;       // Speed of rotation
     public int maxShells;            // Max floating shells
     public int currentShells;
     public List<GameObject> orbitingShells = new List<GameObject>();
+    public BulletStateManager bulletManager;
     public PlayerBaseState currentState;
-    public float default_speed = 100;
+    //public float default_speed = 15;
     public bool isSneaking = false;
     [HideInInspector]
     public PlayerIdleState idleState = new PlayerIdleState();
@@ -57,7 +64,7 @@ public class PlayerStateManager : MonoBehaviour
     public Transform groundCheck; // Assign this in the inspector
     public float groundCheckRadius = 0.2f; // Radius of the ground check
     public LayerMask groundLayer; // Set this to the layer(s) you consider as ground
-    private bool isGrounded; // To track if the player is on the ground
+    public bool isGrounded; // To track if the player is on the ground
     private bool hasJumped = false; // Track if the player has jumped
     public float jumpForce = 20f; // Adjustable jump force
     public float verticalVelocity = 0f; // Tracks falling speed
@@ -76,6 +83,17 @@ public class PlayerStateManager : MonoBehaviour
         maxShells = maxMana / manaCost;
         currentShells = maxShells;
         SpawnSpiritBubbleShells();
+        // Subscribe to the BulletTypeChanged event
+        if (bulletManager != null)
+        {
+            bulletManager.OnBulletTypeChanged.AddListener(UpdateShellColors);
+            // Initial color update
+            UpdateShellColors();
+        }
+        else
+        {
+            Debug.LogError("BulletStateManager.Instance is null!  Make sure the BulletStateManager is in the scene and initializes before PlayerStateManager.");
+        }
         Debug.Log("Your currentHealth starts as: " + currentHealth);
 
         // Start recovery for all stats
@@ -123,13 +141,40 @@ public class PlayerStateManager : MonoBehaviour
         }
     }
 
+    // --- INPUT SYSTEM EVENT HANDLERS ---
+
+    private void OnRightClick(InputAction.CallbackContext context)
+    {
+        // Find all active teleportation projectiles.
+        TeleportBulletState[] projectiles = FindObjectsOfType<TeleportBulletState>();
+
+        foreach (TeleportBulletState proj in projectiles)
+        {
+            proj.Teleport(); // Call Teleport() on *each* one.
+        }
+    }
+
+    // IMPORTANT: Enable and disable the action to avoid errors.
+    private void OnEnable()
+    {
+        if (rightClickAction != null)
+            rightClickAction.Enable();
+    }
+
+    private void OnDisable()
+    {
+        if (rightClickAction != null)
+            rightClickAction.Disable();
+    }
+
+
     // Update is called once per frame
     void Update()
     {
-
         // Ground check using Sphere Cast
         isGrounded = controller.isGrounded;
         // Check for jump input
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             print("IsGrounded = "+ controller.isGrounded);
@@ -154,7 +199,7 @@ public class PlayerStateManager : MonoBehaviour
 
         // Apply gravity when airborne
         verticalVelocity += gravity * Time.deltaTime;
-
+        /*
         // Move the character
         // Convert movement from 2D (input) to 3D
         Vector3 moveDirection = new Vector3(movement.x, 0, movement.y);
@@ -162,6 +207,7 @@ public class PlayerStateManager : MonoBehaviour
         // Move the character with gravity
         Vector3 finalMovement = (moveDirection * currentSpeed) + new Vector3(0, verticalVelocity, 0);
         controller.Move(finalMovement * Time.deltaTime);
+        */
         currentState.UpdateState(this);
         UpdateShellPositions();
     }
@@ -180,10 +226,12 @@ public class PlayerStateManager : MonoBehaviour
     {
         float moveX = movement.x;
         float moveY = movement.y;
+        verticalVelocity += gravity * Time.deltaTime;
 
         Vector3 moveDirection = (transform.right * moveX) + (transform.forward * moveY);
+        Vector3 finalMovement = (moveDirection * currentSpeed) + new Vector3(0, verticalVelocity, 0);
         //Vector3 actual_movement = new Vector3(moveX, 0, moveY);
-        controller.Move(moveDirection.normalized * speed*Time.deltaTime);
+        controller.Move(finalMovement.normalized * speed*Time.deltaTime);
     }
     public void Jump()
     {
@@ -198,27 +246,7 @@ public class PlayerStateManager : MonoBehaviour
 
         Debug.Log("Player Jumped!");
     }
-    void OnAttack()
-    {
-        if (Input.GetMouseButtonDown((int)MouseButton.LeftMouse) && currentMana > manaCost)
-        {
-            if (currentShells > 0)
-            {
-                orbitingShells[currentShells - 1].GetComponent<MeshRenderer>().enabled = false;
-                currentShells -= 1;
-                FireProjectile(this);
-                UseMana(manaCost, this);
-            }
-        }
-    }
-    void FireProjectile(PlayerStateManager player)
-    {
-        // Instantiate the projectile at the firePoint
-        if (player.projectilePrefab != null && player.firePoint != null)
-        {
-            GameObject projectile = GameObject.Instantiate(player.projectilePrefab, player.firePoint.position, player.firePoint.rotation);
-        }
-    }
+
     public void UseMana(int mCost, PlayerStateManager player)
     {
         player.currentMana -= mCost;
@@ -265,11 +293,34 @@ public class PlayerStateManager : MonoBehaviour
             }
         }
     }
+    // This method is called whenever the BulletStateManager's OnBulletTypeChanged event is fired.
+    void UpdateShellColors()
+    {
+        if (BulletStateManager.Instance == null) return; // Safety check
+
+        Color newColor = BulletStateManager.Instance.GetCurrentBulletColor();
+        foreach (GameObject shell in orbitingShells)
+        {
+            if (shell != null)
+            {
+                shell.GetComponent<ShellColorController>().SetColor(newColor);
+            }
+        }
+    }
 
     public void SwitchState(PlayerBaseState newState)
     {
         currentState?.ExitState(this); // Calls ExitState only if it exists
         currentState = newState;
         currentState.EnterState(this);
+    }
+
+    private void OnDestroy()
+    {
+        // Unsubscribe from the event when this object is destroyed to prevent memory leaks.
+        if (BulletStateManager.Instance != null)
+        {
+            BulletStateManager.Instance.OnBulletTypeChanged.RemoveListener(UpdateShellColors);
+        }
     }
 }

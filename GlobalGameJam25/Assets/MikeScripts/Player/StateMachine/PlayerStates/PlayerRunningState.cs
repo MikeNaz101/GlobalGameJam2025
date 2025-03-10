@@ -10,7 +10,7 @@ public class PlayerRunningState : PlayerBaseState
     public override void UpdateState(PlayerStateManager player)
     {
         // What are we doing in this state
-        player.MovePlayer(player.default_speed);
+        player.MovePlayer(player.currentSpeed*2);
 
         if (player.movement.magnitude < 0.1)
         {

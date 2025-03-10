@@ -9,7 +9,7 @@ public class PlayerDeathState : PlayerBaseState
     public override void UpdateState(PlayerStateManager player)
     {
         // What are we doing in this state
-        player.MovePlayer(player.default_speed);
+        //player.MovePlayer(player.default_speed);
 
         if (player.movement.magnitude < 0.1)
         {
