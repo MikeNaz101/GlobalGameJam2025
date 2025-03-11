@@ -1,0 +1,377 @@
+fileFormatVersion: 2
+guid: f4dc1917ad6428d46984d545861cde13
+ModelImporter:
+  serializedVersion: 22200
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: daffodil-flower-white
+    second: {fileID: 2100000, guid: 56998f0de572f9945b793de906157ea0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: daffodil-flower-yellow
+    second: {fileID: 2100000, guid: 66f4ec76b84f54a4f8c9da91d0eca192, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: daffodil-stem-01-diffuse
+    second: {fileID: 2100000, guid: 6f70618f39c782a4e964a5fa2bddc40f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: daffodil-stem-02-diffuse
+    second: {fileID: 2100000, guid: a3f03f03b578e9b4f9899843d041301e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: daisy-flower-diffuse
+    second: {fileID: 2100000, guid: 00a19c6436b19454485ae8e37f35fbb0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: daisy-stem-diffuse
+    second: {fileID: 2100000, guid: 39d6e12c6d0fc2b4b8901df558ed8195, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: daisy-stem-diffuse-02
+    second: {fileID: 2100000, guid: dd4a56335a20c88459924f7c14982cf8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: grass-01
+    second: {fileID: 2100000, guid: f9f24e13352a6174bb42774ff6da82e7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: grass-stylized-02
+    second: {fileID: 2100000, guid: 78035731883aa384aacbcb1e34bb7549, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: plant-ground-brown-02
+    second: {fileID: 2100000, guid: c18360dd62b7e9348a597fd5af09ab1b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: plant-ground-green-01
+    second: {fileID: 2100000, guid: 8905c5a633b0ebe4583513e22c2d8b6d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: tree-04
+    second: {fileID: 2100000, guid: d3956dd20c3488d43aa1ba07f2409dd1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: tree-bark-02
+    second: {fileID: 2100000, guid: 7dc362c2274ecbc4988cf1f4ba6ce896, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: tree-bark-03
+    second: {fileID: 2100000, guid: f5de1f5c4749b22459531faaee1bf8a0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: tree-branch-stylized-diffuse
+    second: {fileID: 2100000, guid: 0fcea534c12c1d3448d9e12e52ecfa7a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: tree-branches-autumn-mix-diffuse
+    second: {fileID: 2100000, guid: 8c7916cbd1f9cb0428e86e4d12c54ca5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: tree-branches-autumn-yellow-mix-diffuse
+    second: {fileID: 2100000, guid: c9c281147704a7749a84747ad201bcbe, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: tree-branches-dry-diffuse
+    second: {fileID: 2100000, guid: 366576195faecbb4a90739618387da32, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: tree-branches-mix-diffuse
+    second: {fileID: 2100000, guid: 9b8d5978261644147826808d8f2206c0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: tree-wood
+    second: {fileID: 2100000, guid: 51c83118207bbfa4dbcc226009f3900f, type: 2}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: brown-diffuse
+    second: {fileID: 2800000, guid: f55341da47fb9974496eb8e87f126a5c, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: daffodil-flower-white
+    second: {fileID: 2800000, guid: f97d03e21f13d7e4081e6f21ff04b161, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: daffodil-flower-yellow
+    second: {fileID: 2800000, guid: cd416ca82c18a7745a5b9ea03bbb465c, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: daffodil-stem-01-diffuse
+    second: {fileID: 2800000, guid: e38e063d02e2989479b9c2247c4f54c4, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: daffodil-stem-01-normal
+    second: {fileID: 2800000, guid: 62dbdaf71cdae6345821696b493ceb1d, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: daffodil-stem-02-diffuse
+    second: {fileID: 2800000, guid: 40de68b3f6097c745aa78eb68b05e575, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: daisy-flower-diffuse
+    second: {fileID: 2800000, guid: 8ee4e5081c9672946a5c1156613239da, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: daisy-stem-diffuse
+    second: {fileID: 2800000, guid: c444ef1ebbcdf224ba5c02222b5151b2, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: daisy-stem-diffuse-02
+    second: {fileID: 2800000, guid: 51102e28d5fc08e4685d14e6ab9a6898, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: daisy-stem-normal
+    second: {fileID: 2800000, guid: f7ab9f2083f077c4ba5d0bb1365b01b1, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: daisy-stem-normal-02
+    second: {fileID: 2800000, guid: b2b5d8ecc168b674dac16a6ef798867f, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: diffuse
+    second: {fileID: 2800000, guid: 56d2d8b4ee01a6746af75a495f58485b, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: grass-cartoon-diffuse-02
+    second: {fileID: 2800000, guid: 406b3bbe3c1fd174ebb0643a08408236, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: grass-cartoon-normal-02
+    second: {fileID: 2800000, guid: 73492e54ad74f194587e7343531e718b, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: grass-ground-01-diffuse
+    second: {fileID: 2800000, guid: e34c9239351b3c0469cbd7307f83c008, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: grass-ground-01-normal
+    second: {fileID: 2800000, guid: 5a898a71588b9db4aae4860f76d9f76c, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: normal
+    second: {fileID: 2800000, guid: a82d7139cd1172b4f9e54d080e48191f, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-bark-04-texture-diffuse
+    second: {fileID: 2800000, guid: 292850fb01d71e943913f1a3eabf7268, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-bark-04-texture-normal
+    second: {fileID: 2800000, guid: 5076cae8af2bc694a9489c8468596832, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-bark-texture-03-diffuse
+    second: {fileID: 2800000, guid: f712d052fff32f14e8ede2103d56190d, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-bark-texture-03-normal
+    second: {fileID: 2800000, guid: 8236eb0a083221842aaa17ca55a88e81, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-bark-texture-dry-diffuse
+    second: {fileID: 2800000, guid: afb4389a8095d7444815ee8844a2d6af, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-bark-texture-dry-normal
+    second: {fileID: 2800000, guid: b1c8fb9ce683a3249b52706d4274c222, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-bark-trunk-diffuse
+    second: {fileID: 2800000, guid: 313b1d295685d6740b1196be719f68e8, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-bark-trunk-normal
+    second: {fileID: 2800000, guid: 75fb18a5b229dba4f8ce80547240d32d, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-branch-stylized-diffuse
+    second: {fileID: 2800000, guid: 01d7f12d82532994d968137eb423e3f5, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-branch-stylized-normal
+    second: {fileID: 2800000, guid: 1c4fb32cd076f9c469d10f2524e614d3, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-branches-autumn-mix-diffuse
+    second: {fileID: 2800000, guid: 07740ae4e9fc3034bbca1964ed79b457, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-branches-autumn-mix-normal
+    second: {fileID: 2800000, guid: 75c9cec12b0569f45b8f258abe9f03c1, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-branches-autumn-yellow-mix-diffuse
+    second: {fileID: 2800000, guid: 73ba6ace744bdb74ba80b82b14d9bc3f, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-branches-autumn-yellow-mix-normal
+    second: {fileID: 2800000, guid: e1885d6343f7ae44a88ebd2467088bb9, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-branches-dry-diffuse
+    second: {fileID: 2800000, guid: e25ca2a6efe8a2c4ba7eed567af9df4a, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-branches-mix-diffuse
+    second: {fileID: 2800000, guid: aafa611e7f466c44baa8af92b854c41a, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tree-branches-mix-normal
+    second: {fileID: 2800000, guid: 79edfc8cf53a5d74c9e08d9b235f4f50, type: 3}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

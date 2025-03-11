@@ -258,6 +258,7 @@ GameObject:
   - component: {fileID: 8965878364588421786}
   - component: {fileID: 7700973093407317718}
   - component: {fileID: 398414287492612374}
+  - component: {fileID: 5145371135310564459}
   m_Layer: 0
   m_Name: EnemyBubble
   m_TagString: Enemy
@@ -5212,6 +5213,28 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!95 &5145371135310564459
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7874923396403286280}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: fd7b24556442c6a4faccc0f1c965f14b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &7827146700553706799
 PrefabInstance:
   m_ObjectHideFlags: 0
