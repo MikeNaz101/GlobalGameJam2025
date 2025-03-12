@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class PlayerStateManager : MonoBehaviour
 {
@@ -41,6 +42,7 @@ public class PlayerStateManager : MonoBehaviour
     public List<GameObject> orbitingShells = new List<GameObject>();
     public BulletStateManager bulletManager;
     public PlayerBaseState currentState;
+    public CharacterController controller;
     //public float default_speed = 15;
     public bool isSneaking = false;
     [HideInInspector]
@@ -59,7 +61,7 @@ public class PlayerStateManager : MonoBehaviour
     public PlayerFlyingState flyingState = new PlayerFlyingState();
     public Vector2 movement;
     [HideInInspector]
-    public CharacterController controller;
+    
     private bool canDoubleJump = false;
     public Transform groundCheck; // Assign this in the inspector
     public float groundCheckRadius = 0.2f; // Radius of the ground check
@@ -71,7 +73,6 @@ public class PlayerStateManager : MonoBehaviour
     public float gravity = -4.81f;
 
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         isGrounded = true;
@@ -145,12 +146,20 @@ public class PlayerStateManager : MonoBehaviour
 
     private void OnRightClick(InputAction.CallbackContext context)
     {
-        // Find all active teleportation projectiles.
-        TeleportBulletState[] projectiles = FindObjectsOfType<TeleportBulletState>();
+        // Get the BulletStateManager instance.
+        BulletStateManager bulletManager = BulletStateManager.Instance;
 
-        foreach (TeleportBulletState proj in projectiles)
+        // Check if the BulletStateManager exists and the current bullet type is Teleport.
+        if (bulletManager != null && bulletManager.CurrentBulletType == BulletType.Type2)
         {
-            proj.Teleport(); // Call Teleport() on *each* one.
+            // Access the TeleportBulletState from the BulletStateManager.
+            TeleportBulletState teleportState = bulletManager.teleportBullet;
+
+            // Call the Teleport() function on the TeleportBulletState.
+            if (teleportState != null)
+            {
+                teleportState.Teleport();
+            }
         }
     }
 
@@ -263,6 +272,12 @@ public class PlayerStateManager : MonoBehaviour
         }
     }
 
+    public void Die()
+    {
+        Debug.Log("Player has perished! Transitioning to EndScene, like a fallen fruit!");
+        SceneManager.LoadScene("EndScene"); // And *sploosh* we're in the EndScene smoothie!
+    }
+
 
     // Makes the spirit bubbles orbit around player.
     void SpawnSpiritBubbleShells()
@@ -296,9 +311,10 @@ public class PlayerStateManager : MonoBehaviour
     // This method is called whenever the BulletStateManager's OnBulletTypeChanged event is fired.
     void UpdateShellColors()
     {
-        if (BulletStateManager.Instance == null) return; // Safety check
+        //bulletManager = BulletStateManager.Instance;
+        if (bulletManager == null) return; // Safety check
 
-        Color newColor = BulletStateManager.Instance.GetCurrentBulletColor();
+        Color newColor = bulletManager.GetCurrentBulletColor();
         foreach (GameObject shell in orbitingShells)
         {
             if (shell != null)

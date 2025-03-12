@@ -30,12 +30,13 @@ public class PlayerHitState : PlayerBaseState
         if (!knockbackApplied)
         {
             ApplyKnockback(player);
-            knockbackApplied = true;
+            //knockbackApplied = true;
         }
 
         // Check if the player is dead
         if (player.currentHealth <= 0)
         {
+            player.Die();
             player.SwitchState(player.deathState); // Transition to death state (if you have one)
         }
     }

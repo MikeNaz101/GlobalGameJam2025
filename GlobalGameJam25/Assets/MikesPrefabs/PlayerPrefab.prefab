@@ -541,8 +541,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1497107145123222382}
-  - component: {fileID: 2153936097896318442}
   - component: {fileID: 1647014433008874312}
+  - component: {fileID: 2153936097896318442}
   - component: {fileID: 3392016347494806393}
   - component: {fileID: 6132794304212841273}
   - component: {fileID: 7552419452380975823}
@@ -582,6 +582,14 @@ Transform:
   - {fileID: 7279541352019418828}
   m_Father: {fileID: 7574001101456263496}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!81 &1647014433008874312
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2273503798170520020}
+  m_Enabled: 1
 --- !u!143 &2153936097896318442
 CharacterController:
   m_ObjectHideFlags: 0
@@ -607,14 +615,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.77, z: 0}
---- !u!81 &1647014433008874312
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2273503798170520020}
-  m_Enabled: 1
 --- !u!114 &3392016347494806393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -683,9 +683,9 @@ MonoBehaviour:
   currentShells: 0
   orbitingShells: []
   bulletManager: {fileID: 9163193775338358070, guid: b362a71fd0839eb4bb8378e0960a8ed6, type: 3}
+  controller: {fileID: 2153936097896318442}
   isSneaking: 0
   movement: {x: 0, y: 0}
-  controller: {fileID: 0}
   groundCheck: {fileID: 9184776978381332160}
   groundCheckRadius: 0.3
   groundLayer:

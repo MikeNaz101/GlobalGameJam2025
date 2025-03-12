@@ -6,24 +6,27 @@ public class EnemyBubble : MonoBehaviour
     private bool _isFrozen = false;
     private float _freezeEndTime = 0f;
     public float detectionRadius = 5f;  // Range to detect player
-    public LayerMask playerLayer;  // Set this to a layer that only includes the player
+    public LayerMask playerLayer; 
     public int size = 20;
     public int maxHealth = 100;
-    public int speed = 2;  // Slower speed to balance chasing behavior
+    public int speed = 2; 
     public int currentHealth;
     public HealthBar healthBar;
     public GameObject projectilePrefab;
-    public Transform firePoint;        // A child GameObject or position where the projectile spawns
+    public Transform firePoint;        // position where the projectile spawns
     public float projectileSpeed = 10f;
     public float detectionRange = 15f; // Distance at which enemy starts chasing
     public float attackRange = 10f;    // Distance at which enemy starts shooting
     public float fireCooldown = 2f;    // Cooldown between shots
     private float fireTimer = 0f;      // Timer to track fire cooldown
     public PlayerStateManager player;
+    public EnemySpawner spawner;
     public Transform playerTransform;   // Reference to the player's transform
 
     void Start()
     {
+        GameObject spawnerObject = GameObject.FindGameObjectWithTag("Spawner");
+        spawner = spawnerObject.GetComponent<EnemySpawner>();
         player = GameObject.FindGameObjectWithTag("Player")?.GetComponent<PlayerStateManager>();
         // Finds player in the scene using "Player" tag
         playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
@@ -40,14 +43,14 @@ public class EnemyBubble : MonoBehaviour
             if (Time.time >= _freezeEndTime)
             {
                 _isFrozen = false;
-                // Optionally, revert material/color change.
-                GetComponent<Renderer>().material.color = Color.white; // Example: back to white.
+                
+                GetComponent<Renderer>().material.color = Color.white;
             }
             else
             {
-                GetComponent<Renderer>().material.color = Color.white; // Example: back to white.
-                // Enemy is frozen - prevent movement, attacking, etc.  You'd likely disable AI scripts here.
-                return; // Early return to prevent any other actions.
+                GetComponent<Renderer>().material.color = Color.white; 
+                // Enemy is frozen - prevent movement, attacking, etc.
+                return;
             }
         }
 
@@ -94,15 +97,6 @@ public class EnemyBubble : MonoBehaviour
         // Instantiate the projectile at the fire point
         GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
 
-        /* Get the Rigidbody of the projectile
-        Rigidbody rb = projectile.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            // Aim the projectile at the player
-            Vector3 shootDirection = (playerTransform.position - firePoint.position).normalized;
-            rb.linearVelocity = shootDirection * projectileSpeed;
-        }*/
-
         // Assign this EnemyBubble instance to the projectile
         EnemyProjectile projectileScript = projectile.GetComponent<EnemyProjectile>();
         if (projectileScript != null)
@@ -136,6 +130,7 @@ public class EnemyBubble : MonoBehaviour
     {
         player.currentMana = player.maxMana;
         Debug.Log(gameObject.name + " has been destroyed!");
+        spawner.EnemyDied(gameObject); // Notify the spawner that this enemy has died
         Destroy(gameObject); // Destroy the enemy GameObject
     }
     

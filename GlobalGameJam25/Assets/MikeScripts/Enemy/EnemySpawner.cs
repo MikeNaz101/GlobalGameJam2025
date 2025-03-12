@@ -1,22 +1,24 @@
 using UnityEngine;
+using System.Collections.Generic; // Add this line for List
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab;  // Reference to the enemy prefab
-    public float spawnRange = 20f;  // Range around the player where enemies can spawn
-    public float spawnHeight = 10f; // Height from which the enemy will spawn (above the player)
-    public float spawnInterval = 5f; // Time interval between enemy spawns
-    public Transform player;       // Reference to the player's transform
+    public GameObject enemyPrefab;
+    public float spawnRange = 20f;
+    public float spawnHeight = 10f;
+    public float spawnInterval = 5f;
+    public Transform player;
+
+    private List<GameObject> activeEnemies = new List<GameObject>(); // List to track active enemies
+    private int maxEnemies = 10; // Maximum number of enemies
 
     void Start()
     {
-        // Find the player object (assuming the player has a "Player" tag)
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
 
-        // Start the spawn loop
         if (player != null)
         {
-            InvokeRepeating("SpawnEnemy", 0f, spawnInterval); // Spawn enemies at regular intervals
+            InvokeRepeating("SpawnEnemy", 0f, spawnInterval);
         }
         else
         {
@@ -24,20 +26,26 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    void SpawnEnemy()
+    public void SpawnEnemy()
     {
+        if (activeEnemies.Count < maxEnemies)
+        {
+            Vector3 randomPosition = player.position + new Vector3(
+                Random.Range(-spawnRange, spawnRange),
+                spawnHeight,
+                Random.Range(-spawnRange, spawnRange)
+            );
 
-        // Generate a random position within the spawn range
-        Vector3 randomPosition = player.position + new Vector3(
-            Random.Range(-spawnRange, spawnRange),
-            spawnHeight,  // Spawn the enemy high in the air
-            Random.Range(-spawnRange, spawnRange)
-        );
+            GameObject enemy = Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
+            activeEnemies.Add(enemy); // Add the spawned enemy to the list
 
-        // Instantiate the enemy prefab at the calculated position
-        GameObject enemy = Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
+            // You can add additional setup for the enemy here if needed
+        }
+    }
 
-        // You can also add additional setup for the enemy here if needed
-        // For example, setting the enemy's target to the player or initializing other properties
+    // Call this function when an enemy dies
+    public void EnemyDied(GameObject deadEnemy)
+    {
+        activeEnemies.Remove(deadEnemy); // Remove the dead enemy from the list
     }
 }

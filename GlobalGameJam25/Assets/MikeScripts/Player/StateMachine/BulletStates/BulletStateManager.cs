@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events; // Add this for UnityEvent
 
 public enum BulletType
 {
@@ -6,18 +7,17 @@ public enum BulletType
     Type2,
     Type3
 }
+
 public class BulletStateManager : MonoBehaviour
 {
     [HideInInspector]
-    public BasicBulletState basicBullet = new BasicBulletState();
+    public BasicBulletState basicBullet; // No need to instantiate here
     [HideInInspector]
-    public FreezeBulletState freezeBullet = new FreezeBulletState();
+    public FreezeBulletState freezeBullet; // No need to instantiate here
     [HideInInspector]
-    public TeleportBulletState teleportBullet = new TeleportBulletState();
-    [HideInInspector]
-    public PlayerAttackingState attackState = new PlayerAttackingState();
-    [HideInInspector]
-    public static BulletStateManager Instance { get; private set; } // Singleton pattern
+    public TeleportBulletState teleportBullet; // No need to instantiate here
+
+    public static BulletStateManager Instance { get; private set; }
 
     public BulletType CurrentBulletType { get; private set; }
     public GameObject bulletPrefab;
@@ -25,41 +25,40 @@ public class BulletStateManager : MonoBehaviour
     public Color type2Color = Color.blue;
     public Color type3Color = Color.green;
 
+    public UnityEvent OnBulletTypeChanged; // Use UnityEvent directly
 
     private void Awake()
     {
-        // Singleton pattern setup
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Optional: Keeps the manager alive between scenes
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
         }
 
-        CurrentBulletType = BulletType.Type1; // Set a default bullet type
+        CurrentBulletType = BulletType.Type1;
+        basicBullet = new BasicBulletState(); // Instantiate here
+        freezeBullet = new FreezeBulletState(); // Instantiate here
+        teleportBullet = new TeleportBulletState(); // Instantiate here
     }
 
     public void ChangeBulletType(int changeAmount)
     {
-        // Cycle through the bullet types.  The modulo operator (%) handles wrapping around.
         int currentTypeIndex = (int)CurrentBulletType;
         int numTypes = System.Enum.GetValues(typeof(BulletType)).Length;
         currentTypeIndex = (currentTypeIndex + changeAmount) % numTypes;
         if (currentTypeIndex < 0)
         {
-            currentTypeIndex += numTypes;  //handle the negative numbers from the scroll wheel
+            currentTypeIndex += numTypes;
         }
         CurrentBulletType = (BulletType)currentTypeIndex;
 
-        // Debug.Log("Current Bullet Type: " + CurrentBulletType); //for testing
-
-        // Notify other systems (e.g., IndicatorManager) about the change.
-        // We'll use a UnityEvent for this.  More robust than direct calls.
         OnBulletTypeChanged?.Invoke();
     }
+
     public Color GetCurrentBulletColor()
     {
         switch (CurrentBulletType)
@@ -71,10 +70,7 @@ public class BulletStateManager : MonoBehaviour
             case BulletType.Type3:
                 return type3Color;
             default:
-                return Color.white; // Should never happen, but good practice
+                return Color.white;
         }
     }
-
-    // UnityEvent for notifying other scripts when the bullet type changes.
-    public UnityEngine.Events.UnityEvent OnBulletTypeChanged;
 }
