@@ -467,6 +467,7 @@ MonoBehaviour:
   target: {fileID: 736282031}
   orbitSpeed: 5
   distance: 5
+  autoRotate: 1
 --- !u!1 &723754825
 GameObject:
   m_ObjectHideFlags: 0
@@ -524,7 +525,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: THE POLLUTION HAS BECOME TO HEAVY OF A BURDEN FOR YOU...
+  m_text: THE POLLUTION HAS BECOME TOo HEAVY OF A BURDEN FOR YOU...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8a89fa14b10d46a99122fd4f73fca9a2, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 6522f30e342599e4e9dd4cc2cc03c830, type: 2}
@@ -551,10 +552,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32
+  m_fontSize: 30.5
   m_fontSizeBase: 32
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
@@ -589,7 +590,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -170.17844, y: 0, z: -212.36536, w: -308.37708}
+  m_margin: {x: -138.4566, y: 0, z: -173.64288, w: -308.37708}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
