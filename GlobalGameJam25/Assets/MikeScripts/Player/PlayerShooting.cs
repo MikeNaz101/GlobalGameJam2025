@@ -5,13 +5,17 @@ public class PlayerShooting : MonoBehaviour
     public Transform firePoint;
     public float bulletForce = 20f;
     private bool _isCharging = false;
-    private BasicBulletState _currentBasicBullet;
-    private FreezeBulletState _currentFreezeBullet;
+    //private BasicBulletState _currentBasicBullet;
+    //private FreezeBulletState _currentFreezeBullet;
     public PlayerStateManager player;
-    public BulletStateManager bullet;
+    //public BulletStateManager bullet;
     private GameObject currentBullet;
     private float chargeStartTime; // Track when the charge started
 
+    /*void Start()
+    {
+        bull
+    }
     void Update()
     {
         float scrollWheelInput = Input.GetAxis("Mouse ScrollWheel");
@@ -46,10 +50,10 @@ public class PlayerShooting : MonoBehaviour
 
         if (bullet.CurrentBulletType == BulletType.Type1 && player.currentMana >= 10)
         {
-            _currentBasicBullet = currentBullet.GetComponent<BasicBulletState>();
-            if (_currentBasicBullet != null)
+            currentBullet = bullet.CurrentBulletType;
+            if (currentBullet != null)
             {
-                _currentBasicBullet.StartCharging();
+                currentBullet.StartCharging();
                 _isCharging = true;
             }
             player.UseMana(10, player);
@@ -100,5 +104,5 @@ public class PlayerShooting : MonoBehaviour
 
         currentBullet = null; // Reset currentBullet
         _isCharging = false; // reset isCharging
-    }
+    }*/
 }

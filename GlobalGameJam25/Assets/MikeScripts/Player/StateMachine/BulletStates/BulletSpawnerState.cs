@@ -1,4 +1,4 @@
-/*using UnityEngine;
+using UnityEngine;
 using UnityEngine.Events; // Add this for UnityEvent
 
 public enum BulletType
@@ -8,16 +8,16 @@ public enum BulletType
     Type3
 }
 
-public class BulletStateManager : MonoBehaviour
+public class BulletSpawnerState : MonoBehaviour
 {
-    [HideInInspector]
-    public BasicBulletState basicBullet; // No need to instantiate here
-    [HideInInspector]
-    public FreezeBulletState freezeBullet; // No need to instantiate here
-    [HideInInspector]
-    public TeleportBulletState teleportBullet; // No need to instantiate here
+    
+    public GameObject basicBullet; [HideInInspector]
+    
+    public GameObject freezeBullet; [HideInInspector]
+    
+    public GameObject teleportBullet; [HideInInspector]
 
-    public static BulletStateManager Instance { get; private set; }
+    //public static BulletStateManager Instance { get; private set; }
 
     public BulletType CurrentBulletType { get; private set; }
     public GameObject bulletPrefab;
@@ -30,9 +30,9 @@ public class BulletStateManager : MonoBehaviour
     private void Awake()
     {
         CurrentBulletType = BulletType.Type1;
-        basicBullet = new BasicBulletState(); // Instantiate here
-        freezeBullet = new FreezeBulletState(); // Instantiate here
-        teleportBullet = new TeleportBulletState(); // Instantiate here
+        //basicBullet = new BasicBulletState(); // Instantiate here
+        //freezeBullet = new FreezeBulletState(); // Instantiate here
+        //teleportBullet = new TeleportBulletState(); // Instantiate here
     }
 
     public void ChangeBulletType(int changeAmount)
@@ -63,4 +63,4 @@ public class BulletStateManager : MonoBehaviour
                 return Color.white;
         }
     }
-}*/
+}

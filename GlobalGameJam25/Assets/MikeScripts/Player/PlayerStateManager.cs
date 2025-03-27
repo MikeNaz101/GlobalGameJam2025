@@ -26,7 +26,7 @@ public class PlayerStateManager : MonoBehaviour
     private Vector3 position;
     //public ProgressBar healthBar;
     public GameObject projectilePrefab;  // projectile prefab here
-    public GameObject shellPrefab;       // Visual-only projectile (dummy)
+    public List<GameObject> shellPrefabs;       // Visual-only projectile (dummy)
     public GameObject rWingPrefab;       // Right Wing
     public GameObject lWingPrefab;       // Left Wing
     public Transform firePoint;  // Point from which the projectile will fire
@@ -40,7 +40,8 @@ public class PlayerStateManager : MonoBehaviour
     public int maxShells;            // Max floating shells
     public int currentShells;
     public List<GameObject> orbitingShells = new List<GameObject>();
-    public BulletStateManager bulletManager;
+    public BulletSpawnerState CurrentBulletType;
+    public int bulletType;
     public PlayerBaseState currentState;
     public CharacterController controller;
     //public float default_speed = 15;
@@ -52,8 +53,6 @@ public class PlayerStateManager : MonoBehaviour
     [HideInInspector]
     public PlayerSneakState sneakState = new PlayerSneakState();
     [HideInInspector]
-    //public PlayerAttackingState attackState = new PlayerAttackingState();
-    //[HideInInspector]
     public PlayerHitState hitState = new PlayerHitState();
     [HideInInspector]
     public PlayerDeathState deathState = new PlayerDeathState();
@@ -75,6 +74,7 @@ public class PlayerStateManager : MonoBehaviour
 
     void Start()
     {
+        bulletType = 0;
         isGrounded = true;
         currentHealth = maxHealth;
         currentMana = maxMana;
@@ -83,9 +83,9 @@ public class PlayerStateManager : MonoBehaviour
         position = transform.position;
         maxShells = maxMana / manaCost;
         currentShells = maxShells;
-        SpawnSpiritBubbleShells();
+        SpawnSpiritBubbleShells(bulletType);
         // Subscribe to the BulletTypeChanged event
-        if (bulletManager != null)
+        /*if (bulletManager != null)
         {
             bulletManager.OnBulletTypeChanged.AddListener(UpdateShellColors);
             // Initial color update
@@ -94,7 +94,7 @@ public class PlayerStateManager : MonoBehaviour
         else
         {
             Debug.LogError("BulletStateManager.Instance is null!  Make sure the BulletStateManager is in the scene and initializes before PlayerStateManager.");
-        }
+        }*/
         Debug.Log("Your currentHealth starts as: " + currentHealth);
 
         // Start recovery for all stats
@@ -146,11 +146,15 @@ public class PlayerStateManager : MonoBehaviour
 
     private void OnRightClick(InputAction.CallbackContext context)
     {
+        if (bulletType != 2)
+        {
+
+        }
         // Get the BulletStateManager instance.
-        BulletStateManager bulletManager = BulletStateManager.Instance;
+        //BulletStateManager bulletManager = BulletStateManager.Instance;
 
         // Check if the BulletStateManager exists and the current bullet type is Teleport.
-        if (bulletManager != null && bulletManager.CurrentBulletType == BulletType.Type2)
+        /*if (bulletManager != null && bulletManager.CurrentBulletType == BulletType.Type2)
         {
             // Access the TeleportBulletState from the BulletStateManager.
             TeleportBulletState teleportState = bulletManager.teleportBullet;
@@ -160,7 +164,7 @@ public class PlayerStateManager : MonoBehaviour
             {
                 teleportState.Teleport();
             }
-        }
+        }*/
     }
 
     // IMPORTANT: Enable and disable the action to avoid errors.
@@ -180,10 +184,16 @@ public class PlayerStateManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Ground check using Sphere Cast
-        isGrounded = controller.isGrounded;
-        // Check for jump input
+        float scrollWheelInput = Input.GetAxis("Mouse ScrollWheel");
+        if (scrollWheelInput != 0)
+        {
+            int changeDirection = scrollWheelInput > 0 ? 1 : -1;
+            CurrentBulletType.ChangeBulletType(changeDirection);
+        }
 
+        // Ground check using Sphere Cast
+        //isGrounded = controller.isGrounded;
+        // Check for jump input
         if (Input.GetKeyDown(KeyCode.Space))
         {
             print("IsGrounded = "+ controller.isGrounded);
@@ -280,7 +290,7 @@ public class PlayerStateManager : MonoBehaviour
 
 
     // Makes the spirit bubbles orbit around player.
-    void SpawnSpiritBubbleShells()
+    void SpawnSpiritBubbleShells(int type)
     {
         for (int i = 0; i < maxShells; i++)
         {
@@ -289,7 +299,7 @@ public class PlayerStateManager : MonoBehaviour
             float z = transform.position.z + orbitRadius * Mathf.Sin(angle * Mathf.Deg2Rad);
 
             Vector3 spawnPosition = new Vector3(x, transform.position.y, z);
-            GameObject shell = Instantiate(shellPrefab, spawnPosition, Quaternion.identity);
+            GameObject shell = Instantiate(shellPrefabs[type], spawnPosition, Quaternion.identity);
             shell.transform.parent = transform; // Make sure shells follow the player
             orbitingShells.Add(shell);
         }
@@ -309,7 +319,7 @@ public class PlayerStateManager : MonoBehaviour
         }
     }
     // This method is called whenever the BulletStateManager's OnBulletTypeChanged event is fired.
-    void UpdateShellColors()
+    /*void UpdateShellColors()
     {
         //bulletManager = BulletStateManager.Instance;
         if (bulletManager == null) return; // Safety check
@@ -322,7 +332,7 @@ public class PlayerStateManager : MonoBehaviour
                 shell.GetComponent<ShellColorController>().SetColor(newColor);
             }
         }
-    }
+    }*/
 
     public void SwitchState(PlayerBaseState newState)
     {
@@ -331,12 +341,12 @@ public class PlayerStateManager : MonoBehaviour
         currentState.EnterState(this);
     }
 
-    private void OnDestroy()
+    /*private void OnDestroy()
     {
         // Unsubscribe from the event when this object is destroyed to prevent memory leaks.
         if (BulletStateManager.Instance != null)
         {
             BulletStateManager.Instance.OnBulletTypeChanged.RemoveListener(UpdateShellColors);
         }
-    }
+    }*/
 }
