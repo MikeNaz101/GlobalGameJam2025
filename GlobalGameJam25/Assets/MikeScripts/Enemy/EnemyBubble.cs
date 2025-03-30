@@ -48,7 +48,7 @@ public class EnemyBubble : MonoBehaviour
             }
             else
             {
-                GetComponent<Renderer>().material.color = Color.white; 
+                //GetComponent<Renderer>().material.color = Color.white; 
                 // Enemy is frozen - prevent movement, attacking, etc.
                 return;
             }

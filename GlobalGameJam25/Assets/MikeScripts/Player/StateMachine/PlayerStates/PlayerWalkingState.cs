@@ -4,27 +4,38 @@ public class PlayerWalkingState : PlayerBaseState
 {
     public override void EnterState(PlayerStateManager player)
     {
-        Debug.Log("im WALKING!!!!!!!!!");
-        player.MovePlayer(player.currentSpeed);
+        Debug.Log("Entering Walking State");
     }
 
     public override void UpdateState(PlayerStateManager player)
     {
-        // What are we doing in this state
-        player.MovePlayer(player.currentSpeed);
+        // --- Calculate Movement Direction ---
+        // Get the desired direction based on input (player.movement)
+        // relative to the player's current orientation (transform.right/forward)
+        Vector3 moveDirection = (player.transform.right * player.movement.x) + (player.transform.forward * player.movement.y);
 
-        if (player.movement.magnitude < 0.1)
+        // --- Call MovePlayer with Direction and Speed ---
+        // Now pass BOTH the direction and the specific speed for walking
+        player.MovePlayer(moveDirection, player.walkSpeed);
+
+        // --- Check for transitions ---
+        if (player.movement.magnitude < 0.1f) // Transition to Idle if stopping
         {
             player.SwitchState(player.idleState);
         }
-        else if (player.isSneaking)
+        // Prioritize Run > Sneak
+        else if (player.isRunning && !player.isSneaking) // Transition to Run if holding Run and not sneaking
+        {
+            player.SwitchState(player.runState);
+        }
+        else if (player.isSneaking) // Transition to Sneak if sneak is toggled
         {
             player.SwitchState(player.sneakState);
         }
-        else if (!player.controller.isGrounded)
-        {
-            player.isGrounded = false;
-            //player.SwitchState(player.flyingState);
-        }
+
+        // TODO: Add Jump Check based on input flag/event
+        // TODO: Add Falling Check based on !player.isGrounded
     }
+
+     public override void ExitState(PlayerStateManager player) { }
 }

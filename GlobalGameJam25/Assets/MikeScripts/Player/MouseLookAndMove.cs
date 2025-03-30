@@ -1,85 +1,73 @@
 using UnityEngine;
 
+// Consider renaming this script to MouseLook or CameraController
 public class MouseLookAndMove : MonoBehaviour
 {
-    public float mouseSensitivity = 100f; // Sensitivity for mouse input
-    public Transform playerBody; // Reference to the player body
-    //public CharacterController player; // Rigidbody reference for physics-based movement
-    public float movementSpeed = 5f; // Speed of movement
-    public float jumpForce = 10f; // Force of the jump
-    private float xRotation = 0f; // For clamping vertical rotation
+    [Tooltip("Sensitivity for mouse movement.")]
+    public float mouseSensitivity = 100f;
 
-    public PlayerStateManager player;
+    [Tooltip("Assign the main Player Body Transform (the parent object with PlayerStateManager).")]
+    public Transform playerBody; // Reference to the player body (parent object)
+
+    private float xRotation = 0f; // Stores the vertical rotation angle for the camera
+
+    // No longer need reference to PlayerStateManager or CharacterController here
+    // public PlayerStateManager player;
+    // public CharacterController player;
 
     void Start()
     {
-        // Lock the cursor to the game window
+        // Lock and hide the cursor for a typical FPS feel
         Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        if (playerBody == null)
+        {
+            Debug.LogError("CRITICAL: Player Body Transform must be assigned in the Inspector for MouseLook script!", this.gameObject);
+            // You might want to disable the script if the reference is missing
+            // this.enabled = false;
+        }
+
+        // Assuming this script is on the Camera object, which should be a child of the Player Body.
+        // If not, the rotation logic might need adjustment.
     }
 
     void Update()
     {
-        // --- Mouse Look ---
+        // --- Mouse Look Logic ---
+
+        // Get Mouse Input (using old Input Manager GetAxis)
+        // Note: Your PlayerStateManager uses the new Input System. For consistency,
+        // you might want to update this script to read mouse delta from an Input Action as well.
+        // However, this will work if your project still uses the old Input Manager or mixes them.
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
-        // Rotate camera vertically (up/down)
+        // --- Vertical Rotation (Pitch) ---
+        // Rotate the Camera up/down based on mouseY.
+        // This rotation is applied to the GameObject this script is attached to (presumably the Camera).
         xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f); // Prevent over-rotation
-        transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f); // Prevent looking straight up/down and flipping over
+        transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f); // Apply rotation locally to the camera
 
-        // Rotate player body horizontally (left/right)
-        playerBody.Rotate(Vector3.up * mouseX);
-
-        // --- Jump ---
-        if (Input.GetButtonDown("Jump"))
+        // --- Horizontal Rotation (Yaw) ---
+        // Rotate the entire player body left/right based on mouseX.
+        // This rotation is applied to the parent 'playerBody' transform.
+        if (playerBody != null)
         {
-            player.MovePlayer(movementSpeed);
+            playerBody.Rotate(Vector3.up * mouseX);
         }
 
-        // --- Dash ---
-        if (player.currentStamina > 8 && Input.GetButtonDown("Dash"))
-        {
-            Dash();
-            //player.ConsumeStamina(8); // Decrease stamina by 8
-        }
+        // --- MOVEMENT, JUMP, and DASH logic have been REMOVED from this script ---
+        // Why? Because these actions are now handled by the PlayerStateManager and its
+        // state machine (PlayerIdleState, PlayerWalkingState, PlayerRunningState,
+        // PlayerFlyingState, PlayerHitState) based on Input System Actions
+        // like OnMove, OnJump, OnRun, OnSprint defined in PlayerStateManager.
     }
 
-    void FixedUpdate()
-    {
-        // --- Movement ---
-        float moveX = Input.GetAxis("Horizontal"); // Left/Right input
-        float moveZ = Input.GetAxis("Vertical");   // Forward/Backward input
+    // --- FixedUpdate REMOVED ---
+    // Movement is handled in PlayerStateManager's Update via CharacterController.Move, called by the current state.
 
-        // Calculate direction relative to the camera's orientation
-        Vector3 movement = (transform.forward * moveZ + transform.right * moveX).normalized * movementSpeed;
-
-        // Apply movement using Rigidbody's velocity
-        //Vector3 newVelocity = new Vector3(movement.x, playerRigidbody.linearVelocity.y, movement.z);
-        //playerRigidbody.linearVelocity = newVelocity;
-    }
-
-    void Dash()
-    {
-        // Calculate the dash speed only once
-        float dashSpeed = movementSpeed * 50;
-
-        /* Apply dash speed
-        Vector3 movement = (transform.forward * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal")).normalized * dashSpeed;
-        Vector3 newVelocity = new Vector3(movement.x, playerRigidbody.linearVelocity.y, movement.z);
-        playerRigidbody.linearVelocity = newVelocity;
-
-        // Apply dash speed horizontally
-        Vector3 movement = (transform.forward * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal")).normalized * dashSpeed;
-        Vector3 newVelocity = new Vector3(movement.x, playerRigidbody.linearVelocity.y, movement.z);
-        playerRigidbody.linearVelocity = newVelocity;
-        */
-
-        // Project the dash direction onto the horizontal plane
-        Vector3 dashDirection = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
-
-        // Apply the dash force horizontally
-        //playerRigidbody.AddForce(dashDirection * dashSpeed, ForceMode.Impulse);
-    }
+    // --- Dash REMOVED ---
+    // Dashing can be re-implemented later as an ability within the PlayerStateManager/State system if desired.
 }
-

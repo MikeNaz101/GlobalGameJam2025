@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6518669622564335423}
   - component: {fileID: -4855705986092693477}
   m_Layer: 0
-  m_Name: PProjectileDummy
+  m_Name: BasicShellPrefab
   m_TagString: PProjectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a91221767bb131f41892ef32631133b9, type: 2}
+  - {fileID: 2100000, guid: db960b88d568d214eac19cafd95b2744, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
