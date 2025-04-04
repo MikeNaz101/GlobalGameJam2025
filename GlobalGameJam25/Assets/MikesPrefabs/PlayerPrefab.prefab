@@ -667,34 +667,37 @@ MonoBehaviour:
   maxStamina: 100
   currentStamina: 0
   staminaRecoveryRate: 10
-  maxSpeed: 15
-  currentSpeed: 10
-  projectilePrefab: {fileID: 5535924560927195969, guid: b362a71fd0839eb4bb8378e0960a8ed6, type: 3}
-  shellPrefab: {fileID: 5535924560927195969, guid: e60666857a9c0e14bbbbfc6a24c1418c, type: 3}
-  rWingPrefab: {fileID: 3219426992458083526, guid: 637779f12e6aefe4bb857f0ca2f209e2, type: 3}
-  lWingPrefab: {fileID: 3219426992458083526, guid: 6229fafd5a7781c478a9952798017c60, type: 3}
-  firePoint: {fileID: 7335547498233184104}
-  lWingPoint: {fileID: 1262399931295126955}
-  rWingPoint: {fileID: 1197767527498041069}
-  bulletTypeChangeCooldown: 0.1
-  orbitRadius: 2
-  orbitSpeed: 50
-  maxShells: 0
-  currentShells: 0
-  orbitingShells: []
-  bulletManager: {fileID: 9163193775338358070, guid: b362a71fd0839eb4bb8378e0960a8ed6, type: 3}
-  controller: {fileID: 2153936097896318442}
-  isSneaking: 0
-  movement: {x: 0, y: 0}
+  walkSpeed: 10
+  runSpeed: 20
+  sneakSpeed: 5
+  flySpeed: 15
+  jumpForce: 20
+  flapStrength: 10
+  gravity: -9.81
   groundCheck: {fileID: 9184776978381332160}
   groundCheckRadius: 0.3
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
   isGrounded: 0
-  jumpForce: 20
   verticalVelocity: 0
-  gravity: -9.81
+  bulletSpawner: {fileID: 0}
+  firePoint: {fileID: 7335547498233184104}
+  shellPrefabs: []
+  orbitRadius: 2
+  orbitSpeed: 50
+  maxShells: 0
+  currentShells: 0
+  orbitingShells: []
+  rWingPrefab: {fileID: 3219426992458083526, guid: 637779f12e6aefe4bb857f0ca2f209e2, type: 3}
+  lWingPrefab: {fileID: 3219426992458083526, guid: 6229fafd5a7781c478a9952798017c60, type: 3}
+  rWingPoint: {fileID: 1197767527498041069}
+  lWingPoint: {fileID: 1262399931295126955}
+  controller: {fileID: 2153936097896318442}
+  movement: {x: 0, y: 0}
+  isSneaking: 0
+  isRunning: 0
+  jumpInputPressedThisFrame: 0
 --- !u!114 &7552419452380975823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -710,7 +713,9 @@ MonoBehaviour:
   firePoint: {fileID: 7335547498233184104}
   bulletForce: 20
   player: {fileID: 6132794304212841273}
-  bullet: {fileID: 9163193775338358070, guid: b362a71fd0839eb4bb8378e0960a8ed6, type: 3}
+  basicManaCostInitial: 5
+  freezeManaCostInitial: 5
+  teleportManaCost: 20
 --- !u!1 &2632762721491750622
 GameObject:
   m_ObjectHideFlags: 0
@@ -951,7 +956,7 @@ Transform:
   m_GameObject: {fileID: 3260947380370268792}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.000020980835, y: 0.000007733601, z: 0.00002154206}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
