@@ -67,7 +67,7 @@ public class PlayerStateManager : MonoBehaviour
     [HideInInspector] public PlayerSneakState sneakState = new PlayerSneakState();
     [HideInInspector] public PlayerRunningState runState = new PlayerRunningState();
     [HideInInspector] public PlayerHitState hitState = new PlayerHitState();
-    [HideInInspector] public PlayerFlyingState flyingState = new PlayerFlyingState();
+    //[HideInInspector] public PlayerFlyingState flyingState = new PlayerFlyingState();
     // TODO: Add a FallingState for better airborne control when not flying
     // [HideInInspector] public PlayerFallingState fallingState = new PlayerFallingState();
 
@@ -105,11 +105,21 @@ public class PlayerStateManager : MonoBehaviour
     void OnMove(InputValue value) { movement = value.Get<Vector2>(); }
     void OnSprint(InputValue value) { if(value.isPressed) isSneaking = !isSneaking; } // Toggle Sneak on press
     void OnRun(InputValue value) { isRunning = value.isPressed; } // Hold Run
-    void OnJump(InputValue value) {
-        if (value.isPressed) {
-            jumpInputPressedThisFrame = true; // Set flag for states (like Flying flap)
-            Jump(); // Handle ground jump / flight entry logic
+    void OnJump() {
+        Debug.Log("Jumped!");
+        if (controller.isGrounded) {
+            Debug.Log("Really Jumped!");
+            hasJumped = true;
+            Jump(); // Handle ground jump
         }
+        else {
+            Debug.Log("Just kidding...");
+        }
+
+        //if (value.isPressed) {
+            //jumpInputPressedThisFrame = true; // Set flag for states (like Flying flap)
+            // / flight entry logic
+        //}
     }
     //void OnFire(InputValue value) { GetComponent<PlayerShooting>()?.StartCharge(); } // Simplified - assumes press
     //void OnFireRelease(InputValue value) { GetComponent<PlayerShooting>()?.EndCharge(); } // Need separate release action
@@ -157,19 +167,21 @@ public class PlayerStateManager : MonoBehaviour
     void Update()
     {
         // Perform ground check
-        isGrounded = CheckGrounded();
+        //isGrounded = CheckGrounded();
 
-        // Apply gravity consistently
-        if (!isGrounded) {
-            verticalVelocity += gravity * Time.deltaTime;
-        } else if (verticalVelocity < 0) {
-            verticalVelocity = -2f; // Small downward force to keep grounded
+        if (controller.isGrounded && verticalVelocity < 0) {
+            verticalVelocity = -2f; // A small negative value helps stick to the ground
+            // Maybe reset hasJumped here if needed for double jump logic later
+            // hasJumped = false;
+        } else {
+            // Apply gravity when not grounded
+            verticalVelocity += gravity * Time.deltaTime; // Use += because gravity is negative
         }
 
         // Reset double jump flag only when grounded
-        if (isGrounded) {
+        /*if (isGrounded) {
             hasJumped = false;
-        }
+        }*/
 
         // --- State Update ---
         // The current state's UpdateState is responsible for movement logic and transitions
@@ -183,10 +195,10 @@ public class PlayerStateManager : MonoBehaviour
         UpdateShellPositions(); // Update orbiting shell visuals
     }
 
-     bool CheckGrounded() {
+     /*bool CheckGrounded() {
           if (groundCheck == null) return false;
           return Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore);
-     }
+     }*/
 
     // --- Player Movement ---
     // Called by states to apply movement based on their logic and speed.
@@ -206,21 +218,25 @@ public class PlayerStateManager : MonoBehaviour
     // Handles ground jump and entering flight state on double jump.
     public void Jump()
     {
-        if (isGrounded) {
+        if (controller.isGrounded) {
+            hasJumped = true;
+            verticalVelocity = Mathf.Sqrt(jumpForce * -2f * gravity); // Calculate impulse for jump height
+        }
+        /*if (isGrounded) {
             verticalVelocity = Mathf.Sqrt(jumpForce * -2f * gravity); // Calculate impulse for jump height
             isGrounded = false;
             hasJumped = true; // Mark first jump
              Debug.Log("Ground Jump!");
             // TODO: Optionally switch to a FallingState immediately after jumping
             // SwitchState(fallingState);
-        }
+        }*/
         // Double Jump -> Enter Flying State
         // Allow if airborne, haven't double-jumped yet, and NOT already flying
-        else if (!hasJumped && currentState != flyingState) {
+        /*else if (!hasJumped && currentState != flyingState) {
             hasJumped = true; // Consume the double jump
             SwitchState(flyingState);
             Debug.Log("Double Jump -> Entering Flying State!");
-        }
+        }*/
         // Note: If already in flyingState, jumpInputPressedThisFrame handles flapping within the state's Update
     }
 

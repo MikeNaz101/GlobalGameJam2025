@@ -19,7 +19,7 @@ public class PlayerSneakState : PlayerBaseState
         player.MovePlayer(moveDirection, player.sneakSpeed);
 
         // --- Check for transitions ---
-        if (player.movement.magnitude < 0.1f) // Transition to Idle if stopping
+        if (player.movement.magnitude < 0.1f && player.isGrounded) // Transition to Idle if stopping
         {
             player.SwitchState(player.idleState);
         }

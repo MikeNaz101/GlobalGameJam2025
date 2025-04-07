@@ -22,7 +22,7 @@ public class PlayerRunningState : PlayerBaseState
 
         // --- Transitions ---
         // 1. Stop Moving -> Idle
-        if (player.movement.magnitude < 0.1f)
+        if (player.movement.magnitude < 0.1f && player.isGrounded)
         {
             player.SwitchState(player.idleState);
         }
