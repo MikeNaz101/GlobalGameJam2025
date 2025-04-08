@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Events; // Use UnityEvent
 
 // Ensure this enum matches the order expected by PlayerStateManager's shellPrefabs list if using index-based access
+// Also used by PlayerShooting to identify the teleport bullet
 public enum BulletType
 {
     Type1, // Example: Basic Bullet
@@ -26,6 +27,10 @@ public class BulletSpawnerState : MonoBehaviour
     // Event fired when bullet type changes (e.g., for UI or PlayerStateManager shell updates)
     public UnityEvent OnBulletTypeChanged;
 
+    // Add a reference to notify PlayerShooting if needed (for VCam priority reset on weapon change)
+    [HideInInspector] // Hide from inspector, PlayerShooting sets this in its Start()
+    public PlayerShooting playerShooting;
+
     private void Awake()
     {
         // Default to first bullet type on start
@@ -37,25 +42,38 @@ public class BulletSpawnerState : MonoBehaviour
             OnBulletTypeChanged = new UnityEvent();
     }
 
+    // Called by PlayerInput's change weapon action (likely via PlayerStateManager)
     public void ChangeBulletType(int changeAmount)
     {
         int currentTypeIndex = (int)CurrentBulletType;
         int numTypes = System.Enum.GetValues(typeof(BulletType)).Length;
+        BulletType previousType = CurrentBulletType; // Store previous type to check for teleport cancel
 
         // Calculate the new index with wrapping
         currentTypeIndex = (currentTypeIndex + changeAmount) % numTypes;
         // Handle negative wrapping if changeAmount is negative
         if (currentTypeIndex < 0) currentTypeIndex += numTypes;
 
+        BulletType newType = (BulletType)currentTypeIndex;
+
         // Update the current bullet type only if it actually changed
-        if ((BulletType)currentTypeIndex != CurrentBulletType)
+        if (newType != previousType)
         {
-            CurrentBulletType = (BulletType)currentTypeIndex;
+            CurrentBulletType = newType;
             UpdateBulletPrefab();
 
             // Invoke the event to notify listeners (like PlayerStateManager for shells/UI)
             OnBulletTypeChanged?.Invoke(); // Safely invoke
-             Debug.Log("Bullet type changed to: " + CurrentBulletType);
+            Debug.Log("Bullet type changed to: " + CurrentBulletType);
+
+            // --- Add Camera Reset Logic ---
+            // If the player was charging the *teleport* bullet and switched *away* from it
+            if (previousType == BulletType.Type3 && newType != BulletType.Type3 && playerShooting != null)
+            {
+                // Tell PlayerShooting to cancel the charge (which includes resetting the VCam priority)
+                 playerShooting.CancelCharge();
+            }
+            // --- End Camera Reset Logic ---
         }
     }
 
@@ -74,9 +92,9 @@ public class BulletSpawnerState : MonoBehaviour
                 bulletPrefab = teleportBullet;
                 break;
             default:
-                 Debug.LogError("Unhandled BulletType in UpdateBulletPrefab!");
-                 bulletPrefab = basicBullet; // Default fallback
-                 break;
+                Debug.LogError("Unhandled BulletType in UpdateBulletPrefab!");
+                bulletPrefab = basicBullet; // Default fallback
+                break;
         }
 
         // Safety check if the selected prefab is null
@@ -85,7 +103,7 @@ public class BulletSpawnerState : MonoBehaviour
         }
     }
 
-     // Optional helper to get color (if needed externally, though bullets might handle their own visuals)
+     // Optional helper to get color (if needed externally)
      public Color GetCurrentBulletColor()
      {
          switch (CurrentBulletType)
