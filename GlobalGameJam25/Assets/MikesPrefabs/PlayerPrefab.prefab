@@ -671,9 +671,9 @@ MonoBehaviour:
   runSpeed: 20
   sneakSpeed: 5
   flySpeed: 15
-  jumpForce: 20
+  jumpForce: 7
   flapStrength: 10
-  gravity: -9.81
+  gravity: -20
   groundCheck: {fileID: 9184776978381332160}
   groundCheckRadius: 0.3
   groundLayer:
