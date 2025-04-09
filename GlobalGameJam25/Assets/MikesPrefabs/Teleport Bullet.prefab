@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4063276952087887430}
   - component: {fileID: 2652358902616244450}
   - component: {fileID: 6505769205496754014}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Teleport Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
