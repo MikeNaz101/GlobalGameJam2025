@@ -17,6 +17,6 @@ public class PlayerBodyRotator : MonoBehaviour
     {
         // It's often better to handle cursor lock in a central game manager,
         // but you can put it here for now if needed.
-        // Cursor.lockState = CursorLockMode.Locked;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 }

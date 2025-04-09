@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2646212917966952310}
   - component: {fileID: 8426819872423491690}
   - component: {fileID: 3976752922529526209}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Basic Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,7 +132,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -155,4 +155,5 @@ MonoBehaviour:
   manaCostPerSecond: 2.5
   maxChargeTime: 2
   maxChargeMultiplier: 2
+  lifetime: 5
   hitEffectPrefab: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}

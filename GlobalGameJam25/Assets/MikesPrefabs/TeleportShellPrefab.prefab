@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6078441537723927670}
   - component: {fileID: 6518669622564335423}
   - component: {fileID: -4855705986092693477}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: TeleportShellPrefab
   m_TagString: PProjectile
   m_Icon: {fileID: 0}

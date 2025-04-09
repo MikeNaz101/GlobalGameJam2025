@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2442803532878912150}
   - component: {fileID: 3783524923384099649}
   - component: {fileID: 2661717401436711549}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Freeze Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,7 +132,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0

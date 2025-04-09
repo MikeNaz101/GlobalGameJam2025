@@ -25,7 +25,7 @@ public class TeleportBullet : MonoBehaviour
         }
 
         // Optional: Set a lifetime for the bullet in case it never hits anything
-         Destroy(gameObject, 10f); // Destroy after 10 seconds if nothing hit
+         Destroy(gameObject, 30f); // Destroy after 10 seconds if nothing hit
     }
 
     // Using OnCollisionEnter
@@ -68,38 +68,60 @@ public class TeleportBullet : MonoBehaviour
     // Teleports the player to the specified location
     public void Teleport(Vector3 targetPosition)
     {
+         // Use the more detailed logs from the previous example for better diagnostics
+         Debug.Log($"Teleport method called. Target: {targetPosition}. CanTeleport: {_canTeleport}, Player Null: {_player == null}, Controller Null: {(_player != null ? (_player.controller == null).ToString() : "N/A")}");
+
         // Check if teleport is allowed and player reference is valid
         if (_canTeleport && _player != null)
         {
-             Debug.Log($"Teleporting player to {targetPosition}");
+            // Increased offset slightly, adjust as needed
+            Vector3 finalTeleportPosition = targetPosition + Vector3.up * 0.15f;
 
-             // Use CharacterController.Move for teleportation if player has one,
-             // as directly setting transform.position can cause issues with controllers.
-             if (_player.controller != null) {
-                 // Disable controller temporarily to prevent conflicts when setting position?
-                 // _player.controller.enabled = false;
-                 // _player.transform.position = targetPosition;
-                 // _player.controller.enabled = true;
+            Debug.Log($"Attempting teleportation. Player Position BEFORE: {_player.transform.position}");
 
-                 // Alternatively, try moving over one frame (less reliable for instant teleport)
-                 // Vector3 moveVector = targetPosition - _player.transform.position;
-                 // _player.controller.Move(moveVector);
+            // --- CharacterController Handling ---
+            // Check if the PlayerStateManager has a valid controller reference
+            if (_player.controller != null)
+            {
+                Debug.Log("<color=green>Using CharacterController disable/enable method via PlayerStateManager.</color>");
 
-                 // Safest might be direct transform setting, IF you handle potential physics overlaps/issues.
-                 // Add a small vertical offset to prevent falling through floor?
-                  _player.transform.position = targetPosition + Vector3.up * 0.1f;
-                   _player.verticalVelocity = 0; // Reset fall speed after teleport
+                // --- UNCOMMENT THESE THREE LINES ---
+                _player.controller.enabled = false;   // Disable the controller
+                _player.transform.position = finalTeleportPosition; // Set position *while* disabled
+                _player.controller.enabled = true;    // Re-enable the controller
+                // --- ---
+
+                // --- COMMENT OUT OR DELETE THIS LINE (as it conflicts) ---
+                // _player.transform.position = targetPosition + Vector3.up * 0.1f;
+                // --- ---
+
+            }
+            // --- Fallback: Direct Transform Setting ---
+            else // This runs if _player.controller is null
+            {
+                 Debug.Log("<color=orange>Using direct transform.position setting (No CharacterController found via PlayerStateManager).</color>");
+                // Fallback if no character controller reference found on PlayerStateManager
+                _player.transform.position = finalTeleportPosition;
+            }
+            // --- End Teleport Method ---
+
+
+            // Reset vertical velocity in PlayerStateManager (if applicable)
+             if (_player.verticalVelocity != 0) {
+                 Debug.Log($"Resetting player vertical velocity from {_player.verticalVelocity} to 0.");
+                 _player.verticalVelocity = 0;
              }
-             else {
-                 // Fallback if no character controller
-                 _player.transform.position = targetPosition + Vector3.up * 0.1f; ;
-             }
 
+
+            Debug.Log($"Player Position AFTER teleport attempt: {_player.transform.position}");
 
             _canTeleport = false; // Ensure teleportation only happens once per bullet
         }
-         else if (_player == null) {
-             Debug.LogWarning("Teleport failed: Player reference missing.");
+        else if (_player == null) {
+            Debug.LogWarning("Teleport failed: Player reference missing.");
+        }
+         else if (!_canTeleport) {
+             Debug.LogWarning("Teleport failed: _canTeleport flag was already false.");
          }
     }
 }

@@ -422,7 +422,7 @@ Transform:
   m_GameObject: {fileID: 2161701778704129676}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.004, y: 1.562, z: 0.163}
+  m_LocalPosition: {x: -0.004, y: 1.197, z: 0.726}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -800,6 +800,8 @@ MonoBehaviour:
   player: {fileID: 6132794304212841273}
   gameplayVCam: {fileID: 227384190289370449}
   teleportAimVCam: {fileID: 2459340906484035929}
+  teleportAimUI: {fileID: 0}
+  aimRaycastRange: 100
   basicManaCostInitial: 5
   freezeManaCostInitial: 5
   teleportManaCost: 20
@@ -947,8 +949,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3260947380370268792}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.073175356, y: -0.0050823926, z: 0.053016596, w: -0.995896}
-  m_LocalPosition: {x: 0.3830006, y: 1.8068581, z: 0.063343525}
+  m_LocalRotation: {x: 0.074878715, y: -0.68403465, z: 0.07092943, w: 0.72212106}
+  m_LocalPosition: {x: 666.16473, y: -45.600002, z: 141.80421}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -988,7 +990,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60.000004
+  field of view: 69.49
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
