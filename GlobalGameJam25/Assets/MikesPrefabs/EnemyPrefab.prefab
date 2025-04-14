@@ -247,7 +247,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e823cd5b5d27c0f4b8256e7c12ee3e6d, type: 2}
+  - {fileID: 2100000, guid: c2e40fa84d53ccd428f640eac126b1fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -318,11 +318,11 @@ RectTransform:
   m_GameObject: {fileID: 5011805779187154759}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5827846, y: 0.5827846, z: 0.5827846}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2391132311529111704}
-  m_Father: {fileID: 7100693599763814398}
+  m_Father: {fileID: 5585175397262215929}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -533,6 +533,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2438143072638446542}
+  - {fileID: 2444054711584974566}
   m_Father: {fileID: 7100693599763814398}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &5426296686548598814
@@ -5437,6 +5438,7 @@ MonoBehaviour:
   attackRange: 10
   fireCooldown: 2
   player: {fileID: 0}
+  spawner: {fileID: 0}
   playerTransform: {fileID: 7574001101456263496, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
 --- !u!54 &956260676002308700
 Rigidbody:
@@ -5517,6 +5519,5 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5585175397262215929}
-  - {fileID: 2444054711584974566}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
