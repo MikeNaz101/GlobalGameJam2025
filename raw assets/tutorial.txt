@@ -1,0 +1,8 @@
+"Ishana use wasd to move around the forest, and space to jump"
+"Use left click to shoot a magic blast, use this blast to kill the beast"
+"You can charge your magic to inflict more damage. Hold left click and release after the bubble has fully grown"
+"Destroy that boulder with a fully charged shot"
+"This Corrupted lake will kill you, We have to freeze it" 
+"You Unlocked a freeze shot, You can now freeze that lake and also the enemies
+"Use the scroll wheel to switch bullets"
+"That is a sacred tree!. They will heal you if yo are low on health. 
