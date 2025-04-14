@@ -103,7 +103,7 @@ public class SludgeEnemy : BaseEnemy
         }
     }
 
-    void OnDrawGizmosSelected()
+    private new void OnDrawGizmosSelected()
     {
         base.OnDrawGizmosSelected();
         Gizmos.color = Color.green;

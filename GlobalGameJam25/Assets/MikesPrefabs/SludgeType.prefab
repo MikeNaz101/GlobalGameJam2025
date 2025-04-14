@@ -5510,8 +5510,8 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   moveSpeed: 2
-  playerTransform: {fileID: 0}
-  spawner: {fileID: 0}
+  playerTransform: {fileID: 7574001101456263496, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+  spawner: {fileID: 4365002695795539707, guid: 9dbb68a375427654bb6f0a64b002a59f, type: 3}
   patrolRadius: 9.91
   attackRange: 1.5
   attackDamage: 10

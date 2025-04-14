@@ -144,7 +144,7 @@ public class GasEnemy : BaseEnemy
         // Add any gas-specific death effects here
     }
 
-    private void OnDrawGizmosSelected()
+    private new void OnDrawGizmosSelected()
     {
         base.OnDrawGizmosSelected();
         Gizmos.color = Color.cyan;

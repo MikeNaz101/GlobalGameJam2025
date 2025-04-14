@@ -44,10 +44,12 @@ public class EnemySpawner : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        Debug.Log("here?");
         if (spawningComplete) return;
 
         if (other.CompareTag("Player"))
         {
+            
             if (other.transform == spawnArea1Center && !area1Entered)
             {
                 area1Entered = true;
