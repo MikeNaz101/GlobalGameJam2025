@@ -1,51 +1,111 @@
 using UnityEngine;
-using System.Collections.Generic; // Add this line for List
+using System.Collections.Generic;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab;
-    public float spawnRange = 20f;
-    public float spawnHeight = 10f;
-    public float spawnInterval = 5f;
-    public Transform player;
+    public GameObject sludgePrefab;
+    public GameObject gasPrefab;
+    public Transform spawnArea1Center;
+    public int numSludgeToSpawn = 5;
 
-    private List<GameObject> activeEnemies = new List<GameObject>(); // List to track active enemies
-    private int maxEnemies = 10; // Maximum number of enemies
+    public Transform spawnArea2Center;
+    public int numGasToSpawn = 5;
+
+    private bool area1Entered = false;
+    private bool area2Entered = false;
+    private bool spawningComplete = false;
+    private List<GameObject> activeEnemies = new List<GameObject>();
 
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;
-
-        if (player != null)
+        // Ensure the center GameObjects have SphereColliders set to 'Is Trigger'
+        if (spawnArea1Center != null && spawnArea1Center.GetComponent<SphereCollider>() == null)
         {
-            InvokeRepeating("SpawnEnemy", 0f, spawnInterval);
+            Debug.LogError("Spawn Area 1 Center does not have a SphereCollider!");
+            enabled = false;
         }
-        else
+        if (spawnArea1Center != null && !spawnArea1Center.GetComponent<SphereCollider>().isTrigger)
         {
-            Debug.LogError("Player not found!");
+            Debug.LogError("SphereCollider on Spawn Area 1 Center is not set to 'Is Trigger'!");
+            enabled = false;
+        }
+
+        if (spawnArea2Center != null && spawnArea2Center.GetComponent<SphereCollider>() == null)
+        {
+            Debug.LogError("Spawn Area 2 Center does not have a SphereCollider!");
+            enabled = false;
+        }
+        if (spawnArea2Center != null && !spawnArea2Center.GetComponent<SphereCollider>().isTrigger)
+        {
+            Debug.LogError("SphereCollider on Spawn Area 2 Center is not set to 'Is Trigger'!");
+            enabled = false;
         }
     }
 
-    public void SpawnEnemy()
+    void OnTriggerEnter(Collider other)
     {
-        if (activeEnemies.Count < maxEnemies)
+        if (spawningComplete) return;
+
+        if (other.CompareTag("Player"))
         {
-            Vector3 randomPosition = player.position + new Vector3(
-                Random.Range(-spawnRange, spawnRange),
-                spawnHeight,
-                Random.Range(-spawnRange, spawnRange)
-            );
-
-            GameObject enemy = Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
-            activeEnemies.Add(enemy); // Add the spawned enemy to the list
-
-            // You can add additional setup for the enemy here if needed
+            if (other.transform == spawnArea1Center && !area1Entered)
+            {
+                area1Entered = true;
+                SpawnSludgeEnemies(spawnArea1Center.position, spawnArea1Center.GetComponent<SphereCollider>().radius);
+                Debug.Log("Player entered Spawn Area 1 first. Spawning Sludge enemies here.");
+            }
+            else if (other.transform == spawnArea2Center && !area2Entered)
+            {
+                area2Entered = true;
+                if (!area1Entered)
+                {
+                    SpawnSludgeEnemies(spawnArea2Center.position, spawnArea2Center.GetComponent<SphereCollider>().radius);
+                    Debug.Log("Player entered Spawn Area 2 first. Spawning Sludge enemies here.");
+                }
+                else
+                {
+                    SpawnGasEnemies(spawnArea2Center.position, spawnArea2Center.GetComponent<SphereCollider>().radius);
+                    Debug.Log("Player entered Spawn Area 2 second. Spawning Gas enemies here.");
+                }
+            }
         }
     }
 
-    // Call this function when an enemy dies
+    void SpawnSludgeEnemies(Vector3 center, float radius)
+    {
+        for (int i = 0; i < numSludgeToSpawn; i++)
+        {
+            Vector3 randomPosition = GetRandomPointInCircle(center, radius);
+            GameObject enemy = Instantiate(sludgePrefab, randomPosition, Quaternion.identity);
+            activeEnemies.Add(enemy);
+        }
+    }
+
+    void SpawnGasEnemies(Vector3 center, float radius)
+    {
+        for (int i = 0; i < numGasToSpawn; i++)
+        {
+            Vector3 randomPosition = GetRandomPointInCircle(center, radius);
+            GameObject enemy = Instantiate(gasPrefab, randomPosition, Quaternion.identity);
+            activeEnemies.Add(enemy);
+        }
+    }
+
+    Vector3 GetRandomPointInCircle(Vector3 center, float radius)
+    {
+        float angle = Random.Range(0f, Mathf.PI * 2);
+        float u = Random.Range(0f, 1f) + Random.Range(0f, 1f);
+        float r = radius * (u > 1 ? 2 - u : u);
+        return new Vector3(center.x + r * Mathf.Cos(angle), center.y + 1f, center.z + r * Mathf.Sin(angle));
+    }
+
     public void EnemyDied(GameObject deadEnemy)
     {
-        activeEnemies.Remove(deadEnemy); // Remove the dead enemy from the list
+        activeEnemies.Remove(deadEnemy);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        // No need to draw Gizmos here as the SphereColliders visualize the areas
     }
 }

@@ -5,7 +5,7 @@ public class EnemyProjectile : MonoBehaviour
     public EnemyBubble enemyBubble;
     private PlayerStateManager player; 
 
-    private int damageAmount;
+    public int damageAmount;
     private float speed = 10f; // Speed of the projectile
     private Rigidbody rb;
 

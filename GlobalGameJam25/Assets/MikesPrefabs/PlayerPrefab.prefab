@@ -797,7 +797,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firePoint: {fileID: 7335547498233184104}
-  bulletForce: 20
+  bulletForce: 50
   player: {fileID: 6132794304212841273}
   gameplayVCam: {fileID: 227384190289370449}
   teleportAimVCam: {fileID: 2459340906484035929}
@@ -808,8 +808,8 @@ MonoBehaviour:
     m_Bits: 115
   aimingSpotEffect: {fileID: 0}
   basicManaCostInitial: 5
-  freezeManaCostInitial: 5
-  teleportManaCost: 20
+  freezeManaCostInitial: 10
+  teleportManaCost: 50
 --- !u!114 &1349443047492608146
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -822,7 +822,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59607126a675e34469330f26f76940ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mouseSensitivity: 100
+  mouseSensitivity: 80
 --- !u!1 &2632762721491750622
 GameObject:
   m_ObjectHideFlags: 0
@@ -2132,8 +2132,8 @@ MonoBehaviour:
     m_InputAxisName: Mouse Y
     m_InputAxisValue: 0
     m_InvertInput: 1
-    m_MinValue: -70
-    m_MaxValue: 70
+    m_MinValue: -90
+    m_MaxValue: 15
     m_Wrap: 0
     m_Recentering:
       m_enabled: 0
