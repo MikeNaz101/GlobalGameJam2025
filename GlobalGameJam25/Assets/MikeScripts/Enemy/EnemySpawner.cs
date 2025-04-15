@@ -1,113 +1,92 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class EnemySpawner : MonoBehaviour
 {
     public GameObject sludgePrefab;
     public GameObject gasPrefab;
     public Transform spawnArea1Center;
+    public float spawnArea1Radius = 15f;
     public int numSludgeToSpawn = 5;
-
     public Transform spawnArea2Center;
+    public float spawnArea2Radius = 15f;
     public int numGasToSpawn = 5;
 
-    private bool area1Entered = false;
-    private bool area2Entered = false;
-    private bool spawningComplete = false;
-    private List<GameObject> activeEnemies = new List<GameObject>();
+    private bool firstAreaIsSludge = false;
+    private bool firstAreaSet = false;
+    private bool sludgeSpawned = false; // Track if sludge has spawned
+    private bool gasSpawned = false;   // Track if gas has spawned
 
-    void Start()
+    public void SetFirstArea(int areaNumber)
     {
-        // Ensure the center GameObjects have SphereColliders set to 'Is Trigger'
-        if (spawnArea1Center != null && spawnArea1Center.GetComponent<SphereCollider>() == null)
+        if (!firstAreaSet)
         {
-            Debug.LogError("Spawn Area 1 Center does not have a SphereCollider!");
-            enabled = false;
-        }
-        if (spawnArea1Center != null && !spawnArea1Center.GetComponent<SphereCollider>().isTrigger)
-        {
-            Debug.LogError("SphereCollider on Spawn Area 1 Center is not set to 'Is Trigger'!");
-            enabled = false;
-        }
-
-        if (spawnArea2Center != null && spawnArea2Center.GetComponent<SphereCollider>() == null)
-        {
-            Debug.LogError("Spawn Area 2 Center does not have a SphereCollider!");
-            enabled = false;
-        }
-        if (spawnArea2Center != null && !spawnArea2Center.GetComponent<SphereCollider>().isTrigger)
-        {
-            Debug.LogError("SphereCollider on Spawn Area 2 Center is not set to 'Is Trigger'!");
-            enabled = false;
+            firstAreaIsSludge = (areaNumber == 1);
+            firstAreaSet = true;
+            Debug.Log("EnemySpawner: First area set to " + areaNumber + ". Sludge will spawn there.");
         }
     }
 
-    void OnTriggerEnter(Collider other)
+    public void SpawnEnemiesForArea(int areaNumber)
     {
-        Debug.Log("here?");
-        if (spawningComplete) return;
-
-        if (other.CompareTag("Player"))
+        if (!firstAreaSet)
         {
-            
-            if (other.transform == spawnArea1Center && !area1Entered)
-            {
-                area1Entered = true;
-                SpawnSludgeEnemies(spawnArea1Center.position, spawnArea1Center.GetComponent<SphereCollider>().radius);
-                Debug.Log("Player entered Spawn Area 1 first. Spawning Sludge enemies here.");
-            }
-            else if (other.transform == spawnArea2Center && !area2Entered)
-            {
-                area2Entered = true;
-                if (!area1Entered)
-                {
-                    SpawnSludgeEnemies(spawnArea2Center.position, spawnArea2Center.GetComponent<SphereCollider>().radius);
-                    Debug.Log("Player entered Spawn Area 2 first. Spawning Sludge enemies here.");
-                }
-                else
-                {
-                    SpawnGasEnemies(spawnArea2Center.position, spawnArea2Center.GetComponent<SphereCollider>().radius);
-                    Debug.Log("Player entered Spawn Area 2 second. Spawning Gas enemies here.");
-                }
-            }
+            Debug.LogError("EnemySpawner: First area not set! Cannot spawn enemies yet.");
+            return;
+        }
+
+        if ((firstAreaIsSludge && areaNumber == 1) && !sludgeSpawned)
+        {
+            SpawnSludgeEnemies(spawnArea1Center.position, spawnArea1Radius, numSludgeToSpawn);
+            sludgeSpawned = true;
+            Debug.Log("EnemySpawner: Spawning Sludge in Area " + areaNumber);
+        }
+        else if ((!firstAreaIsSludge && areaNumber == 2) && !sludgeSpawned)
+        {
+            SpawnSludgeEnemies(spawnArea2Center.position, spawnArea2Radius, numSludgeToSpawn);
+            sludgeSpawned = true;
+            Debug.Log("EnemySpawner: Spawning Sludge in Area " + areaNumber);
+        }
+        else if ((firstAreaIsSludge && areaNumber == 2) && !gasSpawned)
+        {
+            SpawnGasEnemies(spawnArea2Center.position, spawnArea2Radius, numGasToSpawn);
+            gasSpawned = true;
+            Debug.Log("EnemySpawner: Spawning Gas in Area " + areaNumber);
+        }
+        else if ((!firstAreaIsSludge && areaNumber == 1) && !gasSpawned)
+        {
+            SpawnGasEnemies(spawnArea1Center.position, spawnArea1Radius, numGasToSpawn);
+            gasSpawned = true;
+            Debug.Log("EnemySpawner: Spawning Gas in Area " + areaNumber);
+        }
+        else
+        {
+            Debug.Log("EnemySpawner: Spawning already complete or invalid area.");
         }
     }
 
-    void SpawnSludgeEnemies(Vector3 center, float radius)
+    private void SpawnSludgeEnemies(Vector3 center, float radius, int count)
     {
-        for (int i = 0; i < numSludgeToSpawn; i++)
+        for (int i = 0; i < count; i++)
         {
             Vector3 randomPosition = GetRandomPointInCircle(center, radius);
-            GameObject enemy = Instantiate(sludgePrefab, randomPosition, Quaternion.identity);
-            activeEnemies.Add(enemy);
+            Instantiate(sludgePrefab, randomPosition, Quaternion.identity);
         }
     }
 
-    void SpawnGasEnemies(Vector3 center, float radius)
+    private void SpawnGasEnemies(Vector3 center, float radius, int count)
     {
-        for (int i = 0; i < numGasToSpawn; i++)
+        for (int i = 0; i < count; i++)
         {
             Vector3 randomPosition = GetRandomPointInCircle(center, radius);
-            GameObject enemy = Instantiate(gasPrefab, randomPosition, Quaternion.identity);
-            activeEnemies.Add(enemy);
+            Instantiate(gasPrefab, randomPosition, Quaternion.identity);
         }
     }
 
-    Vector3 GetRandomPointInCircle(Vector3 center, float radius)
+    public Vector3 GetRandomPointInCircle(Vector3 center, float radius)
     {
         float angle = Random.Range(0f, Mathf.PI * 2);
         float u = Random.Range(0f, 1f) + Random.Range(0f, 1f);
         float r = radius * (u > 1 ? 2 - u : u);
         return new Vector3(center.x + r * Mathf.Cos(angle), center.y + 1f, center.z + r * Mathf.Sin(angle));
-    }
-
-    public void EnemyDied(GameObject deadEnemy)
-    {
-        activeEnemies.Remove(deadEnemy);
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        // No need to draw Gizmos here as the SphereColliders visualize the areas
     }
 }

@@ -130,7 +130,7 @@ public class EnemyBubble : MonoBehaviour
     {
         player.currentMana = player.maxMana;
         Debug.Log(gameObject.name + " has been destroyed!");
-        spawner.EnemyDied(gameObject); // Notify the spawner that this enemy has died
+        //spawner.EnemyDied(gameObject); // Notify the spawner that this enemy has died
         Destroy(gameObject); // Destroy the enemy GameObject
     }
     

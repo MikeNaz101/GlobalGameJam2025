@@ -1,26 +1,22 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject sludgePrefab;
-    public GameObject gasPrefab;
+    public EnemySpawner enemySpawner;
 
-    public Transform spawnArea1Center;
-    public float spawnArea1Radius = 15f;
-    public int numSludgeToSpawn = 5;
-
-    public Transform spawnArea2Center;
-    public float spawnArea2Radius = 15f;
-    public int numGasToSpawn = 5;
+    public TextMeshProUGUI infoTextUI;
+    public GameObject infoPanelUI;
 
     public List<string> triggeredEvents = new List<string>();
     public List<string> triggeredEventsOrder = new List<string>();
+    public List<GameObject> activeEnemies = new List<GameObject>();
 
     public static GameManager Instance { get; private set; }
 
-    private bool area1SludgeSpawned = false;
-    private bool area2GasSpawned = false;
+    private bool firstSpawnTriggered = false;
+    private TutorialManager tutorialManager;
 
     void Awake()
     {
@@ -33,6 +29,21 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("Multiple GameManagers found. Destroying the extra.");
             Destroy(gameObject);
         }
+
+        if (enemySpawner == null)
+        {
+            enemySpawner = FindAnyObjectByType<EnemySpawner>();
+            if (enemySpawner == null)
+            {
+                Debug.LogError("EnemySpawner not found in the scene!");
+            }
+        }
+
+        tutorialManager = FindAnyObjectByType<TutorialManager>();
+        if (tutorialManager == null)
+        {
+            Debug.LogError("TutorialManager not found in the scene!");
+        }
     }
 
     public void RegisterTriggeredEvent(string eventName)
@@ -40,62 +51,54 @@ public class GameManager : MonoBehaviour
         if (!triggeredEvents.Contains(eventName))
         {
             triggeredEvents.Add(eventName);
-            triggeredEventsOrder.Add(eventName);
-            Debug.Log("Event Triggered: " + eventName);
-            ProcessTriggeredEvents();
         }
-        else
-        {
-            triggeredEventsOrder.Add(eventName); // Still record the order if needed
-        }
+        triggeredEventsOrder.Add(eventName);
+        Debug.Log("Event Triggered: " + eventName);
+        ProcessTriggeredEvents();
     }
 
     private void ProcessTriggeredEvents()
     {
-        foreach (string eventName in triggeredEventsOrder)
+        if (triggeredEventsOrder.Count > 0)
         {
-            switch (eventName)
+            string latestEventName = triggeredEventsOrder[triggeredEventsOrder.Count - 1]; // Get the last event
+
+            if (int.TryParse(latestEventName, out int areaNumber))
             {
-                case "Spawn_Sludge_Area1":
-                    if (!area1SludgeSpawned && sludgePrefab != null && spawnArea1Center != null)
-                    {
-                        SpawnEnemies(sludgePrefab, spawnArea1Center.position, spawnArea1Radius, numSludgeToSpawn);
-                        area1SludgeSpawned = true;
-                        Debug.Log("GameManager: Spawning Sludge in Area 1.");
-                    }
-                    break;
-                case "Spawn_Gas_Area2":
-                    if (!area2GasSpawned && gasPrefab != null && spawnArea2Center != null)
-                    {
-                        SpawnEnemies(gasPrefab, spawnArea2Center.position, spawnArea2Radius, numGasToSpawn);
-                        area2GasSpawned = true;
-                        Debug.Log("GameManager: Spawning Gas in Area 2.");
-                    }
-                    break;
-                case "Tutorial_Movement":
-                    ShowTutorialMessage("Welcome! Use WASD to move.");
-                    break;
-                case "Info_Pickup_Item":
-                    ShowInfoMessage("Press E to interact with items.");
-                    break;
-                // Add more cases for other events
+                if (!firstSpawnTriggered)
+                {
+                    enemySpawner?.SetFirstArea(areaNumber);
+                    enemySpawner?.SpawnEnemiesForArea(areaNumber);
+                    firstSpawnTriggered = true;
+                }
+                else
+                {
+                    enemySpawner?.SpawnEnemiesForArea(areaNumber);
+                }
+            }
+            else if (latestEventName.StartsWith("Tutorial"))
+            {
+                string tutorialID = latestEventName.Substring(8);
+                tutorialManager?.ShowTutorial(tutorialID);
+            }
+            else
+            {
+                switch (latestEventName)
+                {
+                    case "Info_Pickup_Item":
+                        ShowInfoMessage("Press E to interact with items.");
+                        break;
+                }
             }
         }
 
-        // You might also want logic that checks the *order* of these events
+        // You can still have logic based on the order of these events (if needed)
         if (triggeredEventsOrder.Count >= 2)
         {
-            if (triggeredEventsOrder[0] == "Tutorial_Movement" && triggeredEventsOrder[1] == "Spawn_Sludge_Area1")
+            if (triggeredEventsOrder[0] == "1" && triggeredEventsOrder[1] == "2")
             {
-                Debug.Log("GameManager: Movement tutorial followed by entering the first enemy area.");
-                // Perform some other action based on the order
+                Debug.Log("First triggered area was 1, then 2.");
             }
-        }
-
-        // You might also want logic that checks for combinations of triggered events
-        if (triggeredEvents.Contains("Tutorial_Movement") && triggeredEvents.Contains("Info_Pickup_Item"))
-        {
-            // Do something when both events have occurred
         }
     }
 
@@ -103,31 +106,40 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < count; i++)
         {
-            Vector3 randomPosition = GetRandomPointInCircle(center, radius);
-            Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
+            Vector3 randomPosition = enemySpawner.GetRandomPointInCircle(center, radius);
+            GameObject newEnemy = Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
+
+            BaseEnemy enemyComponent = newEnemy.GetComponent<BaseEnemy>();
+            if (enemyComponent != null)
+            {
+                enemyComponent.gameManager = this;
+                activeEnemies.Add(newEnemy);
+            }
         }
-    }
-
-    Vector3 GetRandomPointInCircle(Vector3 center, float radius)
-    {
-        float angle = Random.Range(0f, Mathf.PI * 2);
-        float u = Random.Range(0f, 1f) + Random.Range(0f, 1f);
-        float r = radius * (u > 1 ? 2 - u : u);
-        return new Vector3(center.x + r * Mathf.Cos(angle), center.y + 1f, center.z + r * Mathf.Sin(angle));
-    }
-
-    // Methods to show messages
-    private void ShowTutorialMessage(string message)
-    {
-        Debug.Log("Showing Tutorial: " + message);
-        // **YOUR UI CODE TO DISPLAY THE TUTORIAL MESSAGE HERE**
-        // This might involve finding a UI element and updating its text.
     }
 
     private void ShowInfoMessage(string message)
     {
         Debug.Log("Showing Info: " + message);
-        // **YOUR UI CODE TO DISPLAY THE INFO MESSAGE HERE**
-        // This might involve finding a different UI element or handling a different UI flow.
+        if (infoTextUI != null && infoPanelUI != null)
+        {
+            infoTextUI.text = message;
+            infoPanelUI.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("Info UI elements not assigned!");
+        }
+    }
+
+    public void EnemyDied(GameObject deadEnemy)
+    {
+        Debug.Log("GameManager: Enemy Died: " + deadEnemy.name);
+        activeEnemies.Remove(deadEnemy);
+    }
+
+    private void SpawnEnemiesForArea(int areaNumber)
+    {
+        enemySpawner?.SpawnEnemiesForArea(areaNumber);
     }
 }

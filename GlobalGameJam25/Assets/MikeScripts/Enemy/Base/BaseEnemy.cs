@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.AI; // For NavMeshAgent if you decide to use it for movement
+using UnityEngine.AI; // For NavMeshAgent
 
 public enum EnemyState
 {
@@ -19,14 +19,17 @@ public abstract class BaseEnemy : MonoBehaviour
     public int currentHealth;
     public float moveSpeed = 2f;
     public Transform playerTransform;
-    public EnemySpawner spawner;
+    public GameManager gameManager; // Changed to private
 
     protected virtual void Start()
     {
-        GameObject spawnerObject = GameObject.FindGameObjectWithTag("Spawner");
-        spawner = spawnerObject?.GetComponent<EnemySpawner>();
         playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
         currentHealth = maxHealth;
+        gameManager = FindAnyObjectByType<GameManager>(); // Find GameManager
+        if (gameManager == null)
+        {
+            Debug.LogError("GameManager not found!");
+        }
     }
 
     protected virtual void Update()
@@ -93,13 +96,13 @@ public abstract class BaseEnemy : MonoBehaviour
     protected virtual void Die()
     {
         Debug.Log(gameObject.name + " has withered away!");
-        spawner?.EnemyDied(gameObject);
+        gameManager?.EnemyDied(gameObject); // Call GameManager's method
         Destroy(gameObject);
     }
 
     protected abstract float GetAttackRange();
 
-    public void OnDrawGizmosSelected()
+    public virtual void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);

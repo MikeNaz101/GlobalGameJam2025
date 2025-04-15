@@ -5,11 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fce460ab-96da-436b-be79-13280ac23597" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerShooting.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerShooting.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerStateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerStateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikesPrefabs/TeleportShellPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikesPrefabs/TeleportShellPrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main_Game.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main_Game.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Simple FX Kit/Prefabs/Water Splash Continous.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Simple FX Kit/Prefabs/Water Splash Continous.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.GlobalGameJam25/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GlobalGameJam25/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Mike/VinnySceneMikeRevised.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Mike/VinnySceneMikeRevised.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Base/BaseEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Base/BaseEnemy.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemyBubble.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemyBubble.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemySpawner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemySpawner.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/GameManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/TriggerEvent.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/TriggerEvent.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/DynamicsManager.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/DynamicsManager.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,10 +22,15 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 0
-}]]></component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/PanelSizeToText.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/TutorialManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/TypeWriterEffect.cs" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="2vFUekwyU85KdZGQlckRFxSavI2" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -31,7 +39,8 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "Vinny",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -101,6 +110,7 @@
       <option name="presentableId" value="Default" />
       <updated>1743740412758</updated>
       <workItem from="1743740414392" duration="4230000" />
+      <workItem from="1744686986552" duration="9256000" />
     </task>
     <servers />
   </component>
