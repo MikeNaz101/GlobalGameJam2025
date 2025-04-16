@@ -1,0 +1,116 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &225861933715559730
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2840906729972597821}
+  - component: {fileID: 1214674146152360735}
+  - component: {fileID: 541345049283029973}
+  - component: {fileID: 604431163475789616}
+  - component: {fileID: 5244568340785563921}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2840906729972597821
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 225861933715559730}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 275.57025, y: 205.2125, z: 537.0668}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1214674146152360735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 225861933715559730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21723003bc9a9a346846cd5d08e8bf29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  basicBullet: {fileID: 1248408006104775272, guid: b16b1f2b09a408b468d5cdc9749b5110, type: 3}
+  freezeBullet: {fileID: 8293114827483298198, guid: 78541d79fa73ce04c8041df428382966, type: 3}
+  teleportBullet: {fileID: 1792848943308623929, guid: 50851b897ca522d41a08f3952eda6d5d, type: 3}
+  OnBulletTypeChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  playerShooting: {fileID: 0}
+--- !u!114 &541345049283029973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 225861933715559730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c3aa56583b1a854e94463ed4d3620a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemySpawner: {fileID: 604431163475789616}
+  infoTextUI: {fileID: 0}
+  infoPanelUI: {fileID: 0}
+  triggeredEvents: []
+  triggeredEventsOrder: []
+  activeEnemies: []
+--- !u!114 &604431163475789616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 225861933715559730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60dac37c6ed1c3949a1a2e443feeeb01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sludgePrefab: {fileID: 9086509785562928389, guid: ff711e855316b324b87acfddd6ae2584, type: 3}
+  gasPrefab: {fileID: 9086509785562928389, guid: 35ceecdb1a6bb544cb3754a083b1c8a8, type: 3}
+  spawnArea1Center: {fileID: 0}
+  spawnArea1Radius: 15
+  numSludgeToSpawn: 5
+  spawnArea2Center: {fileID: 0}
+  spawnArea2Radius: 15
+  numGasToSpawn: 5
+--- !u!114 &5244568340785563921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 225861933715559730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c535483483c98f46a18ffb5ddd47b05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tutorialMessages:
+  - Greetings Young Godling! You Must Protect The Forrest! Defeat the Decay and SAVE
+    the Forest Realm!
+  - There are some Decay Monsters! Use Left Mouse to fire an SPIRIT Bomb at them!
+  - You can also switch to your ICE spirit enemy's to defeat those more viseral Enemies
+    (USING THE SCROLL WHEEL!)
+  tutorialTextUI: {fileID: 0}
+  tutorialPanelUI: {fileID: 0}
+  typeWriterEffect: {fileID: 0}
+  messageVisibleDuration: 3

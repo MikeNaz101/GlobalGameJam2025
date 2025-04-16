@@ -303,7 +303,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7574001101456263496}
-  m_Layer: 3
+  m_Layer: 2
   m_Name: PlayerPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -768,7 +768,7 @@ MonoBehaviour:
   bulletSpawner: {fileID: 0}
   firePoint: {fileID: 7335547498233184104}
   shellPrefabs:
-  - {fileID: 5535924560927195969, guid: e60666857a9c0e14bbbbfc6a24c1418c, type: 3}
+  - {fileID: 1248408006104775272, guid: 9c65f638508e4b04c91dc1664ba0d8ee, type: 3}
   - {fileID: 5535924560927195969, guid: a2f91601380c9f64dbe9a8c0685da73c, type: 3}
   - {fileID: 5535924560927195969, guid: 23e73f397a44a7649a854cddef7e660b, type: 3}
   orbitRadius: 2

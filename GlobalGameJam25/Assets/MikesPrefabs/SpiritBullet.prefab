@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 2963689969325283412}
   m_Layer: 2
   m_Name: SpiritBullet
-  m_TagString: PProjectile
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

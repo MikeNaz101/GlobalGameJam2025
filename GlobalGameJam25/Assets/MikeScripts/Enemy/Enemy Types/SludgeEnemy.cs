@@ -1,266 +1,169 @@
-// --- SludgeEnemy Script ---
+// --- SludgeEnemy Script (Using GetComponentInParent) ---
 using UnityEngine;
-using UnityEngine.AI; // Include if using NavMeshAgent
 
 // Requires BaseEnemy script and DamageType enum
 
-[RequireComponent(typeof(NavMeshAgent))] // Good practice if Sludge MUST use NavMesh
 public class SludgeEnemy : BaseEnemy
 {
     [Header("Sludge Specific Stats")]
     public float patrolRadius = 10f;
-    public float attackRange = 1.5f; // Close range melee
+    public float attackRange = 1.5f;
     public int attackDamage = 10;
-    public float attackCooldown = 1.5f; // Slightly longer cooldown for melee
+    public float attackCooldown = 1.5f;
+    public float stoppingDistanceBuffer = 0.2f;
+    public float rotationSpeed = 180f;
+
+    [Header("Grounding")]
+    public LayerMask groundLayer;
+    public float groundCheckDistance = 0.5f;
+    public float groundOffset = 0.1f;
 
     [Header("References")]
-    public HealthBar healthBar; // Assign in the Inspector (Optional)
+    public HealthBar healthBar;
 
-    // Internal state
     private Vector3 spawnPosition;
-    private Vector3 patrolTarget;
+    private Vector3 currentTargetPosition;
     private float attackTimer = 0f;
-    private NavMeshAgent agent; // Cache NavMeshAgent
+    private bool hasTarget = false;
 
-    protected override void Awake()
-    {
-        base.Awake(); // Call base Awake first
-        agent = GetComponent<NavMeshAgent>();
-        if (agent == null)
-        {
-             Debug.LogError($"SludgeEnemy {gameObject.name} requires a NavMeshAgent component!");
-             this.enabled = false; // Disable if no agent
-             return;
-        }
-        // Configure agent defaults here if needed
-        agent.speed = moveSpeed;
-        agent.stoppingDistance = attackRange * 0.8f; // Stop slightly before exact attack range
-    }
+    protected override void Awake() { base.Awake(); }
 
     protected override void Start()
     {
-        base.Start(); // Call base Start
+        base.Start();
         spawnPosition = transform.position;
-        // Ensure the enemy starts on the NavMesh
-        if (agent.isOnNavMesh)
-        {
-            SetNewPatrolTarget();
-        }
-        else
-        {
-             Debug.LogError($"SludgeEnemy {gameObject.name} is not placed on a NavMesh!");
-             // Try to warp to nearest valid NavMesh point?
-             NavMeshHit hit;
-             if (NavMesh.SamplePosition(transform.position, out hit, 2.0f, NavMesh.AllAreas)) {
-                 agent.Warp(hit.position);
-                 spawnPosition = hit.position; // Update spawn pos
-                 SetNewPatrolTarget();
-             } else {
-                 Debug.LogError($"Could not find valid NavMesh position near {transform.position} for SludgeEnemy!");
-                 this.enabled = false; // Disable if can't find valid spot
-             }
-        }
-
-        // Initialize Health Bar
-        if (healthBar != null)
-        {
-            healthBar.SetMaxStats(maxHealth);
-            UpdateHealthBar();
-        }
+        SetNewPatrolTarget();
+        if (healthBar != null) { healthBar.SetMaxStats(maxHealth); UpdateHealthBar(); }
     }
 
     protected override void Update()
     {
-        // --- Update Agent Speed (In case moveSpeed changes) ---
-         if (agent != null && agent.speed != moveSpeed) {
-             agent.speed = moveSpeed;
-         }
-
-        base.Update(); // Handles freeze check and calls HandleStateMachine if not frozen
-
-        // Update attack timer ONLY if not frozen
-        if (!_isFrozen)
-        {
-            attackTimer += Time.deltaTime;
-        }
+        if (!_isFrozen) attackTimer += Time.deltaTime;
+        StickToGround();
+        base.Update();
     }
 
     // --- State Implementations ---
-
+    // Patrol, SetNewPatrolTarget, Chase remain the same as the previous version
     protected override void Patrol()
     {
-        // Use NavMeshAgent to move towards patrol target
-        if (!agent.pathPending && agent.remainingDistance < 0.5f)
-        {
-            SetNewPatrolTarget();
-        }
+        if (!hasTarget || Vector3.Distance(transform.position, currentTargetPosition) < 1.0f) SetNewPatrolTarget();
+        if (hasTarget) { MoveTowards(currentTargetPosition); LookTowards(currentTargetPosition); }
     }
-
     private void SetNewPatrolTarget()
     {
         Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
-        randomDirection += spawnPosition; // Use spawnPosition as origin
-
-        NavMeshHit hit;
-        // Find a random point on the NavMesh within the patrolRadius from spawnPosition
-        if (NavMesh.SamplePosition(randomDirection, out hit, patrolRadius * 1.5f, NavMesh.AllAreas)) // Increase sample radius slightly
-        {
-            patrolTarget = hit.position;
-            agent.SetDestination(patrolTarget);
-        }
-        else
-        {
-             // Could not find point, maybe try again next frame or log warning
-             // For now, just stay put or go back to spawn
-             agent.SetDestination(spawnPosition);
-             Debug.LogWarning($"Could not find NavMesh point near {randomDirection} for {gameObject.name}");
+        Vector3 potentialTarget = spawnPosition + new Vector3(randomDirection.x, 0, randomDirection.z);
+        RaycastHit hit;
+        if (Physics.Raycast(potentialTarget + Vector3.up * 5f, Vector3.down, out hit, 10f, groundLayer)) {
+            currentTargetPosition = hit.point; hasTarget = true;
+        } else {
+             currentTargetPosition = spawnPosition; hasTarget = true;
         }
     }
-
     protected override void Chase()
     {
-        if (playerTransform == null || !agent.enabled || !agent.isOnNavMesh) return;
-        // Set destination to player's position
-        agent.SetDestination(playerTransform.position);
-        // Agent handles rotation automatically (updateRotation = true) unless specified otherwise
+        if (playerTransform == null) { hasTarget = false; return; }
+        currentTargetPosition = playerTransform.position; hasTarget = true;
+        if (Vector3.Distance(transform.position, currentTargetPosition) > GetAttackRange() - stoppingDistanceBuffer) MoveTowards(currentTargetPosition);
+        LookTowards(currentTargetPosition);
     }
 
-    protected override void Attack()
+    // Attack method remains the same (still calls PerformMeleeAttack)
+     protected override void Attack()
     {
-         if (playerTransform == null || !agent.enabled || !agent.isOnNavMesh) return;
+         if (playerTransform == null) { hasTarget = false; return; }
+         currentTargetPosition = playerTransform.position; hasTarget = true;
+         LookTowards(currentTargetPosition); // Keep looking
 
-        // Stop moving when in attack state (usually handled by agent.stoppingDistance)
-         // agent.ResetPath(); // Or agent.isStopped = true; might be better if you want it to resume chase easily
+        // --- DEBUG LOGS for Attack State (Optional - Keep or Remove) ---
+        /*
+        float currentDistance = Vector3.Distance(transform.position, currentTargetPosition);
+        bool readyToAttack = attackTimer >= attackCooldown;
+        bool withinRange = currentDistance <= GetAttackRange() * 1.1f;
+        if (Time.frameCount % 20 == 0) {
+             Debug.Log($"<color=#FFBF00>[{gameObject.name}]</color> In Attack State. Timer: {attackTimer:F2}/{attackCooldown:F2} (Ready? {readyToAttack}). Dist: {currentDistance:F2} / Range: {(GetAttackRange() * 1.1f):F2} (InRange? {withinRange}).");
+        }
+        */
+        // --- END DEBUG LOGS ---
 
-        // Ensure looking at player
-        LookAtPlayer();
-
-        // Melee attack logic
-        if (attackTimer >= attackCooldown)
+        // Check conditions to perform the attack
+        if (attackTimer >= attackCooldown && Vector3.Distance(transform.position, currentTargetPosition) <= GetAttackRange() * 1.1f)
         {
-            // Check distance again just to be sure (NavMesh pathing isn't instant)
-            if (Vector3.Distance(transform.position, playerTransform.position) <= attackRange * 1.1f) // Slight tolerance
-            {
-                PerformMeleeAttack();
-                attackTimer = 0f; // Reset timer AFTER attacking
-            }
+             // Log call if keeping debug logs
+             // Debug.Log($"<color=lime>[{gameObject.name}]</color> *** Attack conditions met! Calling PerformMeleeAttack... ***");
+             PerformMeleeAttack();
+             attackTimer = 0f;
         }
     }
 
+
+     // --- PerformMeleeAttack NOW USES GetComponentInParent ---
      void PerformMeleeAttack()
      {
-         Debug.Log($"{gameObject.name} performs melee attack!");
-         // Optional: Play attack animation
-         // animator.SetTrigger("Attack");
+         // Optional Log: Debug.Log($"<color=green>[{gameObject.name}]</color> Inside PerformMeleeAttack. Trying GetComponentInParent on '{playerTransform?.name ?? "null"}'.");
 
-         // Apply damage to player
-         PlayerStateManager player = playerTransform.GetComponent<PlayerStateManager>();
+         // --- CHANGE IS HERE: Use GetComponentInParent ---
+         PlayerStateManager player = playerTransform?.GetComponentInParent<PlayerStateManager>();
+         // ---------------------------------------------
+
          if (player != null)
          {
-             // IMPORTANT: Call TakeDamage with DamageType.Basic (or .Other if sludge isn't 'basic')
-             player.TakeDamage(attackDamage/*, DamageType.Basic*/); // Assuming PlayerStateManager.TakeDamage doesn't need type
+             // Optional Log: Debug.Log($"<color=green>[{gameObject.name}]</color> Found PlayerStateManager via parent on '{player.name}'. Applying {attackDamage} damage.");
+             player.TakeDamage(attackDamage);
+         }
+         else
+         {
+              // Error if still not found (means script isn't on 'body' or any of its parents)
+             if(playerTransform == null) {
+                  Debug.LogError($"<color=red>[{gameObject.name}]</color> ERROR in PerformMeleeAttack: playerTransform reference is NULL!");
+             } else {
+                 Debug.LogError($"<color=red>[{gameObject.name}]</color> ERROR in PerformMeleeAttack: Could not find PlayerStateManager component on '{playerTransform.name}' OR IN ANY OF ITS PARENTS! Check player prefab structure and script location.");
+             }
          }
      }
 
-    protected override void Flee()
+    // Flee method remains the same
+     protected override void Flee()
     {
-         if (playerTransform == null || !agent.enabled || !agent.isOnNavMesh) return;
-
-        // Find a point away from the player on the NavMesh
+        if (playerTransform == null) { hasTarget = false; return; }
         Vector3 fleeDirection = (transform.position - playerTransform.position).normalized;
-        Vector3 targetPos = transform.position + fleeDirection * (patrolRadius * 0.5f); // Flee a certain distance
-
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(targetPos, out hit, patrolRadius * 0.5f, NavMesh.AllAreas))
-        {
-            agent.SetDestination(hit.position);
+        Vector3 potentialTarget = transform.position + fleeDirection * (patrolRadius * 0.75f);
+        RaycastHit hit;
+        if (Physics.Raycast(potentialTarget + Vector3.up * 5f, Vector3.down, out hit, 10f, groundLayer)) {
+            currentTargetPosition = hit.point; hasTarget = true;
+        } else {
+            hasTarget = false;
         }
-        else
-        {
-            // Can't find flee point, maybe just stop or patrol?
-             agent.SetDestination(spawnPosition); // Go back to spawn as fallback
-        }
+        if(hasTarget) { MoveTowards(currentTargetPosition); LookTowards(currentTargetPosition); }
     }
 
     // --- Helper Methods ---
-    void LookAtPlayer()
-    {
-        if (playerTransform == null) return;
-        Vector3 direction = (playerTransform.position - transform.position).normalized;
-        if (direction != Vector3.zero)
-        {
-            Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-             // Agent might handle rotation, but manual can be smoother or override
-             transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * agent.angularSpeed * 0.1f); // Sync roughly with agent rotation speed
+    void MoveTowards(Vector3 target) { /* ... same as before ... */
+        Vector3 direction = (target - transform.position).normalized;
+        direction.y = 0;
+        transform.position += direction * moveSpeed * Time.deltaTime;
+     }
+    void LookTowards(Vector3 target) { /* ... same as before ... */
+        Vector3 direction = (target - transform.position).normalized;
+        if (direction != Vector3.zero) {
+            direction.y = 0;
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
-    }
+     }
+    void StickToGround() { /* ... same as before ... */
+         RaycastHit hit;
+         Vector3 rayStart = transform.position + Vector3.up * 0.5f;
+         if (Physics.Raycast(rayStart, Vector3.down, out hit, groundCheckDistance + 0.5f, groundLayer)) {
+             Vector3 targetPosition = hit.point + Vector3.up * groundOffset;
+             transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * 10f);
+         }
+     }
 
     // --- Overrides ---
+    protected override float GetAttackRange() { return attackRange; }
+    protected override void UpdateHealthBar() { healthBar?.SetHealth(currentHealth); }
+    protected override void Die() { base.Die(); }
 
-     public override void Freeze(float baseDuration = 4f) // Sludge might freeze for slightly less?
-     {
-         if (_isFrozen || currentState == EnemyState.Dying) return;
-
-         // Stop NavMesh Agent BEFORE calling base.Freeze if base.Freeze might disable it
-         if (agent != null && agent.enabled)
-         {
-             agent.isStopped = true;
-             // agent.velocity = Vector3.zero; // Ensure it stops immediately
-         }
-         base.Freeze(baseDuration); // Call base freeze logic
-     }
-
-     protected override void Unfreeze()
-     {
-         base.Unfreeze(); // Call base unfreeze logic
-         // Resume NavMesh Agent AFTER calling base.Unfreeze
-         if (agent != null && agent.enabled)
-         {
-             agent.isStopped = false;
-             // Re-evaluate destination based on current state
-             if (currentState == EnemyState.Chasing && playerTransform != null) {
-                 agent.SetDestination(playerTransform.position);
-             } else if (currentState == EnemyState.Patrolling) {
-                 // Might need to reset patrol target or let it continue
-                 if (!agent.hasPath || agent.remainingDistance < 0.5f) SetNewPatrolTarget();
-                 else agent.SetDestination(patrolTarget); // Resume patrolling
-             }
-             // Add other states if needed (Fleeing)
-         }
-     }
-
-    protected override float GetAttackRange()
-    {
-        return attackRange;
-    }
-
-     protected override void UpdateHealthBar()
-     {
-         healthBar?.SetHealth(currentHealth);
-     }
-
-    protected override void Die()
-    {
-        // Add specific sludge death effects (e.g., puddle dissolve)
-        // Instantiate(sludgeDissolveEffect, transform.position, Quaternion.identity);
-
-        // Disable NavMeshAgent BEFORE destroying
-        if (agent != null) { agent.enabled = false; }
-
-        base.Die(); // Call base Die for destruction and GameManager notification
-    }
-
-    // Override Gizmos to draw attack range
-    private new void OnDrawGizmosSelected()
-    {
-        base.OnDrawGizmosSelected(); // Draw base gizmos (detection radius)
-
-        // Draw Patrol Radius
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(spawnPosition, patrolRadius);
-
-        // Draw Attack Radius
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-    }
-}
+} // End of SludgeEnemy class
