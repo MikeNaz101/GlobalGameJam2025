@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 225861933715559730}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 275.57025, y: 205.2125, z: 537.0668}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -105,9 +105,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tutorialMessages:
-  - Greetings Young Godling! You Must Protect The Forrest! Defeat the Decay and SAVE
-    the Forest Realm!
-  - There are some Decay Monsters! Use Left Mouse to fire an SPIRIT Bomb at them!
+  - Greetings Young Godling!  Use WASP to move around the forest, and space to jump.
+  - Ishana,You Must Protect The Forrest! Defeat the Decay and SAVE the Forest Realm!
+  - Those are Slimemaw! Use Left Mouse to fire a SPIRIT shot at them!
+  - Your bullet will land where the light shows
+  - You can charge your magic to inflict more damage. Hold left click and release
+    after the Aura has fully grown.
+  - You can also switch to your ICE spirit enemy's to defeat those more viseral Enemies
+    (USING THE SCROLL WHEEL!)
+  - That is a sacred tree!. They will heal you if yo are low on health.
+  - You can also switch to your ICE spirit enemy's to defeat those more viseral Enemies
+    (USING THE SCROLL WHEEL!)
   - You can also switch to your ICE spirit enemy's to defeat those more viseral Enemies
     (USING THE SCROLL WHEEL!)
   tutorialTextUI: {fileID: 0}
