@@ -11,9 +11,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/EndScene.unity
     guid: 6ab9ecec3038a51409eb4f4c6ef8723f
-  - enabled: 1
+  - enabled: 0
     path: Assets/Vinny/Vinnyscene.unity
     guid: cfb78183ffb374b4a8065eade6dc4c4a
+  - enabled: 1
+    path: Assets/Mike/WorkingScript.unity
+    guid: 0b1f0dd78b0a87844bf03754941bd4cc
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
