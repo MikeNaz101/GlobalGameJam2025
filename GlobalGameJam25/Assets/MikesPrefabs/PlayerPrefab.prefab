@@ -1075,15 +1075,16 @@ MonoBehaviour:
   player: {fileID: 6132794304212841273}
   gameplayVCam: {fileID: 227384190289370449}
   teleportAimVCam: {fileID: 2459340906484035929}
-  teleportAimUI: {fileID: 0}
+  teleportAimUI: {fileID: 3597000251551646225}
   aimRaycastRange: 100
   aimRaycastLayerMask:
     serializedVersion: 2
     m_Bits: 115
-  aimingSpotEffect: {fileID: 0}
+  aimingSpotPrefab: {fileID: 3099402073855120435, guid: 843c54ca697fa434cb1c08d274c7ca29, type: 3}
   basicManaCostInitial: 5
   freezeManaCostInitial: 10
   teleportManaCost: 50
+  bulletAngleOffset: 2
 --- !u!114 &1349443047492608146
 MonoBehaviour:
   m_ObjectHideFlags: 0

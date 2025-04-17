@@ -7,12 +7,8 @@
     <list default="true" id="fce460ab-96da-436b-be79-13280ac23597" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GlobalGameJam25/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GlobalGameJam25/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Mike/VinnySceneMikeRevised.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Mike/VinnySceneMikeRevised.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Base/BaseEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Base/BaseEnemy.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemyBubble.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemyBubble.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemySpawner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemySpawner.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/GameManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/TriggerEvent.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/TriggerEvent.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/DynamicsManager.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/DynamicsManager.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikesPrefabs/PlayerPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikesPrefabs/PlayerPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikesPrefabs/TargetEffect.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikesPrefabs/TargetEffect.prefab" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,19 +32,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "Vinny",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Vinny&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Standalone Player" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="$PROJECT_DIR$/Build\GlobalGameJam25.exe" />
@@ -111,6 +107,7 @@
       <updated>1743740412758</updated>
       <workItem from="1743740414392" duration="4230000" />
       <workItem from="1744686986552" duration="9256000" />
+      <workItem from="1744863572190" duration="1811000" />
     </task>
     <servers />
   </component>
