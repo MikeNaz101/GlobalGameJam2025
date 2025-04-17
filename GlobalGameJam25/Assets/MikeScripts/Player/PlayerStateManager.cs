@@ -249,6 +249,7 @@ public class PlayerStateManager : MonoBehaviour
             SwitchState(hitState);
         }
          else if (currentHealth <= 0) {
+            Die();
              // Already dead, do nothing? Or ensure Die() is called?
          }
     }
