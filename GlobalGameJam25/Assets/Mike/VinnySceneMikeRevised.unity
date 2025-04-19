@@ -1228,11 +1228,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!198 &1023292774 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 1247646017617128803, guid: d6300fb1fa9311a478b3a97674bbfed6, type: 3}
-  m_PrefabInstance: {fileID: 286351021}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1037014012 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1583458680852880667, guid: 9528ee35e56ae85438c1608e97c6f00c, type: 3}
@@ -2193,7 +2188,7 @@ PrefabInstance:
     - target: {fileID: 7552419452380975823, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
       propertyPath: aimingSpotEffect
       value: 
-      objectReference: {fileID: 1023292774}
+      objectReference: {fileID: 4416527533646018381, guid: 843c54ca697fa434cb1c08d274c7ca29, type: 3}
     - target: {fileID: 7574001101456263496, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 907.9
