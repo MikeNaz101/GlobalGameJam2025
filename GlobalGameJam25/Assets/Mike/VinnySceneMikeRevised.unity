@@ -2125,6 +2125,62 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 124923501195362665, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 124923501195362665, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -21
+      objectReference: {fileID: 0}
+    - target: {fileID: 347678556043192439, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_fontSize
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 347678556043192439, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_margin.w
+      value: -21.33248
+      objectReference: {fileID: 0}
+    - target: {fileID: 347678556043192439, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_margin.x
+      value: -101.718124
+      objectReference: {fileID: 0}
+    - target: {fileID: 347678556043192439, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_margin.y
+      value: 14.780237
+      objectReference: {fileID: 0}
+    - target: {fileID: 347678556043192439, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_margin.z
+      value: -117.52997
+      objectReference: {fileID: 0}
+    - target: {fileID: 347678556043192439, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 355389718910906765, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 35.134266
+      objectReference: {fileID: 0}
+    - target: {fileID: 355389718910906765, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 5.1846347
+      objectReference: {fileID: 0}
+    - target: {fileID: 355389718910906765, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 3.1107187
+      objectReference: {fileID: 0}
+    - target: {fileID: 355389718910906765, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.00000099202
+      objectReference: {fileID: 0}
+    - target: {fileID: 355389718910906765, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 99
+      objectReference: {fileID: 0}
+    - target: {fileID: 355389718910906765, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 1909221523740618788, guid: a5b2cad3384bc7041a8cfffccdf6888b, type: 3}
       propertyPath: m_Name
       value: PlayerPrefab
