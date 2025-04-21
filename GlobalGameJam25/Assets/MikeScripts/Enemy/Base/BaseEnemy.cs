@@ -17,12 +17,16 @@ public abstract class BaseEnemy : MonoBehaviour
     [Tooltip("Leave empty to find by tag 'Player' at runtime.")]
     public Transform playerTransform;
     public GameManager gameManager;
+    // --- NEW: Add this reference! ---
+    [Tooltip("Assign the AreaCleansingManager for the zone this enemy belongs to.")]
+    public AreaCleansingManager myAreaManager;
+    // --------------------------------
 
-    [Header("Loot & Effects")] // Section added for XP Orb
+    [Header("Loot & Effects")]
     [Tooltip("The particle effect prefab to spawn when the enemy dies (represents XP). Assign your XP Orb Prefab here.")]
-    public GameObject xpEffectPrefab; // <-- Assign your XpOrbEffect prefab in the Inspector
+    public GameObject xpEffectPrefab;
     [Tooltip("Amount of XP this enemy grants (used by Player on collection). Value could potentially be passed if needed.")]
-    public int xpValue = 10; // Example value - Currently collected by Player script
+    public int xpValue = 10;
 
     // Freeze related variables
     protected bool _isFrozen = false;
@@ -48,10 +52,19 @@ public abstract class BaseEnemy : MonoBehaviour
             else Debug.LogError($"<color=red>[{gameObject.name}]</color> FAILED TO FIND PLAYER OBJECT TAGGED 'Player' IN START!");
         }
         if (gameManager == null) gameManager = FindFirstObjectByType<GameManager>();
+
+        // --- Optional: Add a check/warning if the Area Manager isn't assigned ---
+        // Note: This check runs in Start. If assigned later (e.g., by a spawner), this warning might be premature.
+        if (myAreaManager == null)
+        {
+            Debug.LogWarning($"[{gameObject.name}] does not have an AreaCleansingManager assigned in Start. Ensure it's set via Inspector or Spawner.", this);
+        }
+        // ----------------------------------------------------------------------
     }
 
     protected virtual void Update()
     {
+        // ... (rest of Update remains the same) ...
         if (_isFrozen) {
             if (Time.time >= _freezeEndTime) Unfreeze();
             else return;
@@ -62,7 +75,7 @@ public abstract class BaseEnemy : MonoBehaviour
 
     protected virtual void HandleStateMachine()
     {
-        // Simplified state machine logic from previous version
+        // ... (HandleStateMachine remains the same) ...
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
         switch (currentState) {
             case EnemyState.Patrolling:
@@ -89,12 +102,14 @@ public abstract class BaseEnemy : MonoBehaviour
 
     protected virtual void ChangeState(EnemyState newState)
     {
+        // ... (ChangeState remains the same) ...
         if (currentState == EnemyState.Dying || currentState == newState || _isFrozen) return;
         currentState = newState;
     }
 
     public virtual void TakeDamage(int damage, DamageType type = DamageType.Other)
     {
+        // ... (TakeDamage remains the same, eventually calls Die) ...
         if (currentState == EnemyState.Dying) return;
         currentHealth -= damage;
         currentHealth = Mathf.Max(0, currentHealth);
@@ -108,6 +123,7 @@ public abstract class BaseEnemy : MonoBehaviour
 
     public virtual void Freeze(float baseDuration)
     {
+        // ... (Freeze remains the same) ...
         if (_isFrozen || currentState == EnemyState.Dying) return;
         _isFrozen = true;
         _freezeEndTime = Time.time + Random.Range(Mathf.Max(1f, baseDuration * 0.8f), baseDuration * 1.2f);
@@ -118,6 +134,7 @@ public abstract class BaseEnemy : MonoBehaviour
 
      protected virtual void Unfreeze()
      {
+         // ... (Unfreeze remains the same) ...
          _isFrozen = false;
          EnemyState stateToRevertTo = _stateBeforeFreeze;
          if (_stateBeforeFreeze == EnemyState.Fleeing && currentHealth > maxHealth * 0.25f) stateToRevertTo = EnemyState.Patrolling;
@@ -130,17 +147,28 @@ public abstract class BaseEnemy : MonoBehaviour
         if (!enabled) return; // Prevent multi-calls if already dying/disabled
         Debug.Log($"{gameObject.name} withered away!");
 
-        // --- Spawn XP Effect ---
-        if (xpEffectPrefab != null && playerTransform != null) // Check player still exists
+        // Spawn XP Effect
+        if (xpEffectPrefab != null && playerTransform != null)
         {
-            Vector3 spawnPos = transform.position + Vector3.up * 0.5f; // Spawn slightly above pivot
+            Vector3 spawnPos = transform.position + Vector3.up * 0.5f;
             Instantiate(xpEffectPrefab, spawnPos, Quaternion.identity);
-            // The XpOrbDelay script on the prefab handles delayed homing activation.
-            // The Player's XpCollector script handles receiving the XP via triggers.
         } else if (xpEffectPrefab == null) {
             Debug.LogWarning($"[{gameObject.name}] No xpEffectPrefab assigned in Inspector.");
         }
-        // --- End Spawn XP Effect ---
+
+        // --- NEW: Notify the Area Manager! ---
+        if (myAreaManager != null)
+        {
+            myAreaManager.RegisterMonsterKill();
+            // Optional: You could even pass 'this' enemy if the manager needed specific info
+            // myAreaManager.RegisterMonsterKill(this);
+        }
+        else
+        {
+            // Warning if an enemy dies without being part of an area cleansing process
+            Debug.LogWarning($"[{gameObject.name}] died but was not assigned to an AreaCleansingManager. Progression in its area won't be tracked.", this);
+        }
+        // --- End Notify Area Manager ---
 
         this.enabled = false; // Disable script immediately
         gameManager?.EnemyDied(gameObject); // Notify GM
@@ -157,6 +185,7 @@ public abstract class BaseEnemy : MonoBehaviour
 
     // OnDrawGizmosSelected remains the same
     public virtual void OnDrawGizmosSelected() {
+        // ... (Gizmos remain the same) ...
         Gizmos.color = Color.yellow; Gizmos.DrawWireSphere(transform.position, detectionRadius);
         float attackRange = GetAttackRange();
         if(currentState != EnemyState.Patrolling && attackRange > 0) { Gizmos.color = Color.red; Gizmos.DrawWireSphere(transform.position, attackRange); }

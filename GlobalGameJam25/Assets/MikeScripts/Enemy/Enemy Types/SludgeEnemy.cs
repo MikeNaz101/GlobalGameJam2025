@@ -104,7 +104,7 @@ public class SludgeEnemy : BaseEnemy
          // Optional Log: Debug.Log($"<color=green>[{gameObject.name}]</color> Inside PerformMeleeAttack. Trying GetComponentInParent on '{playerTransform?.name ?? "null"}'.");
 
          // --- CHANGE IS HERE: Use GetComponentInParent ---
-         PlayerStateManager player = playerTransform?.GetComponentInParent<PlayerStateManager>();
+         PlayerStateManager player = playerTransform?.GetComponent<PlayerStateManager>();
          // ---------------------------------------------
 
          if (player != null)

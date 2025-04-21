@@ -72,7 +72,7 @@ public class FreezeBullet : MonoBehaviour
             int manaCostThisFrame = Mathf.CeilToInt(manaToAttemptDeduct);
 
             // Check if player reference exists AND if mana can be used
-            if (manaCostThisFrame > 0 && (_player == null || !_player.UseMana(manaCostThisFrame, _player)))
+            if (manaCostThisFrame > 0 && (_player == null || !_player.UseMana(manaCostThisFrame)))
             {
                 // If no player reference or out of mana, stop charging
                 _isCharging = false;

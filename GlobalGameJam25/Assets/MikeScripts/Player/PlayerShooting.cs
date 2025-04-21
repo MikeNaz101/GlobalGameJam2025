@@ -107,35 +107,125 @@ public class PlayerShooting : MonoBehaviour
     // Called by PlayerStateManager (or input system) when the Fire action starts
     public void StartCharge()
     {
-        // ... (StartCharge logic remains the same - checks, mana, activate view, instantiate, call bullet StartCharging) ...
-
         // --- Pre-Charge Checks ---
-        if (player == null || player.bulletSpawner == null || firePoint == null){ return; }
-        if (_isCharging) { return; }
+        if (player == null || player.bulletSpawner == null || firePoint == null){ Debug.LogError("StartCharge Error: Missing Player, Spawner, or FirePoint refs."); return; }
+        if (_isCharging) { Debug.LogWarning("StartCharge: Already charging."); return; }
+
         // --- Determine Requirements ---
-        int requiredMana = 0; BulletType currentType = player.bulletSpawner.CurrentBulletType; bool isTeleportSelected = currentType == BulletType.Type3;
-        switch (currentType) { case BulletType.Type1: requiredMana = basicManaCostInitial; break; case BulletType.Type2: requiredMana = freezeManaCostInitial; break; case BulletType.Type3: requiredMana = teleportManaCost; break; default: Debug.LogError($"Unhandled BulletType: {currentType}"); return; }
+        int requiredMana = 0;
+        BulletType currentType = player.bulletSpawner.CurrentBulletType;
+        bool isTeleportSelected = currentType == BulletType.Type3; // Assuming Type3 is Teleport
+
+        switch (currentType)
+        {
+            case BulletType.Type1: // Basic
+                requiredMana = basicManaCostInitial;
+                break;
+            case BulletType.Type2: // Freeze
+                requiredMana = freezeManaCostInitial;
+                break;
+            case BulletType.Type3: // Teleport
+                requiredMana = teleportManaCost;
+                break;
+            default:
+                Debug.LogError($"StartCharge Error: Unhandled BulletType: {currentType}");
+                return;
+        }
+
         // --- Check Resources ---
-        if (player.currentMana < requiredMana) { Debug.Log("Not enough mana!"); return; }
+        if (player.currentMana < requiredMana)
+        {
+            Debug.Log($"StartCharge: Not enough mana for {currentType}. Need {requiredMana}, Have {player.currentMana}");
+            // Optionally provide player feedback here (sound, UI)
+            return;
+        }
+
         // --- Activate Aiming Mode (if needed) ---
-        if (isTeleportSelected) { ActivateTeleportVCamView(); }
+        if (isTeleportSelected)
+        {
+            ActivateTeleportVCamView();
+        }
+
         // --- Instantiate Bullet ---
+        // Ensure prefab is valid before instantiating
+        if (player.bulletSpawner.bulletPrefab == null)
+        {
+             Debug.LogError($"StartCharge Error: Bullet Prefab for {currentType} is null in BulletSpawner!");
+             if(isTeleportSelected) DeactivateTeleportVCamView(); // Clean up VCam if activated
+             return;
+        }
         currentBullet = Instantiate(player.bulletSpawner.bulletPrefab, firePoint.position, firePoint.rotation);
-        if (currentBullet == null) { if(isTeleportSelected) DeactivateTeleportVCamView(); return; }
+        if (currentBullet == null)
+        {
+             Debug.LogError($"StartCharge Error: Failed to Instantiate bullet prefab for {currentType}");
+             if(isTeleportSelected) DeactivateTeleportVCamView();
+             return;
+        }
+
         // --- Prepare Bullet ---
-        Rigidbody rb = currentBullet.GetComponent<Rigidbody>(); if (rb != null) rb.isKinematic = true; currentBullet.transform.parent = firePoint;
+        Rigidbody rb = currentBullet.GetComponent<Rigidbody>();
+        if (rb != null) rb.isKinematic = true; // Make it kinematic initially
+        currentBullet.transform.parent = firePoint; // Attach to fire point during charge
+
         // --- Start Charging State ---
-        chargeStartTime = Time.time; _isCharging = true;
+        chargeStartTime = Time.time;
+        _isCharging = true;
+
         // --- Handle Bullet-Specific Logic & Mana Use ---
-        BasicBullet basic = currentBullet.GetComponent<BasicBullet>(); FreezeBullet freeze = currentBullet.GetComponent<FreezeBullet>(); TeleportBullet teleport = currentBullet.GetComponent<TeleportBullet>();
+        BasicBullet basic = currentBullet.GetComponent<BasicBullet>();
+        FreezeBullet freeze = currentBullet.GetComponent<FreezeBullet>();
+        TeleportBullet teleport = currentBullet.GetComponent<TeleportBullet>();
         bool chargeStartedSuccessfully = false;
-        if (basic != null) { if (player.UseMana(requiredMana, player)) { basic.StartCharging(player); chargeStartedSuccessfully = true; } }
-        else if (freeze != null) { if (player.UseMana(requiredMana, player)) { freeze.StartCharging(player); chargeStartedSuccessfully = true; } }
-        else if (teleport != null) { if (player.UseMana(requiredMana, player)) { chargeStartedSuccessfully = true; } }
-        else { Debug.LogError($"Instantiated bullet '{currentBullet.name}' has no recognized script!"); chargeStartedSuccessfully = false; }
-        // --- Handle Failed Charge Start ---
-        if (!chargeStartedSuccessfully) { _isCharging = false; if(isTeleportSelected) DeactivateTeleportVCamView(); Destroy(currentBullet); currentBullet = null; Debug.Log("Failed start charge."); }
-        else { Debug.Log($"<color=lime>Started charging {currentType}</color>"); }
+
+        // --- CORRECTED UseMana CALLS ---
+        if (basic != null)
+        {
+            // Call UseMana with ONLY the mana cost
+            if (player.UseMana(requiredMana))
+            {
+                basic.StartCharging(player); // Pass player ref to bullet script if needed
+                chargeStartedSuccessfully = true;
+            }
+        }
+        else if (freeze != null)
+        {
+            // Call UseMana with ONLY the mana cost
+            if (player.UseMana(requiredMana))
+            {
+                freeze.StartCharging(player); // Pass player ref to bullet script if needed
+                chargeStartedSuccessfully = true;
+            }
+        }
+        else if (teleport != null)
+        {
+            // Call UseMana with ONLY the mana cost
+            // Teleport might not need a StartCharging method, but still consumes mana on start
+            if (player.UseMana(requiredMana))
+            {
+                chargeStartedSuccessfully = true;
+            }
+        }
+        else
+        {
+            Debug.LogError($"StartCharge Error: Instantiated bullet '{currentBullet.name}' has no recognized bullet script (Basic, Freeze, Teleport)!");
+            chargeStartedSuccessfully = false; // Ensure failure state
+        }
+        // --- END OF CORRECTIONS ---
+
+
+        // --- Handle Failed Charge Start (e.g., mana check failed inside UseMana) ---
+        if (!chargeStartedSuccessfully)
+        {
+            _isCharging = false; // Reset charging flag
+            if(isTeleportSelected) DeactivateTeleportVCamView(); // Clean up VCam if activated
+            Destroy(currentBullet); // Destroy the unused bullet
+            currentBullet = null;
+            Debug.Log($"StartCharge: Failed to start charge for {currentType} (Likely due to UseMana returning false or missing script).");
+        }
+        else
+        {
+            Debug.Log($"<color=lime>Started charging {currentType}. Mana deducted: {requiredMana}</color>");
+        }
     }
 
     // Called by PlayerStateManager (or input system) when the Fire action is released/canceled
@@ -243,7 +333,7 @@ public class PlayerShooting : MonoBehaviour
         if (_isCharging) {
              if (currentBullet != null) { Destroy(currentBullet); currentBullet = null; }
              _isCharging = false;
-         } else { Debug.Log("<color=red>CancelCharge: Was not charging.</color>"); }
+        } else { Debug.Log("<color=red>CancelCharge: Was not charging.</color>"); }
     }
 
 } // End of PlayerShooting class

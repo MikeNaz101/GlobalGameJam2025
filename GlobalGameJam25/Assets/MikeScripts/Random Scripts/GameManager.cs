@@ -4,6 +4,7 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    // Keep the reference to the spawner
     public EnemySpawner enemySpawner;
 
     public TextMeshProUGUI infoTextUI;
@@ -11,11 +12,11 @@ public class GameManager : MonoBehaviour
 
     public List<string> triggeredEvents = new List<string>();
     public List<string> triggeredEventsOrder = new List<string>();
-    public List<GameObject> activeEnemies = new List<GameObject>();
+    public List<GameObject> activeEnemies = new List<GameObject>(); // We'll repopulate this
 
     public static GameManager Instance { get; private set; }
 
-    private bool firstSpawnTriggered = false;
+    private bool firstAreaTypeDecisionMade = false; // Renamed for clarity
     private TutorialManager tutorialManager;
 
     void Awake()
@@ -28,95 +29,134 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogWarning("Multiple GameManagers found. Destroying the extra.");
             Destroy(gameObject);
+            return; // Added return to prevent further execution on destroyed object
         }
 
+        // Find Enemy Spawner if not assigned
         if (enemySpawner == null)
         {
             enemySpawner = FindAnyObjectByType<EnemySpawner>();
             if (enemySpawner == null)
             {
-                Debug.LogError("EnemySpawner not found in the scene!");
+                Debug.LogError("EnemySpawner not found in the scene and not assigned!", this);
             }
         }
 
+        // Find Tutorial Manager
         tutorialManager = FindAnyObjectByType<TutorialManager>();
         if (tutorialManager == null)
         {
-            Debug.LogError("TutorialManager not found in the scene!");
+            Debug.LogError("TutorialManager not found in the scene!", this);
         }
     }
 
     public void RegisterTriggeredEvent(string eventName)
     {
+        // --- Simplified Event Registration ---
         if (!triggeredEvents.Contains(eventName))
         {
             triggeredEvents.Add(eventName);
         }
+        // Keep track of order if needed for complex logic, otherwise might not be necessary
         triggeredEventsOrder.Add(eventName);
-        Debug.Log("Event Triggered: " + eventName);
-        ProcessTriggeredEvents();
+        Debug.Log("GameManager: Event Triggered: " + eventName);
+        // --- End Simplified ---
+
+        ProcessSingleTriggeredEvent(eventName); // Process immediately
     }
 
-    private void ProcessTriggeredEvents()
+    // Process the most recent event immediately
+    private void ProcessSingleTriggeredEvent(string eventName)
     {
-        if (triggeredEventsOrder.Count > 0)
+        if (int.TryParse(eventName, out int areaNumber)) // Check if it's an area number (1 or 2)
         {
-            string latestEventName = triggeredEventsOrder[triggeredEventsOrder.Count - 1]; // Get the last event
+            if (enemySpawner == null) {
+                 Debug.LogError("Cannot process area trigger: EnemySpawner reference is missing!", this);
+                 return;
+            }
 
-            if (int.TryParse(latestEventName, out int areaNumber))
+            // --- Set Initial Enemy Type Distribution (Only Once) ---
+            if (!firstAreaTypeDecisionMade)
             {
-                if (!firstSpawnTriggered)
-                {
-                    enemySpawner?.SetFirstArea(areaNumber);
-                    enemySpawner?.SpawnEnemiesForArea(areaNumber);
-                    firstSpawnTriggered = true;
-                }
-                else
-                {
-                    enemySpawner?.SpawnEnemiesForArea(areaNumber);
-                }
+                // Example Logic: If Area 1 is triggered first, it gets Sludge. If Area 2 first, Area 1 gets Gas.
+                bool area1GetsSludgeFirst = (areaNumber == 1);
+                enemySpawner.SetArea1EnemyType(area1GetsSludgeFirst);
+                firstAreaTypeDecisionMade = true;
+                 Debug.Log($"GameManager: First area triggered was {areaNumber}. Setting initial enemy distribution.");
             }
-            else if (latestEventName.StartsWith("Tutorial"))
+            // --- End Set Initial Type ---
+
+            // --- Trigger Spawning for the specific area ---
+            Debug.Log($"GameManager: Requesting spawn for area {areaNumber}.");
+            enemySpawner.SpawnEnemiesForArea(areaNumber);
+            // --- End Trigger Spawning ---
+        }
+        else if (eventName.StartsWith("Tutorial")) // Check for Tutorial events
+        {
+            if (tutorialManager != null)
             {
-                string tutorialID = latestEventName.Substring(8);
-                tutorialManager?.ShowTutorial(tutorialID);
+                string tutorialID = eventName.Substring(8); // Get the part after "Tutorial"
+                tutorialManager.ShowTutorial(tutorialID);
+            } else {
+                 Debug.LogWarning("Cannot show tutorial, TutorialManager reference is missing!", this);
             }
-            else
+        }
+        else // Handle other named events
+        {
+            switch (eventName)
             {
-                switch (latestEventName)
-                {
-                    case "Info_Pickup_Item":
-                        ShowInfoMessage("Press E to interact with items.");
-                        break;
-                }
+                case "Info_Pickup_Item":
+                    ShowInfoMessage("Press E to interact with items.");
+                    break;
+                // Add other specific named events here
+                default:
+                     Debug.Log($"GameManager: Received unhandled named event: {eventName}");
+                     break;
             }
         }
 
-        // You can still have logic based on the order of these events (if needed)
-        if (triggeredEventsOrder.Count >= 2)
+        // Optional: Logic based on sequence of events (kept from original)
+        CheckEventSequence();
+    }
+
+    // Optional: Keep if you need complex logic based on trigger order
+    private void CheckEventSequence()
+    {
+         if (triggeredEventsOrder.Count >= 2)
         {
             if (triggeredEventsOrder[0] == "1" && triggeredEventsOrder[1] == "2")
             {
-                Debug.Log("First triggered area was 1, then 2.");
+                Debug.Log("GameManager Sequence Check: First triggered area was 1, then 2.");
+                // Add specific logic here if needed
             }
+             // Add other sequence checks if necessary
         }
     }
 
-    private void SpawnEnemies(GameObject enemyPrefab, Vector3 center, float radius, int count)
+
+    // --- REMOVED OLD SpawnEnemies METHOD ---
+    // The EnemySpawner script now handles instantiation and Area Manager assignment.
+
+    // --- NEW Method for EnemySpawner to call ---
+    // This allows GameManager to keep track of active enemies if needed.
+    public void RegisterSpawnedEnemy(GameObject enemyGO)
     {
-        for (int i = 0; i < count; i++)
+        if (enemyGO != null && !activeEnemies.Contains(enemyGO))
         {
-            Vector3 randomPosition = enemySpawner.GetRandomPointInCircle(center, radius);
-            GameObject newEnemy = Instantiate(enemyPrefab, randomPosition, Quaternion.identity);
+            activeEnemies.Add(enemyGO);
+             Debug.Log($"GameManager: Registered spawned enemy {enemyGO.name}. Total active: {activeEnemies.Count}");
 
-            BaseEnemy enemyComponent = newEnemy.GetComponent<BaseEnemy>();
-            if (enemyComponent != null)
-            {
-                enemyComponent.gameManager = this;
-                activeEnemies.Add(newEnemy);
-            }
+            // Optional: Explicitly assign gameManager reference here if needed,
+            // though BaseEnemy's Start() method should find it anyway.
+            // BaseEnemy enemyScript = enemyGO.GetComponent<BaseEnemy>();
+            // if (enemyScript != null && enemyScript.gameManager == null)
+            // {
+            //     enemyScript.gameManager = this;
+            // }
         }
     }
+    // --- End New Method ---
+
 
     private void ShowInfoMessage(string message)
     {
@@ -128,18 +168,24 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Info UI elements not assigned!");
+            Debug.LogError("Info UI elements not assigned in GameManager!", this);
         }
     }
 
+    // Keep this: Called by BaseEnemy when it dies
     public void EnemyDied(GameObject deadEnemy)
     {
         Debug.Log("GameManager: Enemy Died: " + deadEnemy.name);
-        activeEnemies.Remove(deadEnemy);
+        if (activeEnemies.Contains(deadEnemy))
+        {
+             activeEnemies.Remove(deadEnemy);
+              Debug.Log($"GameManager: Removed enemy. Total active remaining: {activeEnemies.Count}");
+        } else {
+            Debug.LogWarning($"GameManager: Tried to remove enemy {deadEnemy.name} but it wasn't in the active list.", deadEnemy);
+        }
+        // Add any logic here needed when an enemy dies (e.g., check if area clear)
     }
 
-    private void SpawnEnemiesForArea(int areaNumber)
-    {
-        enemySpawner?.SpawnEnemiesForArea(areaNumber);
-    }
+    // --- REMOVED OLD SpawnEnemiesForArea METHOD ---
+    // Calling enemySpawner.SpawnEnemiesForArea directly is done in ProcessSingleTriggeredEvent now.
 }

@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// Remember to assign the Hit Effect Prefab in the Inspector, darling!
 public class BasicBullet : MonoBehaviour
 {
     [Header("Damage & Scaling")]
@@ -13,36 +12,33 @@ public class BasicBullet : MonoBehaviour
     public float maxChargeTime = 2f;
     public float maxChargeMultiplier = 2f;
 
-    [Header("Lifetime & Effects")] // Updated Header
-    public float lifetime = 5.0f;       // Time in seconds before bullet explodes on its own
-    public GameObject hitEffectPrefab; // Used for both impact and timeout explosion ✨
+    [Header("Lifetime & Effects")]
+    public float lifetime = 5.0f;
+    public GameObject hitEffectPrefab; // Assign in Inspector! ✨
 
-    // --- Private Variables ---
+    // Private Variables
     private bool _isCharging = false;
     private bool _wasStarted = false;
     private float chargeStartTime;
     private PlayerStateManager _player;
     private Transform bulletTransform;
-    private float expireTime;           // Time when the bullet should expire
-    private bool hasExploded = false;   // Prevent double explosions
+    private float expireTime;
+    private bool hasExploded = false;
 
     void Awake()
     {
         bulletTransform = transform;
     }
 
-    void Start() // Use Start for time-based initialization
+    void Start()
     {
-        // Calculate when the bullet should expire
         expireTime = Time.time + lifetime;
-        // --- IMPORTANT: Ensure no Destroy(gameObject, time) calls are here ---
     }
 
     // Called by PlayerShooting when charging begins
     public void StartCharging(PlayerStateManager playerRef)
     {
-        // ... (StartCharging logic remains the same - setting player, time, flags) ...
-        if (playerRef == null) { /* ... Error handling ... */ Destroy(gameObject); return; }
+        if (playerRef == null) { Debug.LogError("Player reference is null in StartCharging!", this); Destroy(gameObject); return; }
          _player = playerRef;
          chargeStartTime = Time.time;
          _isCharging = true;
@@ -54,7 +50,6 @@ public class BasicBullet : MonoBehaviour
     // Called by PlayerShooting when charging ends
     public float StopCharging()
     {
-        // ... (StopCharging logic remains the same - calculating multiplier) ...
         if (!_wasStarted) return 1f;
          _isCharging = false;
          Debug.Log("BasicBullet charging stopped.");
@@ -64,114 +59,100 @@ public class BasicBullet : MonoBehaviour
          return chargeMultiplier;
     }
 
-    // Update is called once per frame
     private void Update()
     {
-        // --- Charging Logic ---
+        // Charging Logic
         if (_isCharging)
         {
-            // ... (Mana Drain and Scaling logic remains the same) ...
             float chargeTime = Time.time - chargeStartTime;
             float manaToAttemptDeduct = manaCostPerSecond * Time.deltaTime;
             int manaCostThisFrame = Mathf.CeilToInt(manaToAttemptDeduct);
-            if (manaCostThisFrame > 0 && (_player == null || !_player.UseMana(manaCostThisFrame, _player))) {
-                _isCharging = false; /* Log out of mana */
+            if (manaCostThisFrame > 0 && (_player == null || !_player.UseMana(manaCostThisFrame))) {
+                _isCharging = false; Debug.Log("BasicBullet stopped charging (out of mana or player lost).");
             } else if (_player != null) {
                  float effectiveChargeTime = Mathf.Min(chargeTime, maxChargeTime);
                  float chargePercentage = (maxChargeTime > 0) ? (effectiveChargeTime / maxChargeTime) : 1.0f;
                  float newScale = Mathf.Lerp(1f, maxSize, chargePercentage);
                  bulletTransform.localScale = Vector3.one * newScale;
-            } else { _isCharging = false; /* Player became null? */ }
+            } else { _isCharging = false; Debug.Log("BasicBullet stopped charging (player became null)."); }
         }
 
-        // --- Lifetime Expiry Check ---
-        // Check if the bullet hasn't already exploded and its time is up
+        // Lifetime Expiry Check
         if (!hasExploded && Time.time >= expireTime)
         {
             Debug.Log($"BasicBullet lifetime expired at {Time.time}s.");
-            // Explode at the current position, maybe facing away from travel direction
-            Explode(bulletTransform.position, -bulletTransform.forward); // Pass current position and a dummy normal
+            Explode(bulletTransform.position, -bulletTransform.forward); // Explode without a hit object
         }
     }
 
     // Using OnCollisionEnter for physics interactions
     void OnCollisionEnter(Collision collision)
     {
-        // Prevent collision processing if already exploded (e.g., by lifetime)
         if (hasExploded) return;
 
-        // Prevent collision with player right after firing
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            return;
-        }
+        // Optional: Ignore player for a very short time after firing if needed
+        // if (collision.gameObject.CompareTag("Player") && Time.time < expireTime - (lifetime - 0.1f)) return;
+        if (collision.gameObject.CompareTag("Player")) return; // Simple ignore
 
-        // --- Get Hit Info and Call Explode ---
         if (collision.contacts.Length > 0)
         {
             ContactPoint contact = collision.contacts[0];
-            // Call Explode with details from the collision
-            Explode(contact.point, contact.normal, collision.gameObject); // Pass hit object too
+            Explode(contact.point, contact.normal, collision.gameObject);
         }
-        else
-        {
-            // Fallback if no contact points (rare) - explode at bullet pos facing away
-            Explode(bulletTransform.position, -bulletTransform.forward, collision.gameObject);
-        }
+        else { Explode(bulletTransform.position, -bulletTransform.forward, collision.gameObject); }
     }
 
-    // Central method to handle explosion logic (called by Collision or Lifetime Expiry)
-    // Added optional hitObject parameter
+    // Central method to handle explosion logic
     void Explode(Vector3 position, Vector3 normal, GameObject hitObject = null)
     {
-        // Ensure this only runs once
         if (hasExploded) return;
         hasExploded = true;
 
-        // Calculate final damage based on final scale (needs to happen here now)
-        float currentScale = Mathf.Max(1f, bulletTransform.localScale.x); // Get scale just before explosion
+        float currentScale = Mathf.Max(1f, bulletTransform.localScale.x);
         int damage = baseDamage + Mathf.FloorToInt((currentScale - 1f) * damageMultiplier);
 
         Debug.Log($"BasicBullet exploding. Hit: {(hitObject != null ? hitObject.name : "Lifetime Expired")}, Scale: {currentScale:F2}, Damage: {damage} at point {position}");
 
-        // --- Instantiate and Scale the Hit Effect! ---
+        // Instantiate and Scale the Hit Effect
         if (hitEffectPrefab != null)
         {
-            // Create the particle effect prefab instance at the explosion point
             GameObject effectInstance = Instantiate(hitEffectPrefab, position, Quaternion.LookRotation(normal));
-            // Scale the particle effect instance based on the bullet's final scale
             effectInstance.transform.localScale = Vector3.one * currentScale;
-            // Particle system should auto-destroy, add fallback if needed
-        }
-        else { Debug.LogWarning("BasicBullet 'Hit Effect Prefab' is not assigned!"); }
+        } else { Debug.LogWarning("BasicBullet 'Hit Effect Prefab' is not assigned!"); }
 
-        // --- Apply Damage (Only if caused by collision, not timeout) ---
+        // Apply Damage (Only if caused by collision)
         if (hitObject != null)
         {
-             EnemyBubble enemy = hitObject.GetComponent<EnemyBubble>();
-             if (enemy != null)
-             {
-                 enemy.EnemyTakeDamage(damage);
-             }
+            // --- Find BaseEnemy on hit object or its children ---
+            BaseEnemy enemy = hitObject.GetComponentInChildren<BaseEnemy>(); // Use InChildren!
+            if (enemy != null)
+            {
+                Debug.Log($"Applying {damage} Basic damage to {enemy.gameObject.name} (found via GetComponentInChildren on {hitObject.name})");
+                enemy.TakeDamage(damage, DamageType.Basic);
+            }
+            else { Debug.Log($"{hitObject.name} was hit but doesn't have a BaseEnemy component on itself or children."); }
+            // -----------------------------------------------------
 
-             // --- Handle Splash Damage ---
-             float splashRadius = currentScale * 0.5f; // Example splash radius
-             Collider[] hitColliders = Physics.OverlapSphere(position, splashRadius); // Use explosion position
-             foreach (var hitCollider in hitColliders)
-             {
-                 if (hitCollider.gameObject == hitObject || hitCollider.CompareTag("Player")) continue;
-                 EnemyBubble splashEnemy = hitCollider.GetComponent<EnemyBubble>();
-                 if (splashEnemy != null)
-                 {
-                     int splashDamage = damage; // Or reduced splash: damage / 2;
-                     splashEnemy.EnemyTakeDamage(splashDamage);
-                 }
-             }
+            // Handle Splash Damage
+            float splashRadius = currentScale * 0.5f;
+            Collider[] hitColliders = Physics.OverlapSphere(position, splashRadius);
+            foreach (var hitCollider in hitColliders)
+            {
+                if (hitCollider.gameObject == hitObject || hitCollider.CompareTag("Player")) continue;
+
+                // --- Find BaseEnemy on splashed object or its children ---
+                BaseEnemy splashEnemy = hitCollider.GetComponentInChildren<BaseEnemy>(); // Use InChildren!
+                if (splashEnemy != null)
+                {
+                    int splashDamage = damage; // Or reduced splash: damage / 2;
+                    Debug.Log($"Applying {splashDamage} Basic splash damage to {splashEnemy.gameObject.name} (found via GetComponentInChildren on {hitCollider.gameObject.name})");
+                    splashEnemy.TakeDamage(splashDamage, DamageType.Basic);
+                }
+                // --------------------------------------------------------
+            }
         }
-        // Note: No damage applied if explosion is due to lifetime expiry in this example
 
-        // --- Destroy Bullet ---
-        // Happens last, after effects are spawned and damage dealt
+        // Destroy Bullet
         Destroy(gameObject);
     }
 }

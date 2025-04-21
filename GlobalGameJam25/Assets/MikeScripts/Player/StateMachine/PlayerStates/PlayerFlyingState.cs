@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerFlyingState : PlayerBaseState
+/*public class PlayerFlyingState : PlayerBaseState
 {
     // Wing object references
     private GameObject rWingInstance;
@@ -94,4 +94,4 @@ public class PlayerFlyingState : PlayerBaseState
         // Reset orientation if it was changed on entry?
         // player.transform.rotation = Quaternion.Euler(0, player.transform.eulerAngles.y, 0);
     }
-}
+}*/
