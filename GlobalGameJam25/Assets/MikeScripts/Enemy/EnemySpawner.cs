@@ -1,4 +1,20 @@
+using System.Collections.Generic;
 using UnityEngine;
+
+[System.Serializable]
+public class SpawnAreaSettings
+{
+    [Header("Spawn Area Settings")]
+    public Transform spawnAreaCenter;
+    public float spawnAreaRadius = 15f;
+    public int numSludgeToSpawn = 5;
+    public int numGasToSpawn = 5;
+    [Tooltip("Drag the AreaCleansingManager GameObject for this area here.")]
+    public AreaCleansingManager areaManager;
+    [HideInInspector] public bool sludgeSpawned = false;
+    [HideInInspector] public bool gasSpawned = false;
+    [HideInInspector] public bool spawnSludgeFirst = false; // Determined externally
+}
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -6,91 +22,67 @@ public class EnemySpawner : MonoBehaviour
     public GameObject sludgePrefab;
     public GameObject gasPrefab;
 
-    [Header("Spawn Area 1 Settings")]
-    public Transform spawnArea1Center;
-    public float spawnArea1Radius = 15f;
-    public int numSludgeToSpawnArea1 = 5;
-    public int numGasToSpawnArea1 = 5;
-    [Tooltip("Drag the AreaCleansingManager GameObject for Area 1 here.")]
-    public AreaCleansingManager area1Manager;
+    [Header("Spawn Areas")]
+    public List<SpawnAreaSettings> spawnAreas = new List<SpawnAreaSettings>();
 
-    [Header("Spawn Area 2 Settings")]
-    public Transform spawnArea2Center;
-    public float spawnArea2Radius = 15f;
-    public int numSludgeToSpawnArea2 = 5;
-    public int numGasToSpawnArea2 = 5;
-    [Tooltip("Drag the AreaCleansingManager GameObject for Area 2 here.")]
-    public AreaCleansingManager area2Manager;
-
-    // Internal Logic Variables
-    private bool area1IsSludgeFirst = false;
     private bool firstAreaTypeSet = false;
-    private bool area1SludgeSpawned = false;
-    private bool area1GasSpawned = false;
-    private bool area2SludgeSpawned = false;
-    private bool area2GasSpawned = false;
 
     // Call this early (e.g., from GameManager) to decide initial enemy distribution
-    public void SetArea1EnemyType(bool spawnSludgeFirstInArea1)
+    public void SetAreaEnemyTypes(List<bool> spawnSludgeFirstInAreas)
     {
-        if (!firstAreaTypeSet)
+        if (spawnSludgeFirstInAreas.Count != spawnAreas.Count)
         {
-            area1IsSludgeFirst = spawnSludgeFirstInArea1;
-            firstAreaTypeSet = true;
-            Debug.Log($"EnemySpawner: Area 1 will spawn {(spawnSludgeFirstInArea1 ? "Sludge" : "Gas")} first.");
+            Debug.LogError("EnemySpawner: The number of initial area types does not match the number of spawn areas!");
+            return;
         }
+
+        for (int i = 0; i < spawnAreas.Count; i++)
+        {
+            spawnAreas[i].spawnSludgeFirst = spawnSludgeFirstInAreas[i];
+            Debug.Log($"EnemySpawner: Area {i + 1} will spawn {(spawnAreas[i].spawnSludgeFirst ? "Sludge" : "Gas")} first.");
+        }
+        firstAreaTypeSet = true;
     }
 
-    // Call this to trigger spawning for a specific area number (1 or 2)
-    public void SpawnEnemiesForArea(int areaNumber)
+    // Call this to trigger spawning for a specific area index (0-based)
+    public void SpawnEnemiesForArea(int areaIndex)
     {
         if (!firstAreaTypeSet)
         {
-            Debug.LogError("EnemySpawner: Initial area enemy type not set! Call SetArea1EnemyType first.");
-            return;
-        }
-        if (area1Manager == null) {
-            Debug.LogError("EnemySpawner: Area 1 Manager is not assigned in the Inspector!", this);
-            return;
-        }
-         if (area2Manager == null) {
-            Debug.LogError("EnemySpawner: Area 2 Manager is not assigned in the Inspector!", this);
+            Debug.LogError("EnemySpawner: Initial area enemy types not set! Call SetAreaEnemyTypes first.");
             return;
         }
 
-        if (areaNumber == 1)
+        if (areaIndex < 0 || areaIndex >= spawnAreas.Count)
         {
-            if (area1IsSludgeFirst && !area1SludgeSpawned)
-            {
-                Debug.Log("EnemySpawner: Spawning Sludge in Area 1.");
-                SpawnSludgeEnemies(spawnArea1Center.position, spawnArea1Radius, numSludgeToSpawnArea1, area1Manager);
-                area1SludgeSpawned = true;
-            }
-            else if (!area1IsSludgeFirst && !area1GasSpawned)
-            {
-                Debug.Log("EnemySpawner: Spawning Gas in Area 1.");
-                SpawnGasEnemies(spawnArea1Center.position, spawnArea1Radius, numGasToSpawnArea1, area1Manager);
-                area1GasSpawned = true;
-            }
-            else { Debug.Log($"EnemySpawner: Area 1 ({ (area1IsSludgeFirst ? "Sludge" : "Gas") }) already spawned."); }
+            Debug.LogError($"EnemySpawner: Invalid area index provided: {areaIndex}.");
+            return;
         }
-        else if (areaNumber == 2)
+
+        SpawnAreaSettings currentArea = spawnAreas[areaIndex];
+
+        if (currentArea.areaManager == null)
         {
-            if (!area1IsSludgeFirst && !area2SludgeSpawned)
-            {
-                 Debug.Log("EnemySpawner: Spawning Sludge in Area 2.");
-                SpawnSludgeEnemies(spawnArea2Center.position, spawnArea2Radius, numSludgeToSpawnArea2, area2Manager);
-                area2SludgeSpawned = true;
-            }
-            else if (area1IsSludgeFirst && !area2GasSpawned)
-            {
-                Debug.Log("EnemySpawner: Spawning Gas in Area 2.");
-                SpawnGasEnemies(spawnArea2Center.position, spawnArea2Radius, numGasToSpawnArea2, area2Manager);
-                area2GasSpawned = true;
-            }
-             else { Debug.Log($"EnemySpawner: Area 2 ({ (!area1IsSludgeFirst ? "Sludge" : "Gas") }) already spawned."); }
+            Debug.LogError($"EnemySpawner: Area Manager is not assigned for Area {areaIndex + 1} in the Inspector!", this);
+            return;
         }
-        else { Debug.LogError($"EnemySpawner: Invalid area number provided: {areaNumber}. Use 1 or 2."); }
+
+        if (currentArea.spawnSludgeFirst && !currentArea.sludgeSpawned)
+        {
+            Debug.Log($"EnemySpawner: Spawning Sludge in Area {areaIndex + 1}.");
+            SpawnSludgeEnemies(currentArea.spawnAreaCenter.position, currentArea.spawnAreaRadius, currentArea.numSludgeToSpawn, currentArea.areaManager);
+            currentArea.sludgeSpawned = true;
+        }
+        else if (!currentArea.spawnSludgeFirst && !currentArea.gasSpawned)
+        {
+            Debug.Log($"EnemySpawner: Spawning Gas in Area {areaIndex + 1}.");
+            SpawnGasEnemies(currentArea.spawnAreaCenter.position, currentArea.spawnAreaRadius, currentArea.numGasToSpawn, currentArea.areaManager);
+            currentArea.gasSpawned = true;
+        }
+        else
+        {
+            Debug.Log($"EnemySpawner: Area {areaIndex + 1} ({ (currentArea.spawnSludgeFirst ? "Sludge" : "Gas") }) already spawned.");
+        }
     }
 
     // Spawns Sludge enemies and assigns the correct Area Manager
@@ -105,21 +97,17 @@ public class EnemySpawner : MonoBehaviour
             Vector3 randomPosition = GetRandomPointInCircle(center, radius);
             GameObject enemyGO = Instantiate(sludgePrefab, randomPosition, Quaternion.identity);
 
-            // --- Assign the Manager using GetComponentInChildren ---
-            BaseEnemy enemyScript = enemyGO.GetComponentInChildren<BaseEnemy>(); // Use InChildren!
+            BaseEnemy enemyScript = enemyGO.GetComponentInChildren<BaseEnemy>();
             if (enemyScript != null)
             {
                 enemyScript.myAreaManager = managerToAssign;
-                 // Log the specific object where the script was found
-                 Debug.Log($"Found BaseEnemy script on child object '{enemyScript.gameObject.name}' of instance '{enemyGO.name}'. Assigning manager '{managerToAssign.gameObject.name}'.");
+                Debug.Log($"Found BaseEnemy script on child object '{enemyScript.gameObject.name}' of instance '{enemyGO.name}'. Assigning manager '{managerToAssign.gameObject.name}'.");
             }
             else
             {
                 Debug.LogError($"Spawned Sludge enemy '{enemyGO.name}' is missing BaseEnemy script on itself AND all children!", enemyGO);
             }
-            // -------------------------------------------------------
 
-            // Register with GameManager
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.RegisterSpawnedEnemy(enemyGO);
@@ -131,46 +119,39 @@ public class EnemySpawner : MonoBehaviour
     // Spawns Gas enemies and assigns the correct Area Manager
     private void SpawnGasEnemies(Vector3 center, float radius, int count, AreaCleansingManager managerToAssign)
     {
-         if (gasPrefab == null) { Debug.LogError("Gas Prefab not assigned to spawner!", this); return; }
-         if (managerToAssign == null) { Debug.LogError("Attempted to spawn Gas enemies but managerToAssign was null!", this); return; }
+        if (gasPrefab == null) { Debug.LogError("Gas Prefab not assigned to spawner!", this); return; }
+        if (managerToAssign == null) { Debug.LogError("Attempted to spawn Gas enemies but managerToAssign was null!", this); return; }
 
         Debug.Log($"Attempting to spawn {count} Gas enemies for manager: {managerToAssign.gameObject.name}");
         for (int i = 0; i < count; i++)
         {
             Vector3 randomPosition = GetRandomPointInCircle(center, radius);
-            // Define the desired rotation (90 degrees on X, 0 on Y, 0 on Z)
             Quaternion desiredRotation = Quaternion.Euler(180f, 0f, 90f);
+            GameObject enemyGO = Instantiate(gasPrefab, randomPosition, desiredRotation);
 
-            // Instantiate with the desired rotation
-            GameObject enemyGO = Instantiate(sludgePrefab, randomPosition, desiredRotation);
-
-            // --- Assign the Manager using GetComponentInChildren ---
-            BaseEnemy enemyScript = enemyGO.GetComponentInChildren<BaseEnemy>(); // Use InChildren!
+            BaseEnemy enemyScript = enemyGO.GetComponentInChildren<BaseEnemy>();
             if (enemyScript != null)
             {
                 enemyScript.myAreaManager = managerToAssign;
-                // Log the specific object where the script was found
                 Debug.Log($"Found BaseEnemy script on child object '{enemyScript.gameObject.name}' of instance '{enemyGO.name}'. Assigning manager '{managerToAssign.gameObject.name}'.");
             }
             else
             {
-                  Debug.LogError($"Spawned Gas enemy '{enemyGO.name}' is missing BaseEnemy script on itself AND all children!", enemyGO);
-             }
-             // -------------------------------------------------------
+                Debug.LogError($"Spawned Gas enemy '{enemyGO.name}' is missing BaseEnemy script on itself AND all children!", enemyGO);
+            }
 
-             // Register with GameManager
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.RegisterSpawnedEnemy(enemyGO);
             }
-             else { Debug.LogWarning("GameManager instance not found when trying to register spawned enemy.", enemyGO); }
+            else { Debug.LogWarning("GameManager instance not found when trying to register spawned enemy.", enemyGO); }
         }
     }
 
     // Utility Method to find a point on the ground within the radius
     public Vector3 GetRandomPointInCircle(Vector3 center, float radius)
     {
-        for(int attempt = 0; attempt < 5; attempt++)
+        for (int attempt = 0; attempt < 5; attempt++)
         {
             float angle = Random.Range(0f, Mathf.PI * 2);
             float u = Random.Range(0f, 1f) + Random.Range(0f, 1f);

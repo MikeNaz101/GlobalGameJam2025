@@ -68,27 +68,36 @@ public class GameManager : MonoBehaviour
     // Process the most recent event immediately
     private void ProcessSingleTriggeredEvent(string eventName)
     {
-        if (int.TryParse(eventName, out int areaNumber)) // Check if it's an area number (1 or 2)
+        if (int.TryParse(eventName, out int areaNumber)) // Check if it's an area number (1-based now)
         {
-            if (enemySpawner == null) {
-                 Debug.LogError("Cannot process area trigger: EnemySpawner reference is missing!", this);
-                 return;
+            if (enemySpawner == null)
+            {
+                Debug.LogError("Cannot process area trigger: EnemySpawner reference is missing!", this);
+                return;
             }
+
+            int areaIndex = areaNumber - 1; // Convert to 0-based index for the list
 
             // --- Set Initial Enemy Type Distribution (Only Once) ---
             if (!firstAreaTypeDecisionMade)
             {
-                // Example Logic: If Area 1 is triggered first, it gets Sludge. If Area 2 first, Area 1 gets Gas.
-                bool area1GetsSludgeFirst = (areaNumber == 1);
-                enemySpawner.SetArea1EnemyType(area1GetsSludgeFirst);
+                // Example Logic: Determine initial spawn types based on the order areas are triggered.
+                // You might want more sophisticated logic here based on your game design.
+                List<bool> initialSpawnTypes = new List<bool>();
+                for (int i = 0; i < enemySpawner.spawnAreas.Count; i++)
+                {
+                    // Example: First triggered area gets Sludge, others get Gas initially.
+                    initialSpawnTypes.Add(i == areaIndex);
+                }
+                enemySpawner.SetAreaEnemyTypes(initialSpawnTypes);
                 firstAreaTypeDecisionMade = true;
-                 Debug.Log($"GameManager: First area triggered was {areaNumber}. Setting initial enemy distribution.");
+                Debug.Log($"GameManager: First area triggered was {areaNumber}. Setting initial enemy distribution.");
             }
             // --- End Set Initial Type ---
 
             // --- Trigger Spawning for the specific area ---
             Debug.Log($"GameManager: Requesting spawn for area {areaNumber}.");
-            enemySpawner.SpawnEnemiesForArea(areaNumber);
+            enemySpawner.SpawnEnemiesForArea(areaIndex);
             // --- End Trigger Spawning ---
         }
         else if (eventName.StartsWith("Tutorial")) // Check for Tutorial events
@@ -97,8 +106,10 @@ public class GameManager : MonoBehaviour
             {
                 string tutorialID = eventName.Substring(8); // Get the part after "Tutorial"
                 tutorialManager.ShowTutorial(tutorialID);
-            } else {
-                 Debug.LogWarning("Cannot show tutorial, TutorialManager reference is missing!", this);
+            }
+            else
+            {
+                Debug.LogWarning("Cannot show tutorial, TutorialManager reference is missing!", this);
             }
         }
         else // Handle other named events
@@ -110,8 +121,8 @@ public class GameManager : MonoBehaviour
                     break;
                 // Add other specific named events here
                 default:
-                     Debug.Log($"GameManager: Received unhandled named event: {eventName}");
-                     break;
+                    Debug.Log($"GameManager: Received unhandled named event: {eventName}");
+                    break;
             }
         }
 
@@ -122,14 +133,14 @@ public class GameManager : MonoBehaviour
     // Optional: Keep if you need complex logic based on trigger order
     private void CheckEventSequence()
     {
-         if (triggeredEventsOrder.Count >= 2)
+        if (triggeredEventsOrder.Count >= 2)
         {
             if (triggeredEventsOrder[0] == "1" && triggeredEventsOrder[1] == "2")
             {
                 Debug.Log("GameManager Sequence Check: First triggered area was 1, then 2.");
                 // Add specific logic here if needed
             }
-             // Add other sequence checks if necessary
+            // Add other sequence checks if necessary
         }
     }
 
@@ -144,7 +155,7 @@ public class GameManager : MonoBehaviour
         if (enemyGO != null && !activeEnemies.Contains(enemyGO))
         {
             activeEnemies.Add(enemyGO);
-             Debug.Log($"GameManager: Registered spawned enemy {enemyGO.name}. Total active: {activeEnemies.Count}");
+            Debug.Log($"GameManager: Registered spawned enemy {enemyGO.name}. Total active: {activeEnemies.Count}");
 
             // Optional: Explicitly assign gameManager reference here if needed,
             // though BaseEnemy's Start() method should find it anyway.
@@ -178,9 +189,11 @@ public class GameManager : MonoBehaviour
         Debug.Log("GameManager: Enemy Died: " + deadEnemy.name);
         if (activeEnemies.Contains(deadEnemy))
         {
-             activeEnemies.Remove(deadEnemy);
-              Debug.Log($"GameManager: Removed enemy. Total active remaining: {activeEnemies.Count}");
-        } else {
+            activeEnemies.Remove(deadEnemy);
+            Debug.Log($"GameManager: Removed enemy. Total active remaining: {activeEnemies.Count}");
+        }
+        else
+        {
             Debug.LogWarning($"GameManager: Tried to remove enemy {deadEnemy.name} but it wasn't in the active list.", deadEnemy);
         }
         // Add any logic here needed when an enemy dies (e.g., check if area clear)
