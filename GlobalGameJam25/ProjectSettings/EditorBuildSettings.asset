@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Main_Game.unity
     guid: f4e89985689ad5147b6fba905ad885ef
   - enabled: 1
-    path: Assets/Mike/VinnySceneMikeRevised.unity
+    path: Assets/Mike/VinnySceneMikeRevisedvinny.unity
     guid: 7810f9697e1a5174db8684d6e323b2f2
   - enabled: 1
     path: Assets/Scenes/EndScene.unity
