@@ -7,28 +7,9 @@
     <list default="true" id="fce460ab-96da-436b-be79-13280ac23597" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GlobalGameJam25/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GlobalGameJam25/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Mike/VinnySceneMikeRevised.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Mike/VinnySceneMikeRevised.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Base/BaseEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Base/BaseEnemy.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Enemy Types/SludgeEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Enemy Types/SludgeEnemy.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemySpawner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemySpawner.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerShooting.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerShooting.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerStateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerStateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/BulletStates/BasicBullet.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/BulletStates/BasicBullet.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/BulletStates/FreezeBullet.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/BulletStates/FreezeBullet.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/PlayerStates/PlayerFlyingState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/PlayerStates/PlayerFlyingState.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/GameManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikesPrefabs/SludgeType.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikesPrefabs/SludgeType.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikesPrefabs/SpiritBullet.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikesPrefabs/SpiritBullet.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikesPrefabs/SpiritBulletShell.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikesPrefabs/SpiritBulletShell.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikesPrefabs/TargetPoint.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikesPrefabs/TargetPoint.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Settings/DefaultVolumeProfile.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/DefaultVolumeProfile.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Simple FX Kit/Materials/FX_IndianOceanAssets_Spheres.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Simple FX Kit/Materials/FX_IndianOceanAssets_Spheres.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Simple FX Kit/Materials/FX_IndianOceanAssets_Squares.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Simple FX Kit/Materials/FX_IndianOceanAssets_Squares.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Simple FX Kit/Materials/FX_IndianOceanAssets_Triangles.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Simple FX Kit/Materials/FX_IndianOceanAssets_Triangles.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Simple FX Kit/Prefabs/Spheres Explode.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Simple FX Kit/Prefabs/Spheres Explode.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Simple FX Kit/Prefabs/Triangles Explode.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Simple FX Kit/Prefabs/Triangles Explode.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/packages-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/New Terrain.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/New Terrain.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Vinny/Grass.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Vinny/Grass.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,6 +25,7 @@
     <setting file="file://$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/TurnCanvas.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/TutorialManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/TypeWriterEffect.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal/Shaders/Lit.shader" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal/Shaders/Particles/ParticlesLit.shader" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProjectColorInfo">{
@@ -131,7 +113,8 @@
       <workItem from="1743740414392" duration="4230000" />
       <workItem from="1744686986552" duration="9256000" />
       <workItem from="1744863572190" duration="7652000" />
-      <workItem from="1745183362518" duration="25406000" />
+      <workItem from="1745183362518" duration="26281000" />
+      <workItem from="1745392304347" duration="1277000" />
     </task>
     <servers />
   </component>
