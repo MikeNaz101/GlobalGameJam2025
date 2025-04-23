@@ -1,194 +1,311 @@
 using UnityEngine;
+using System.Collections; // Needed for Coroutine
 
-public enum EnemyState { Patrolling, Chasing, Attacking, Fleeing, Frozen, Dying }
-public enum DamageType { Basic, Freeze, Other } // Assuming DamageType is defined
+// Add this enum if you don't have it already
+public enum DamageType { Basic, Freeze, Other } // Example types
 
 public abstract class BaseEnemy : MonoBehaviour
 {
-    public EnemyState currentState = EnemyState.Patrolling;
-    [Header("Detection & Stats")]
-    public float detectionRadius = 10f;
-    public LayerMask playerLayer;
-    public int maxHealth = 100;
+    [Header("Base Enemy Stats")]
+    public int maxHealth = 50;
     public int currentHealth;
-    public float moveSpeed = 2f;
+    public float moveSpeed = 3f;
+    public float detectionRange = 20f;
+    public float loseSightRange = 25f;
+    public float fleeHealthPercentage = 0.3f; // Flee when below 30% health
+    [Tooltip("How long the enemy stays frozen by default.")]
+    public float baseFreezeDuration = 5f;
 
-    [Header("References")]
-    [Tooltip("Leave empty to find by tag 'Player' at runtime.")]
-    public Transform playerTransform;
-    public GameManager gameManager;
-    // --- NEW: Add this reference! ---
-    [Tooltip("Assign the AreaCleansingManager for the zone this enemy belongs to.")]
+    // ----- XP Value -----
+    [Header("XP")]
+    [Tooltip("How much XP this enemy grants when killed.")]
+    public int xpValue = 10; // Default value, can be set per enemy type in Inspector
+    // ----- END XP Value -----
+
+    [Header("Effects & References")]
+    public GameObject deathEffectPrefab; // Assign prefab for death particles/sound
+    public GameObject freezeEffectPrefab; // Assign prefab for freeze visual effect
+    [Tooltip("The object representing the visual freeze effect, instantiated when frozen.")]
+    protected GameObject currentFreezeEffectInstance;
+    // ----- ADD THIS LINE -----
+    [Tooltip("Reference to the Area Manager this enemy belongs to. Assigned by Spawner.")]
     public AreaCleansingManager myAreaManager;
-    // --------------------------------
+    // -------------------------
 
-    [Header("Loot & Effects")]
-    [Tooltip("The particle effect prefab to spawn when the enemy dies (represents XP). Assign your XP Orb Prefab here.")]
-    public GameObject xpEffectPrefab;
-    [Tooltip("Amount of XP this enemy grants (used by Player on collection). Value could potentially be passed if needed.")]
-    public int xpValue = 10;
 
-    // Freeze related variables
+    // State Machine
+    public enum EnemyState { Idle, Patrol, Chase, Attack, Flee, Frozen, Dying }
+    public EnemyState currentState = EnemyState.Idle;
+
+    protected Transform playerTransform;
     protected bool _isFrozen = false;
-    protected float _freezeEndTime = 0f;
-    protected EnemyState _stateBeforeFreeze;
-    protected Renderer _renderer;
-    protected Color _originalColor;
+    protected float freezeTimer = 0f;
+    protected float fleeHealthThreshold;
 
+    // --- Abstract Methods (Must be implemented by derived classes) ---
+    protected abstract void Patrol();
+    protected abstract void Chase();
+    protected abstract void Attack();
+    protected abstract void Flee();
+    protected abstract float GetAttackRange(); // Derived classes define their specific attack range
+    protected abstract void UpdateHealthBar(); // Derived classes handle their specific health bar logic
+
+    // --- Virtual Methods (Can be optionally overridden by derived classes) ---
     protected virtual void Awake()
     {
         currentHealth = maxHealth;
-        _renderer = GetComponent<Renderer>();
-        if (_renderer != null) _originalColor = _renderer.material.color;
+        fleeHealthThreshold = maxHealth * fleeHealthPercentage;
     }
 
     protected virtual void Start()
     {
-        // Find Player Reference via Tag
-        if (playerTransform == null)
+        // Find player once at the start (can be improved with a GameManager or event system)
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject != null)
         {
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null) playerTransform = playerObj.transform;
-            else Debug.LogError($"<color=red>[{gameObject.name}]</color> FAILED TO FIND PLAYER OBJECT TAGGED 'Player' IN START!");
+            playerTransform = playerObject.transform;
         }
-        if (gameManager == null) gameManager = FindFirstObjectByType<GameManager>();
+        else
+        {
+            Debug.LogWarning($"Enemy '{gameObject.name}' could not find GameObject with tag 'Player'.", this);
+        }
+        UpdateHealthBar(); // Initial health bar update
 
         // --- Optional: Add a check/warning if the Area Manager isn't assigned ---
-        // Note: This check runs in Start. If assigned later (e.g., by a spawner), this warning might be premature.
-        if (myAreaManager == null)
-        {
-            Debug.LogWarning($"[{gameObject.name}] does not have an AreaCleansingManager assigned in Start. Ensure it's set via Inspector or Spawner.", this);
-        }
+        // Note: This check runs in Start. Spawner assigns it AFTER Instantiate but before Start sometimes.
+        // A warning here might be premature if the spawner assigns it correctly.
+        // if (myAreaManager == null)
+        // {
+        //     Debug.LogWarning($"[{gameObject.name}] does not have an AreaCleansingManager assigned in Start. Ensure it's set via Spawner.", this);
+        // }
         // ----------------------------------------------------------------------
     }
 
     protected virtual void Update()
     {
-        // ... (rest of Update remains the same) ...
-        if (_isFrozen) {
-            if (Time.time >= _freezeEndTime) Unfreeze();
-            else return;
-        }
-        if (playerTransform == null && currentState != EnemyState.Dying) { return; } // Basic check if player lost
-        if (playerTransform != null) HandleStateMachine();
-    }
+        if (currentState == EnemyState.Dying) return; // Don't do anything if dying
 
-    protected virtual void HandleStateMachine()
-    {
-        // ... (HandleStateMachine remains the same) ...
-        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
-        switch (currentState) {
-            case EnemyState.Patrolling:
+        HandleFreezeTimer();
+
+        if (_isFrozen)
+        {
+            // If currently frozen, don't run other state logic
+            if (currentState != EnemyState.Frozen) TransitionToState(EnemyState.Frozen);
+            return;
+        }
+        else if (currentState == EnemyState.Frozen)
+        {
+            // If NOT frozen anymore but state is Frozen, transition back (e.g., to Idle)
+            TransitionToState(EnemyState.Idle);
+        }
+
+        // --- State Machine Logic ---
+        float distanceToPlayer = GetDistanceToPlayer();
+
+        switch (currentState)
+        {
+            case EnemyState.Idle:
+                // Look for player
+                if (CanSeePlayer(distanceToPlayer)) TransitionToState(EnemyState.Chase);
+                else Patrol(); // Or just stand still if Idle shouldn't patrol
+                break;
+
+            case EnemyState.Patrol:
                 Patrol();
-                if (distanceToPlayer < detectionRadius) ChangeState(EnemyState.Chasing);
+                // Check for player
+                if (CanSeePlayer(distanceToPlayer)) TransitionToState(EnemyState.Chase);
                 break;
-            case EnemyState.Chasing:
-                Chase();
-                if (distanceToPlayer <= GetAttackRange()) ChangeState(EnemyState.Attacking);
-                else if (distanceToPlayer > detectionRadius * 1.2f) ChangeState(EnemyState.Patrolling);
+
+            case EnemyState.Chase:
+                // Check flee condition first
+                if (ShouldFlee()) TransitionToState(EnemyState.Flee);
+                // Check attack range
+                else if (distanceToPlayer <= GetAttackRange()) TransitionToState(EnemyState.Attack);
+                // Check if player is lost
+                else if (!CanSeePlayer(distanceToPlayer, loseSightRange)) TransitionToState(EnemyState.Patrol); // Go back to patrol if lost
+                else Chase(); // Continue chasing
                 break;
-            case EnemyState.Attacking:
-                Attack();
-                if (distanceToPlayer > GetAttackRange()) ChangeState(EnemyState.Chasing);
+
+            case EnemyState.Attack:
+                // Check flee condition first
+                if (ShouldFlee()) TransitionToState(EnemyState.Flee);
+                // Check if player moved out of range
+                else if (distanceToPlayer > GetAttackRange() * 1.1f) TransitionToState(EnemyState.Chase); // Give a little buffer (1.1f)
+                // Check if player is lost (e.g., behind cover)
+                else if (!CanSeePlayer(distanceToPlayer, loseSightRange)) TransitionToState(EnemyState.Patrol);
+                else Attack(); // Continue attacking
                 break;
-            case EnemyState.Fleeing:
-                Flee();
-                if (distanceToPlayer > detectionRadius * 1.5f) ChangeState(EnemyState.Patrolling);
+
+            case EnemyState.Flee:
+                // If health recovered or player is far away, stop fleeing
+                if (!ShouldFlee() || distanceToPlayer > loseSightRange * 1.5f) TransitionToState(EnemyState.Patrol);
+                else Flee();
                 break;
-            case EnemyState.Dying: break;
-            case EnemyState.Frozen: break;
+
+            case EnemyState.Frozen:
+                // Logic is handled by HandleFreezeTimer and the start of Update
+                break;
         }
     }
 
-    protected virtual void ChangeState(EnemyState newState)
+    protected virtual void TransitionToState(EnemyState newState)
     {
-        // ... (ChangeState remains the same) ...
-        if (currentState == EnemyState.Dying || currentState == newState || _isFrozen) return;
+        if (currentState == newState || currentState == EnemyState.Dying) return;
+
         currentState = newState;
     }
 
+
+    // --- Damage & Effects ---
+
     public virtual void TakeDamage(int damage, DamageType type = DamageType.Other)
     {
-        // ... (TakeDamage remains the same, eventually calls Die) ...
-        if (currentState == EnemyState.Dying) return;
+        if (currentState == EnemyState.Dying || damage <= 0) return;
+
         currentHealth -= damage;
-        currentHealth = Mathf.Max(0, currentHealth);
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        Debug.Log($"{gameObject.name} took {damage} ({type}) damage. Health: {currentHealth}/{maxHealth}");
         UpdateHealthBar();
-        if (currentHealth <= 0) {
-            if(currentState != EnemyState.Dying) { ChangeState(EnemyState.Dying); Die(); }
-        } else if (currentHealth <= maxHealth * 0.25f && currentState != EnemyState.Fleeing && currentState != EnemyState.Frozen) {
-            ChangeState(EnemyState.Fleeing);
-        }
-    }
 
-    public virtual void Freeze(float baseDuration)
-    {
-        // ... (Freeze remains the same) ...
-        if (_isFrozen || currentState == EnemyState.Dying) return;
-        _isFrozen = true;
-        _freezeEndTime = Time.time + Random.Range(Mathf.Max(1f, baseDuration * 0.8f), baseDuration * 1.2f);
-        _stateBeforeFreeze = currentState;
-        currentState = EnemyState.Frozen;
-        if (_renderer != null) _renderer.material.color = Color.cyan;
-    }
-
-     protected virtual void Unfreeze()
-     {
-         // ... (Unfreeze remains the same) ...
-         _isFrozen = false;
-         EnemyState stateToRevertTo = _stateBeforeFreeze;
-         if (_stateBeforeFreeze == EnemyState.Fleeing && currentHealth > maxHealth * 0.25f) stateToRevertTo = EnemyState.Patrolling;
-         if(currentState == EnemyState.Frozen) currentState = stateToRevertTo;
-         if (_renderer != null) _renderer.material.color = _originalColor;
-     }
-
-    // --- Die Method Modified ---
-    protected virtual void Die() {
-        if (!enabled) return; // Prevent multi-calls if already dying/disabled
-        Debug.Log($"{gameObject.name} withered away!");
-
-        // Spawn XP Effect
-        if (xpEffectPrefab != null && playerTransform != null)
+        if (currentHealth <= 0)
         {
-            Vector3 spawnPos = transform.position + Vector3.up * 0.5f;
-            Instantiate(xpEffectPrefab, spawnPos, Quaternion.identity);
-        } else if (xpEffectPrefab == null) {
-            Debug.LogWarning($"[{gameObject.name}] No xpEffectPrefab assigned in Inspector.");
+            Die();
         }
+        else if (ShouldFlee() && currentState != EnemyState.Flee && currentState != EnemyState.Frozen)
+        {
+            TransitionToState(EnemyState.Flee);
+        }
+        else if (currentState == EnemyState.Idle || currentState == EnemyState.Patrol)
+        {
+             TransitionToState(EnemyState.Chase);
+        }
+    }
 
-        // --- NEW: Notify the Area Manager! ---
+    protected virtual void Die()
+    {
+        if (currentState == EnemyState.Dying) return; // Prevent multiple calls
+
+        TransitionToState(EnemyState.Dying);
+        Debug.Log($"{gameObject.name} has died.");
+
+        // ----- Grant XP Directly OR Spawn Orb -----
+        // Decide which method you prefer:
+
+        // METHOD 1: Grant XP Directly (Simpler, use this if you removed the orb script)
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject != null)
+        {
+            PlayerStateManager playerState = playerObject.GetComponent<PlayerStateManager>();
+            if (playerState != null)
+            {
+                playerState.GainXP(xpValue); // Grant XP directly
+            }
+            else { Debug.LogError($"Enemy '{gameObject.name}': Could not find PlayerStateManager on player object!", playerObject); }
+        }
+        else { Debug.LogWarning($"Enemy '{gameObject.name}': Could not find Player object to grant XP."); }
+
+        // METHOD 2: Spawn XP Orb (Use this if you have the XpOrbDelay script on the prefab)
+        // Comment out Method 1 above if using this.
+        // if (deathEffectPrefab != null) // Assuming deathEffectPrefab IS the XP Orb
+        // {
+        //     Instantiate(deathEffectPrefab, transform.position + Vector3.up * 0.5f, Quaternion.identity);
+        // }
+        // else { Debug.LogWarning($"[{gameObject.name}] No deathEffectPrefab (XP Orb) assigned in Inspector."); }
+        // ----- END XP GRANT -----
+
+
+        // --- Notify the Area Manager! ---
         if (myAreaManager != null)
         {
             myAreaManager.RegisterMonsterKill();
-            // Optional: You could even pass 'this' enemy if the manager needed specific info
-            // myAreaManager.RegisterMonsterKill(this);
         }
         else
         {
             // Warning if an enemy dies without being part of an area cleansing process
-            Debug.LogWarning($"[{gameObject.name}] died but was not assigned to an AreaCleansingManager. Progression in its area won't be tracked.", this);
+            Debug.LogWarning($"[{gameObject.name}] died but was not assigned to an AreaCleansingManager by its Spawner. Progression in its area won't be tracked.", this);
         }
         // --- End Notify Area Manager ---
 
-        this.enabled = false; // Disable script immediately
-        gameManager?.EnemyDied(gameObject); // Notify GM
-        Destroy(gameObject, 0.1f); // Destroy shortly after
+
+        // Optional: Disable components instead of destroying immediately for effects
+        Collider col = GetComponent<Collider>(); if (col != null) col.enabled = false;
+        Rigidbody rb = GetComponent<Rigidbody>(); if (rb != null) rb.isKinematic = true; // Stop physics
+
+        // Destroy the GameObject after a short delay (allows effects to play)
+        Destroy(gameObject, 0.1f); // Adjust delay as needed
     }
 
-    // --- Abstract methods & Other Virtuals ---
-    protected abstract void Patrol();
-    protected abstract void Chase();
-    protected abstract void Attack();
-    protected abstract void Flee();
-    protected abstract float GetAttackRange();
-    protected virtual void UpdateHealthBar() { /* Implement in child or leave empty */ }
+    public virtual void Freeze(float duration)
+    {
+        if (_isFrozen || currentState == EnemyState.Dying) return; // Don't freeze if already frozen or dying
 
-    // OnDrawGizmosSelected remains the same
-    public virtual void OnDrawGizmosSelected() {
-        // ... (Gizmos remain the same) ...
-        Gizmos.color = Color.yellow; Gizmos.DrawWireSphere(transform.position, detectionRadius);
-        float attackRange = GetAttackRange();
-        if(currentState != EnemyState.Patrolling && attackRange > 0) { Gizmos.color = Color.red; Gizmos.DrawWireSphere(transform.position, attackRange); }
-        if (playerTransform != null) { Gizmos.color = Color.magenta; Gizmos.DrawLine(transform.position + Vector3.up * 0.1f, playerTransform.position + Vector3.up * 0.1f); }
+        _isFrozen = true;
+        freezeTimer = duration; // Set the timer
+        TransitionToState(EnemyState.Frozen); // Ensure state reflects frozen status
+
+        Debug.Log($"{gameObject.name} frozen for {duration} seconds.");
+
+        // Instantiate freeze visual effect if assigned
+        if (freezeEffectPrefab != null && currentFreezeEffectInstance == null)
+        {
+            currentFreezeEffectInstance = Instantiate(freezeEffectPrefab, transform.position, transform.rotation, transform); // Parent to enemy
+        }
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if(rb != null) rb.isKinematic = true;
+    }
+
+    protected virtual void Unfreeze()
+    {
+        if (!_isFrozen) return; // Only unfreeze if actually frozen
+
+        _isFrozen = false;
+        freezeTimer = 0f;
+        // State will transition out of Frozen in the next Update() call
+
+        Debug.Log($"{gameObject.name} un-frozen.");
+
+        if (currentFreezeEffectInstance != null)
+        {
+            Destroy(currentFreezeEffectInstance);
+            currentFreezeEffectInstance = null;
+        }
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if(rb != null) rb.isKinematic = false;
+    }
+
+    protected virtual void HandleFreezeTimer()
+    {
+        if (_isFrozen && freezeTimer > 0)
+        {
+            freezeTimer -= Time.deltaTime;
+            if (freezeTimer <= 0)
+            {
+                Unfreeze();
+            }
+        }
+    }
+
+    // --- Helper Methods ---
+
+    protected float GetDistanceToPlayer()
+    {
+        if (playerTransform == null) return float.MaxValue; // Player not found or destroyed
+        return Vector3.Distance(transform.position, playerTransform.position);
+    }
+
+    protected bool CanSeePlayer(float currentDistance, float rangeOverride = -1f)
+    {
+        if (playerTransform == null) return false;
+        float checkRange = (rangeOverride > 0) ? rangeOverride : detectionRange;
+        if (currentDistance > checkRange) return false; // Too far away
+        return true; // Simple distance check for now
+    }
+
+    protected bool ShouldFlee()
+    {
+        return currentHealth <= fleeHealthThreshold && currentHealth > 0;
     }
 }
