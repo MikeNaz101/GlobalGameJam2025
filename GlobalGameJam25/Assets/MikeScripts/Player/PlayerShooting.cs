@@ -21,10 +21,12 @@ public class PlayerShooting : MonoBehaviour
     // --- ---
     public ParticleSystem aimingSpotEffect; // Assign a Particle System prefab/instance here
 
-    // ----- NEW: Aim Offset -----
-    [Tooltip("How many units 'further forward' along the camera's aim ray the bullet will target, beyond the initial hit point.")]
-    public float aimForwardOffset = 1.0f; // Adjust this value in the Inspector (e.g., 0=no offset, 1=aim 1m past hit)
-    // ---------------------------
+    // ----- Aim Offset (Informational Only Now) -----
+    // This value no longer affects the bullet trajectory angle with the current setup,
+    // but could be used for other calculations if needed (e.g., max range effects).
+    [Tooltip("Informational: How many units forward from the raycast hit point the target *would* be calculated (currently does not affect fire angle).")]
+    public float aimForwardOffset = 1.0f;
+    // -----------------------------------------------
 
 
     [Header("Mana Costs")]
@@ -176,17 +178,22 @@ public class PlayerShooting : MonoBehaviour
              if (basic != null) { basic.StartCharging(player); chargeStartedSuccessfully = true; }
              else if (freeze != null) { freeze.StartCharging(player); chargeStartedSuccessfully = true; }
              else if (teleport != null) { /* Teleport might not need StartCharging */ chargeStartedSuccessfully = true; }
-             else { Debug.LogError($"StartCharge Error: Instantiated bullet '{currentBullet.name}' has no recognized bullet script!"); }
+             else { Debug.LogError($"StartCharge Error: Instantiated bullet '{currentBullet.name}' has no recognized bullet script!"); chargeStartedSuccessfully = false; } // Ensure flag is false if no script found
         }
+        else
+        {
+            chargeStartedSuccessfully = false; // Mana check failed
+        }
+
 
         // --- Handle Failed Charge Start ---
         if (!chargeStartedSuccessfully)
         {
             _isCharging = false;
             if(isTeleportSelected) DeactivateTeleportVCamView();
-            // IMPORTANT: If UseMana failed, mana was NOT deducted. If it succeeded but bullet script was missing, mana WAS deducted.
-            // Consider refunding mana here if needed, or ensure prefabs always have scripts.
-            Destroy(currentBullet);
+            // Mana was either not deducted (UseMana failed) or was deducted but script missing.
+            // Decide if mana should be refunded if script was missing.
+            if (currentBullet != null) Destroy(currentBullet); // Destroy if instantiated
             currentBullet = null;
             Debug.Log($"StartCharge: Failed to start charge for {currentType} (Likely due to UseMana returning false or missing script).");
         }
@@ -200,13 +207,11 @@ public class PlayerShooting : MonoBehaviour
     public void EndCharge()
     {
         // --- Initial Logs & Deactivation ---
-        // Debug.Log("<color=yellow>EndCharge CALLED.</color>"); // Less verbose
         DeactivateTeleportVCamView(); // Deactivate view and hide UI
 
         // --- Check Charging State ---
         if (!_isCharging || currentBullet == null) { _isCharging = false; currentBullet = null; return; }
 
-        // Debug.Log("<color=green>EndCharge: Proceeding with firing logic...</color>"); // Less verbose
         _isCharging = false;
 
         // --- Prepare Bullet for Firing ---
@@ -222,44 +227,39 @@ public class PlayerShooting : MonoBehaviour
         else if (freeze != null) { freeze.StopCharging(); }
 
 
-        // ===== Calculate Fire Direction with Offset =====
+        // ===== Calculate Fire Direction (Parallel to Camera Aim) =====
         Vector3 fireDirection;
         BulletType firedBulletType = player.bulletSpawner.CurrentBulletType;
 
-        // Debug.Log($"Calculating Aim Direction for {firedBulletType} via Raycast..."); // Less verbose
         if (mainCamera == null) {
              Debug.LogError("Cannot aim raycast: Main Camera missing!");
-             fireDirection = firePoint.forward; // Fallback
+             fireDirection = firePoint.forward; // Fallback: Use firepoint's own forward
         } else {
+            // Get the ray representing the camera's center view
             Ray aimRay = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+
+            // --- Set the Fire Direction to be PARALLEL to the Camera's Aim ---
+            fireDirection = aimRay.direction.normalized; // Use the camera's forward direction directly
+            // ----------------------------------------------------------------
+
+            // We can still do the raycast to find where the visual aim hits for effects or debug
             RaycastHit hitInfo;
-            Vector3 initialTargetPoint;
-
-            // Visualize Aim Ray (where the player THINKS they are aiming)
-            Debug.DrawRay(aimRay.origin, aimRay.direction * aimRaycastRange, Color.yellow, 2.0f);
-
-            // --- Perform Raycast WITH LAYER MASK to find the initial target ---
+            Vector3 initialTargetPoint; // Where the crosshair is pointing
             if (Physics.Raycast(aimRay, out hitInfo, aimRaycastRange, aimRaycastLayerMask)) {
                 initialTargetPoint = hitInfo.point;
-                // Debug.Log($"Aim Raycast Hit: {hitInfo.collider.name} at {initialTargetPoint}"); // Less verbose
             } else {
                 initialTargetPoint = aimRay.GetPoint(aimRaycastRange);
-                // Debug.Log($"Aim Raycast Missed. Targeting point far away: {initialTargetPoint}"); // Less verbose
             }
 
-            // --- Calculate the OFFSET target point ---
-            // We add the offset along the direction of the original camera aim ray
-            Vector3 offsetTargetPoint = initialTargetPoint + aimRay.direction * aimForwardOffset;
-            // ------------------------------------------
+            // --- Debug Visualizations ---
+            // Yellow Ray: Where the camera is looking / crosshair points
+            Debug.DrawRay(aimRay.origin, aimRay.direction * aimRaycastRange, Color.yellow, 3.0f);
 
-            // Calculate final fire direction FROM firePoint TO the OFFSET target point
-            fireDirection = (offsetTargetPoint - firePoint.position).normalized;
-            // Debug.Log($"Calculated Fire Direction (Offset Applied): {fireDirection}"); // Less verbose
+            // Cyan Ray: The actual path the bullet will take (parallel to yellow ray, starting from firePoint)
+            Debug.DrawRay(firePoint.position, fireDirection * 20f, Color.cyan, 3.0f); // Increased length for visibility
 
-            // Visualize Final Fire Direction
-            Color debugColor = (firedBulletType == BulletType.Type3) ? Color.red : Color.cyan; // Use Cyan for offset direction
-            Debug.DrawLine(firePoint.position, offsetTargetPoint, debugColor, 2.0f); // Draw line to offset point
-            Debug.DrawRay(firePoint.position, fireDirection * 15f, debugColor, 2.0f); // Draw ray along final direction
+            // Optional: Draw a line showing the visual target point for reference
+            // Debug.DrawLine(firePoint.position, initialTargetPoint, Color.magenta, 3.0f);
         }
         // ===== End Calculate Fire Direction =====
 
@@ -267,8 +267,9 @@ public class PlayerShooting : MonoBehaviour
         // --- Apply Launch Force ---
         if (rb != null) {
             float finalForce = bulletForce * chargeMultiplier;
-            rb.AddForce(fireDirection * finalForce, ForceMode.VelocityChange); // Use calculated fireDirection
-            Debug.Log($"<color=white>Fired {firedBulletType} with force mult {chargeMultiplier} in dir {fireDirection}</color>");
+            // Apply force ALONG the calculated fireDirection (which is now parallel to camera aim)
+            rb.AddForce(fireDirection * finalForce, ForceMode.VelocityChange);
+            Debug.Log($"<color=white>Fired {firedBulletType} PARALLEL to camera aim with force mult {chargeMultiplier}. Dir: {fireDirection}</color>");
         }
         // --- End Firing Logic ---
 
@@ -277,7 +278,7 @@ public class PlayerShooting : MonoBehaviour
     }
 
 
-    // --- VCam & UI Helper Methods --- (No changes needed here)
+    // --- VCam & UI Helper Methods ---
     private void ActivateTeleportVCamView()
     {
         if (teleportAimVCam != null && gameplayVCam != null && !isUsingTeleportView) {
@@ -285,7 +286,6 @@ public class PlayerShooting : MonoBehaviour
             teleportAimVCam.Priority = newPriority;
             isUsingTeleportView = true;
             if (teleportAimUI != null) { teleportAimUI.SetActive(true); }
-            // Debug.Log("<color=lime>Activated Teleport View & UI.</color>"); // Less verbose
         }
     }
 
@@ -293,7 +293,6 @@ public class PlayerShooting : MonoBehaviour
     {
         if (teleportAimUI != null) { if(teleportAimUI.activeSelf) teleportAimUI.SetActive(false); }
         if (teleportAimVCam != null && isUsingTeleportView) { // Check isUsingTeleportView
-            // Debug.Log("<color=cyan>Deactivating Teleport View.</color>"); // Less verbose
             teleportAimVCam.Priority = teleportAimVCamOriginalPriority;
             isUsingTeleportView = false; // Set flag *after* changing priority
         }
@@ -307,6 +306,30 @@ public class PlayerShooting : MonoBehaviour
              if (currentBullet != null) { Destroy(currentBullet); currentBullet = null; }
              _isCharging = false;
         } else { Debug.Log("<color=red>CancelCharge: Was not charging.</color>"); }
+    }
+
+    // Helper for debug drawing sphere (optional - can be removed if not needed)
+    void DebugDrawSphere(Vector3 center, float radius, Color color, float duration)
+    {
+        int segments = 10;
+        float angleStep = 360f / segments;
+        Vector3 lastPointXY = center + new Vector3(Mathf.Cos(0) * radius, Mathf.Sin(0) * radius, 0);
+        Vector3 lastPointXZ = center + new Vector3(Mathf.Cos(0) * radius, 0, Mathf.Sin(0) * radius);
+        Vector3 lastPointYZ = center + new Vector3(0, Mathf.Cos(0) * radius, Mathf.Sin(0) * radius);
+
+        for (int i = 1; i <= segments; i++)
+        {
+            float rad = Mathf.Deg2Rad * (i * angleStep);
+            Vector3 currentPointXY = center + new Vector3(Mathf.Cos(rad) * radius, Mathf.Sin(rad) * radius, 0);
+            Vector3 currentPointXZ = center + new Vector3(Mathf.Cos(rad) * radius, 0, Mathf.Sin(rad) * radius);
+            Vector3 currentPointYZ = center + new Vector3(0, Mathf.Cos(rad) * radius, Mathf.Sin(rad) * radius);
+            Debug.DrawLine(lastPointXY, currentPointXY, color, duration);
+            Debug.DrawLine(lastPointXZ, currentPointXZ, color, duration);
+            Debug.DrawLine(lastPointYZ, currentPointYZ, color, duration);
+            lastPointXY = currentPointXY;
+            lastPointXZ = currentPointXZ;
+            lastPointYZ = currentPointYZ;
+        }
     }
 
 } // End of PlayerShooting class
