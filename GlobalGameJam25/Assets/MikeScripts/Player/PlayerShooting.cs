@@ -21,6 +21,11 @@ public class PlayerShooting : MonoBehaviour
     // --- ---
     public ParticleSystem aimingSpotEffect; // Assign a Particle System prefab/instance here
 
+    // ----- NEW: Aim Offset -----
+    [Tooltip("How many units 'further forward' along the camera's aim ray the bullet will target, beyond the initial hit point.")]
+    public float aimForwardOffset = 1.0f; // Adjust this value in the Inspector (e.g., 0=no offset, 1=aim 1m past hit)
+    // ---------------------------
+
 
     [Header("Mana Costs")]
     public int basicManaCostInitial = 5;
@@ -42,18 +47,18 @@ public class PlayerShooting : MonoBehaviour
     {
         // --- Cache Main Camera ---
         mainCamera = Camera.main;
-        if (mainCamera == null) { /* ... Error Handling ... */ this.enabled = false; return; }
+        if (mainCamera == null) { Debug.LogError("PlayerShooting Error: Main Camera not found!", this); this.enabled = false; return; }
         Debug.Log($"PlayerShooting Start: Main Camera '{mainCamera.name}' cached successfully.");
 
         // --- Get Player State Manager ---
-        if (player == null) { /* ... (Try GetComponent / GetComponentInParent) ... */ }
-        if (player == null || player.bulletSpawner == null) { /* ... Error handling ... */ this.enabled = false; return; }
+        if (player == null) player = GetComponentInParent<PlayerStateManager>(); // Try to find if not assigned
+        if (player == null || player.bulletSpawner == null) { Debug.LogError("PlayerShooting Error: Missing PlayerStateManager or BulletSpawner reference!", this); this.enabled = false; return; }
         Debug.Log("PlayerShooting Start: PlayerStateManager and BulletSpawner references seem valid.");
 
         // --- Cinemachine Setup ---
-        if (gameplayVCam == null || teleportAimVCam == null) { /* ... Error handling ... */ this.enabled = false; return; }
+        if (gameplayVCam == null || teleportAimVCam == null) { Debug.LogError("PlayerShooting Error: Gameplay or Teleport VCam not assigned!", this); this.enabled = false; return; }
         teleportAimVCamOriginalPriority = teleportAimVCam.Priority;
-        if (teleportAimVCam.Priority >= gameplayVCam.Priority) { /* ... (Warn and fix priority) ... */ }
+        if (teleportAimVCam.Priority >= gameplayVCam.Priority) { Debug.LogWarning("TeleportAim VCam priority might be too high initially. Ensure it's lower than Gameplay VCam.", this); teleportAimVCam.Priority = gameplayVCam.Priority - 1; teleportAimVCamOriginalPriority = teleportAimVCam.Priority; }
         else { Debug.Log($"PlayerShooting Start: VCam Priorities OK. TeleportAim Original: {teleportAimVCamOriginalPriority}, Gameplay: {gameplayVCam.Priority}"); }
 
         // --- UI Setup ---
@@ -85,6 +90,7 @@ public class PlayerShooting : MonoBehaviour
     void Update()
     {
         // --- Aiming Spot Particle Update ---
+        // This still uses the direct raycast hit point, which is usually desired for the visual indicator.
         if (aimingSpotEffect != null && mainCamera != null)
         {
             Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
@@ -118,40 +124,27 @@ public class PlayerShooting : MonoBehaviour
 
         switch (currentType)
         {
-            case BulletType.Type1: // Basic
-                requiredMana = basicManaCostInitial;
-                break;
-            case BulletType.Type2: // Freeze
-                requiredMana = freezeManaCostInitial;
-                break;
-            case BulletType.Type3: // Teleport
-                requiredMana = teleportManaCost;
-                break;
-            default:
-                Debug.LogError($"StartCharge Error: Unhandled BulletType: {currentType}");
-                return;
+            case BulletType.Type1: requiredMana = basicManaCostInitial; break;
+            case BulletType.Type2: requiredMana = freezeManaCostInitial; break;
+            case BulletType.Type3: requiredMana = teleportManaCost; break;
+            default: Debug.LogError($"StartCharge Error: Unhandled BulletType: {currentType}"); return;
         }
 
         // --- Check Resources ---
         if (player.currentMana < requiredMana)
         {
             Debug.Log($"StartCharge: Not enough mana for {currentType}. Need {requiredMana}, Have {player.currentMana}");
-            // Optionally provide player feedback here (sound, UI)
             return;
         }
 
         // --- Activate Aiming Mode (if needed) ---
-        if (isTeleportSelected)
-        {
-            ActivateTeleportVCamView();
-        }
+        if (isTeleportSelected) { ActivateTeleportVCamView(); }
 
         // --- Instantiate Bullet ---
-        // Ensure prefab is valid before instantiating
         if (player.bulletSpawner.bulletPrefab == null)
         {
              Debug.LogError($"StartCharge Error: Bullet Prefab for {currentType} is null in BulletSpawner!");
-             if(isTeleportSelected) DeactivateTeleportVCamView(); // Clean up VCam if activated
+             if(isTeleportSelected) DeactivateTeleportVCamView();
              return;
         }
         currentBullet = Instantiate(player.bulletSpawner.bulletPrefab, firePoint.position, firePoint.rotation);
@@ -164,8 +157,8 @@ public class PlayerShooting : MonoBehaviour
 
         // --- Prepare Bullet ---
         Rigidbody rb = currentBullet.GetComponent<Rigidbody>();
-        if (rb != null) rb.isKinematic = true; // Make it kinematic initially
-        currentBullet.transform.parent = firePoint; // Attach to fire point during charge
+        if (rb != null) rb.isKinematic = true;
+        currentBullet.transform.parent = firePoint;
 
         // --- Start Charging State ---
         chargeStartTime = Time.time;
@@ -177,48 +170,23 @@ public class PlayerShooting : MonoBehaviour
         TeleportBullet teleport = currentBullet.GetComponent<TeleportBullet>();
         bool chargeStartedSuccessfully = false;
 
-        // --- CORRECTED UseMana CALLS ---
-        if (basic != null)
+        // Mana is deducted, then specific bullet logic starts
+        if (player.UseMana(requiredMana))
         {
-            // Call UseMana with ONLY the mana cost
-            if (player.UseMana(requiredMana))
-            {
-                basic.StartCharging(player); // Pass player ref to bullet script if needed
-                chargeStartedSuccessfully = true;
-            }
+             if (basic != null) { basic.StartCharging(player); chargeStartedSuccessfully = true; }
+             else if (freeze != null) { freeze.StartCharging(player); chargeStartedSuccessfully = true; }
+             else if (teleport != null) { /* Teleport might not need StartCharging */ chargeStartedSuccessfully = true; }
+             else { Debug.LogError($"StartCharge Error: Instantiated bullet '{currentBullet.name}' has no recognized bullet script!"); }
         }
-        else if (freeze != null)
-        {
-            // Call UseMana with ONLY the mana cost
-            if (player.UseMana(requiredMana))
-            {
-                freeze.StartCharging(player); // Pass player ref to bullet script if needed
-                chargeStartedSuccessfully = true;
-            }
-        }
-        else if (teleport != null)
-        {
-            // Call UseMana with ONLY the mana cost
-            // Teleport might not need a StartCharging method, but still consumes mana on start
-            if (player.UseMana(requiredMana))
-            {
-                chargeStartedSuccessfully = true;
-            }
-        }
-        else
-        {
-            Debug.LogError($"StartCharge Error: Instantiated bullet '{currentBullet.name}' has no recognized bullet script (Basic, Freeze, Teleport)!");
-            chargeStartedSuccessfully = false; // Ensure failure state
-        }
-        // --- END OF CORRECTIONS ---
 
-
-        // --- Handle Failed Charge Start (e.g., mana check failed inside UseMana) ---
+        // --- Handle Failed Charge Start ---
         if (!chargeStartedSuccessfully)
         {
-            _isCharging = false; // Reset charging flag
-            if(isTeleportSelected) DeactivateTeleportVCamView(); // Clean up VCam if activated
-            Destroy(currentBullet); // Destroy the unused bullet
+            _isCharging = false;
+            if(isTeleportSelected) DeactivateTeleportVCamView();
+            // IMPORTANT: If UseMana failed, mana was NOT deducted. If it succeeded but bullet script was missing, mana WAS deducted.
+            // Consider refunding mana here if needed, or ensure prefabs always have scripts.
+            Destroy(currentBullet);
             currentBullet = null;
             Debug.Log($"StartCharge: Failed to start charge for {currentType} (Likely due to UseMana returning false or missing script).");
         }
@@ -232,63 +200,68 @@ public class PlayerShooting : MonoBehaviour
     public void EndCharge()
     {
         // --- Initial Logs & Deactivation ---
-        Debug.Log("<color=yellow>EndCharge CALLED.</color>");
+        // Debug.Log("<color=yellow>EndCharge CALLED.</color>"); // Less verbose
         DeactivateTeleportVCamView(); // Deactivate view and hide UI
-        // ... (Log priorities for debugging) ...
 
         // --- Check Charging State ---
         if (!_isCharging || currentBullet == null) { _isCharging = false; currentBullet = null; return; }
 
-        Debug.Log("<color=green>EndCharge: Proceeding with firing logic...</color>");
+        // Debug.Log("<color=green>EndCharge: Proceeding with firing logic...</color>"); // Less verbose
         _isCharging = false;
 
         // --- Prepare Bullet for Firing ---
         currentBullet.transform.parent = null;
         Rigidbody rb = currentBullet.GetComponent<Rigidbody>();
-        if (rb == null) { /* ... handle error ... */ Destroy(currentBullet); currentBullet = null; return; }
+        if (rb == null) { Debug.LogError("Fired bullet is missing Rigidbody!", currentBullet); Destroy(currentBullet); currentBullet = null; return; }
         rb.isKinematic = false;
 
         // --- Handle Bullet-Specific Stop Logic ---
         BasicBullet basic = currentBullet.GetComponent<BasicBullet>(); FreezeBullet freeze = currentBullet.GetComponent<FreezeBullet>();
-        float chargeMultiplier = 1f;
+        float chargeMultiplier = 1f; // Force multiplier from charging
         if (basic != null) { chargeMultiplier = basic.StopCharging(); }
         else if (freeze != null) { freeze.StopCharging(); }
 
-        // --- Calculate Fire Direction (Raycast for ALL Types) ---
+
+        // ===== Calculate Fire Direction with Offset =====
         Vector3 fireDirection;
         BulletType firedBulletType = player.bulletSpawner.CurrentBulletType;
 
-        Debug.Log($"Calculating Aim Direction for {firedBulletType} via Raycast...");
+        // Debug.Log($"Calculating Aim Direction for {firedBulletType} via Raycast..."); // Less verbose
         if (mainCamera == null) {
              Debug.LogError("Cannot aim raycast: Main Camera missing!");
              fireDirection = firePoint.forward; // Fallback
         } else {
-            Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-            RaycastHit hit;
-            Vector3 targetPoint;
+            Ray aimRay = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+            RaycastHit hitInfo;
+            Vector3 initialTargetPoint;
 
-            // Visualize Aim Ray
-            Debug.DrawRay(ray.origin, ray.direction * aimRaycastRange, Color.yellow, 2.0f);
+            // Visualize Aim Ray (where the player THINKS they are aiming)
+            Debug.DrawRay(aimRay.origin, aimRay.direction * aimRaycastRange, Color.yellow, 2.0f);
 
-            // --- Perform Raycast WITH LAYER MASK ---
-            // **** ENSURE 'aimRaycastLayerMask' IS CONFIGURED IN INSPECTOR ****
-            if (Physics.Raycast(ray, out hit, aimRaycastRange, aimRaycastLayerMask)) { // USE THE MASK!
-                targetPoint = hit.point;
-                Debug.Log($"Aim Raycast Hit: {hit.collider.name} (Layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)}) at {targetPoint}, Dist: {hit.distance}");
+            // --- Perform Raycast WITH LAYER MASK to find the initial target ---
+            if (Physics.Raycast(aimRay, out hitInfo, aimRaycastRange, aimRaycastLayerMask)) {
+                initialTargetPoint = hitInfo.point;
+                // Debug.Log($"Aim Raycast Hit: {hitInfo.collider.name} at {initialTargetPoint}"); // Less verbose
             } else {
-                targetPoint = ray.GetPoint(aimRaycastRange);
-                Debug.Log($"Aim Raycast Missed (Range: {aimRaycastRange}m). Targeting point far away.");
+                initialTargetPoint = aimRay.GetPoint(aimRaycastRange);
+                // Debug.Log($"Aim Raycast Missed. Targeting point far away: {initialTargetPoint}"); // Less verbose
             }
 
-            // Calculate direction FROM firePoint TO targetPoint
-            fireDirection = (targetPoint - firePoint.position).normalized;
-            Debug.Log($"Calculated Fire Direction: {fireDirection}");
+            // --- Calculate the OFFSET target point ---
+            // We add the offset along the direction of the original camera aim ray
+            Vector3 offsetTargetPoint = initialTargetPoint + aimRay.direction * aimForwardOffset;
+            // ------------------------------------------
 
-            // Visualize Fire Direction
-            Color debugColor = (firedBulletType == BulletType.Type3) ? Color.red : Color.green;
-            Debug.DrawRay(firePoint.position, fireDirection * 10f, debugColor, 2.0f);
+            // Calculate final fire direction FROM firePoint TO the OFFSET target point
+            fireDirection = (offsetTargetPoint - firePoint.position).normalized;
+            // Debug.Log($"Calculated Fire Direction (Offset Applied): {fireDirection}"); // Less verbose
+
+            // Visualize Final Fire Direction
+            Color debugColor = (firedBulletType == BulletType.Type3) ? Color.red : Color.cyan; // Use Cyan for offset direction
+            Debug.DrawLine(firePoint.position, offsetTargetPoint, debugColor, 2.0f); // Draw line to offset point
+            Debug.DrawRay(firePoint.position, fireDirection * 15f, debugColor, 2.0f); // Draw ray along final direction
         }
-        // --- End Calculate Fire Direction ---
+        // ===== End Calculate Fire Direction =====
 
 
         // --- Apply Launch Force ---
@@ -312,17 +285,17 @@ public class PlayerShooting : MonoBehaviour
             teleportAimVCam.Priority = newPriority;
             isUsingTeleportView = true;
             if (teleportAimUI != null) { teleportAimUI.SetActive(true); }
-            Debug.Log("<color=lime>Activated Teleport View & UI.</color>");
+            // Debug.Log("<color=lime>Activated Teleport View & UI.</color>"); // Less verbose
         }
     }
 
     private void DeactivateTeleportVCamView()
     {
         if (teleportAimUI != null) { if(teleportAimUI.activeSelf) teleportAimUI.SetActive(false); }
-        if (teleportAimVCam != null) {
-            if (isUsingTeleportView) { Debug.Log("<color=cyan>Deactivating Teleport View.</color>"); }
+        if (teleportAimVCam != null && isUsingTeleportView) { // Check isUsingTeleportView
+            // Debug.Log("<color=cyan>Deactivating Teleport View.</color>"); // Less verbose
             teleportAimVCam.Priority = teleportAimVCamOriginalPriority;
-            isUsingTeleportView = false;
+            isUsingTeleportView = false; // Set flag *after* changing priority
         }
     }
 
