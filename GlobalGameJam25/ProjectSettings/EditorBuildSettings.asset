@@ -8,9 +8,15 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Main_Game.unity
     guid: f4e89985689ad5147b6fba905ad885ef
-  - enabled: 1
+  - enabled: 0
     path: Assets/Mike/VinnySceneMikeRevisedvinny.unity
     guid: 7810f9697e1a5174db8684d6e323b2f2
+  - enabled: 1
+    path: Assets/Scenes/StartMenu.unity
+    guid: 9f74daef0e55f394ab6c07dcbcf9bc1f
+  - enabled: 1
+    path: Assets/Mike/VinnySceneMikeRevised.unity
+    guid: 10c52619f65f7fd4c83dff78217359c9
   - enabled: 1
     path: Assets/Scenes/EndScene.unity
     guid: 6ab9ecec3038a51409eb4f4c6ef8723f

@@ -227,39 +227,47 @@ public class PlayerShooting : MonoBehaviour
         else if (freeze != null) { freeze.StopCharging(); }
 
 
-        // ===== Calculate Fire Direction (Parallel to Camera Aim) =====
+        // ===== Calculate Fire Direction (Towards OFFSET Target Point) =====
         Vector3 fireDirection;
         BulletType firedBulletType = player.bulletSpawner.CurrentBulletType;
 
         if (mainCamera == null) {
              Debug.LogError("Cannot aim raycast: Main Camera missing!");
-             fireDirection = firePoint.forward; // Fallback: Use firepoint's own forward
+             fireDirection = firePoint.forward; // Fallback
         } else {
             // Get the ray representing the camera's center view
             Ray aimRay = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-
-            // --- Set the Fire Direction to be PARALLEL to the Camera's Aim ---
-            fireDirection = aimRay.direction.normalized; // Use the camera's forward direction directly
-            // ----------------------------------------------------------------
-
-            // We can still do the raycast to find where the visual aim hits for effects or debug
             RaycastHit hitInfo;
-            Vector3 initialTargetPoint; // Where the crosshair is pointing
+            Vector3 initialTargetPoint; // Where the crosshair visually hits
+
+            // Visualize Aim Ray (where the player THINKS they are aiming)
+            Debug.DrawRay(aimRay.origin, aimRay.direction * aimRaycastRange, Color.yellow, 3.0f);
+
+            // --- Perform Raycast WITH LAYER MASK to find the initial target ---
             if (Physics.Raycast(aimRay, out hitInfo, aimRaycastRange, aimRaycastLayerMask)) {
                 initialTargetPoint = hitInfo.point;
             } else {
-                initialTargetPoint = aimRay.GetPoint(aimRaycastRange);
+                initialTargetPoint = aimRay.GetPoint(aimRaycastRange); // Point far away if no hit
             }
 
+            // --- Calculate the OFFSET target point ---
+            // Push the target point further along the CAMERA'S aim direction
+            Vector3 offsetTargetPoint = initialTargetPoint + aimRay.direction * aimForwardOffset;
+            // ------------------------------------------
+
+            // --- Calculate final fire direction FROM firePoint TO the OFFSET target point ---
+            fireDirection = (offsetTargetPoint - firePoint.position).normalized;
+            // ----------------------------------------------------------------------------
+
             // --- Debug Visualizations ---
-            // Yellow Ray: Where the camera is looking / crosshair points
-            Debug.DrawRay(aimRay.origin, aimRay.direction * aimRaycastRange, Color.yellow, 3.0f);
+            // Yellow Ray: Camera aim line
+            // Debug.DrawRay(aimRay.origin, aimRay.direction * aimRaycastRange, Color.yellow, 3.0f); // Already drawn above
 
-            // Cyan Ray: The actual path the bullet will take (parallel to yellow ray, starting from firePoint)
-            Debug.DrawRay(firePoint.position, fireDirection * 20f, Color.cyan, 3.0f); // Increased length for visibility
+            // Magenta Line: From Fire Point to the actual OFFSET point the bullet is aimed towards
+            Debug.DrawLine(firePoint.position, offsetTargetPoint, Color.magenta, 3.0f);
 
-            // Optional: Draw a line showing the visual target point for reference
-            // Debug.DrawLine(firePoint.position, initialTargetPoint, Color.magenta, 3.0f);
+            // Cyan Ray: The actual path the bullet will take (along the magenta line's direction)
+            Debug.DrawRay(firePoint.position, fireDirection * 20f, Color.cyan, 3.0f);
         }
         // ===== End Calculate Fire Direction =====
 
@@ -267,9 +275,9 @@ public class PlayerShooting : MonoBehaviour
         // --- Apply Launch Force ---
         if (rb != null) {
             float finalForce = bulletForce * chargeMultiplier;
-            // Apply force ALONG the calculated fireDirection (which is now parallel to camera aim)
+            // Apply force ALONG the calculated fireDirection (towards offset target)
             rb.AddForce(fireDirection * finalForce, ForceMode.VelocityChange);
-            Debug.Log($"<color=white>Fired {firedBulletType} PARALLEL to camera aim with force mult {chargeMultiplier}. Dir: {fireDirection}</color>");
+            Debug.Log($"<color=white>Fired {firedBulletType} TOWARDS offset target point with force mult {chargeMultiplier}. Dir: {fireDirection}</color>");
         }
         // --- End Firing Logic ---
 
