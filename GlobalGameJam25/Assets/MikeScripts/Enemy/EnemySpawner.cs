@@ -1,20 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// SpawnAreaSettings class goes here (as modified above)
 [System.Serializable]
 public class SpawnAreaSettings
 {
     [Header("Spawn Area Settings")]
     public Transform spawnAreaCenter;
     public float spawnAreaRadius = 15f;
-    public int numSludgeToSpawn = 5;
-    public int numGasToSpawn = 5;
+    public int numSludgeToSpawn = 5; // How many Sludge to spawn in this area
+    public int numGasToSpawn = 5;    // How many Gas to spawn in this area
     [Tooltip("Drag the AreaCleansingManager GameObject for this area here.")]
     public AreaCleansingManager areaManager;
-    [HideInInspector] public bool sludgeSpawned = false;
-    [HideInInspector] public bool gasSpawned = false;
-    [HideInInspector] public bool spawnSludgeFirst = false; // Determined externally
+
+    // Flag to track if enemies have been spawned for this area already
+    [HideInInspector] public bool enemiesHaveSpawned = false;
 }
+
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -25,33 +27,15 @@ public class EnemySpawner : MonoBehaviour
     [Header("Spawn Areas")]
     public List<SpawnAreaSettings> spawnAreas = new List<SpawnAreaSettings>();
 
-    private bool firstAreaTypeSet = false;
+    // Removed: firstAreaTypeSet flag
+    // Removed: SetAreaEnemyTypes method
 
-    // Call this early (e.g., from GameManager) to decide initial enemy distribution
-    public void SetAreaEnemyTypes(List<bool> spawnSludgeFirstInAreas)
-    {
-        if (spawnSludgeFirstInAreas.Count != spawnAreas.Count)
-        {
-            Debug.LogError("EnemySpawner: The number of initial area types does not match the number of spawn areas!");
-            return;
-        }
-
-        for (int i = 0; i < spawnAreas.Count; i++)
-        {
-            spawnAreas[i].spawnSludgeFirst = spawnSludgeFirstInAreas[i];
-            Debug.Log($"EnemySpawner: Area {i + 1} will spawn {(spawnAreas[i].spawnSludgeFirst ? "Sludge" : "Gas")} first.");
-        }
-        firstAreaTypeSet = true;
-    }
 
     // Call this to trigger spawning for a specific area index (0-based)
+    // Assumes this is called by your trigger mechanism when the player enters the area collider.
     public void SpawnEnemiesForArea(int areaIndex)
     {
-        if (!firstAreaTypeSet)
-        {
-            Debug.LogError("EnemySpawner: Initial area enemy types not set! Call SetAreaEnemyTypes first.");
-            return;
-        }
+        // Removed: Check for firstAreaTypeSet
 
         if (areaIndex < 0 || areaIndex >= spawnAreas.Count)
         {
@@ -61,35 +45,60 @@ public class EnemySpawner : MonoBehaviour
 
         SpawnAreaSettings currentArea = spawnAreas[areaIndex];
 
+        // Check if enemies have already been spawned for this area
+        if (currentArea.enemiesHaveSpawned)
+        {
+            Debug.Log($"EnemySpawner: Enemies already spawned for Area {areaIndex + 1}.");
+            return; // Do nothing further
+        }
+
+        // --- Essential Checks ---
         if (currentArea.areaManager == null)
         {
             Debug.LogError($"EnemySpawner: Area Manager is not assigned for Area {areaIndex + 1} in the Inspector!", this);
             return;
         }
+        if (currentArea.spawnAreaCenter == null)
+        {
+             Debug.LogError($"EnemySpawner: Spawn Area Center Transform is not assigned for Area {areaIndex + 1}!", this);
+             return;
+        }
+        // Optional checks for prefabs if they might be null
+        if (currentArea.numSludgeToSpawn > 0 && sludgePrefab == null)
+        {
+             Debug.LogError("EnemySpawner: Trying to spawn Sludge but Sludge Prefab is not assigned!", this);
+             return;
+        }
+         if (currentArea.numGasToSpawn > 0 && gasPrefab == null)
+        {
+             Debug.LogError("EnemySpawner: Trying to spawn Gas but Gas Prefab is not assigned!", this);
+             return;
+        }
+        // --- End Checks ---
 
-        if (currentArea.spawnSludgeFirst && !currentArea.sludgeSpawned)
+
+        Debug.Log($"EnemySpawner: Spawning ALL enemies for Area {areaIndex + 1}.");
+
+        // Spawn Sludge enemies if count > 0
+        if (currentArea.numSludgeToSpawn > 0)
         {
-            Debug.Log($"EnemySpawner: Spawning Sludge in Area {areaIndex + 1}.");
             SpawnSludgeEnemies(currentArea.spawnAreaCenter.position, currentArea.spawnAreaRadius, currentArea.numSludgeToSpawn, currentArea.areaManager);
-            currentArea.sludgeSpawned = true;
         }
-        else if (!currentArea.spawnSludgeFirst && !currentArea.gasSpawned)
+
+        // Spawn Gas enemies if count > 0
+        if (currentArea.numGasToSpawn > 0)
         {
-            Debug.Log($"EnemySpawner: Spawning Gas in Area {areaIndex + 1}.");
-            SpawnGasEnemies(currentArea.spawnAreaCenter.position, currentArea.spawnAreaRadius, currentArea.numGasToSpawn, currentArea.areaManager);
-            currentArea.gasSpawned = true;
+             SpawnGasEnemies(currentArea.spawnAreaCenter.position, currentArea.spawnAreaRadius, currentArea.numGasToSpawn, currentArea.areaManager);
         }
-        else
-        {
-            Debug.Log($"EnemySpawner: Area {areaIndex + 1} ({ (currentArea.spawnSludgeFirst ? "Sludge" : "Gas") }) already spawned.");
-        }
+
+        // Mark this area as having spawned its enemies
+        currentArea.enemiesHaveSpawned = true;
     }
 
     // Spawns Sludge enemies and assigns the correct Area Manager
     private void SpawnSludgeEnemies(Vector3 center, float radius, int count, AreaCleansingManager managerToAssign)
     {
-        if (sludgePrefab == null) { Debug.LogError("Sludge Prefab not assigned to spawner!", this); return; }
-        if (managerToAssign == null) { Debug.LogError("Attempted to spawn Sludge enemies but managerToAssign was null!", this); return; }
+        // Prefab and manager null checks moved to SpawnEnemiesForArea
 
         Debug.Log($"Attempting to spawn {count} Sludge enemies for manager: {managerToAssign.gameObject.name}");
         for (int i = 0; i < count; i++)
@@ -100,71 +109,90 @@ public class EnemySpawner : MonoBehaviour
             BaseEnemy enemyScript = enemyGO.GetComponentInChildren<BaseEnemy>();
             if (enemyScript != null)
             {
-                enemyScript.myAreaManager = managerToAssign;
-                Debug.Log($"Found BaseEnemy script on child object '{enemyScript.gameObject.name}' of instance '{enemyGO.name}'. Assigning manager '{managerToAssign.gameObject.name}'.");
+                // Ensure the BaseEnemy script has the myAreaManager field added previously
+                if (enemyScript.GetType().GetField("myAreaManager") != null)
+                {
+                    enemyScript.myAreaManager = managerToAssign;
+                } else {
+                     Debug.LogError($"Spawned Sludge enemy '{enemyGO.name}' BaseEnemy script is missing the 'myAreaManager' field!", enemyGO);
+                }
+                // Debug.Log($"Found BaseEnemy script on child object '{enemyScript.gameObject.name}' of instance '{enemyGO.name}'. Assigning manager '{managerToAssign.gameObject.name}'."); // Less verbose
             }
             else
             {
                 Debug.LogError($"Spawned Sludge enemy '{enemyGO.name}' is missing BaseEnemy script on itself AND all children!", enemyGO);
             }
 
+            // Register with GameManager if it exists
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.RegisterSpawnedEnemy(enemyGO);
             }
-            else { Debug.LogWarning("GameManager instance not found when trying to register spawned enemy.", enemyGO); }
+            // else { Debug.LogWarning("GameManager instance not found when trying to register spawned enemy.", enemyGO); } // Less verbose
         }
     }
 
     // Spawns Gas enemies and assigns the correct Area Manager
     private void SpawnGasEnemies(Vector3 center, float radius, int count, AreaCleansingManager managerToAssign)
     {
-        if (gasPrefab == null) { Debug.LogError("Gas Prefab not assigned to spawner!", this); return; }
-        if (managerToAssign == null) { Debug.LogError("Attempted to spawn Gas enemies but managerToAssign was null!", this); return; }
+         // Prefab and manager null checks moved to SpawnEnemiesForArea
 
         Debug.Log($"Attempting to spawn {count} Gas enemies for manager: {managerToAssign.gameObject.name}");
         for (int i = 0; i < count; i++)
         {
             Vector3 randomPosition = GetRandomPointInCircle(center, radius);
-            Quaternion desiredRotation = Quaternion.Euler(180f, 0f, 90f);
+            // Consider if Gas enemies need a specific rotation
+            Quaternion desiredRotation = Quaternion.identity; // Or specific rotation if needed
+            // Quaternion desiredRotation = Quaternion.Euler(180f, 0f, 90f); // Old rotation
+
             GameObject enemyGO = Instantiate(gasPrefab, randomPosition, desiredRotation);
 
             BaseEnemy enemyScript = enemyGO.GetComponentInChildren<BaseEnemy>();
-            if (enemyScript != null)
+             if (enemyScript != null)
             {
-                enemyScript.myAreaManager = managerToAssign;
-                Debug.Log($"Found BaseEnemy script on child object '{enemyScript.gameObject.name}' of instance '{enemyGO.name}'. Assigning manager '{managerToAssign.gameObject.name}'.");
+                // Ensure the BaseEnemy script has the myAreaManager field added previously
+                if (enemyScript.GetType().GetField("myAreaManager") != null)
+                {
+                    enemyScript.myAreaManager = managerToAssign;
+                } else {
+                     Debug.LogError($"Spawned Gas enemy '{enemyGO.name}' BaseEnemy script is missing the 'myAreaManager' field!", enemyGO);
+                }
+                // Debug.Log($"Found BaseEnemy script on child object '{enemyScript.gameObject.name}' of instance '{enemyGO.name}'. Assigning manager '{managerToAssign.gameObject.name}'."); // Less verbose
             }
             else
             {
                 Debug.LogError($"Spawned Gas enemy '{enemyGO.name}' is missing BaseEnemy script on itself AND all children!", enemyGO);
             }
 
+            // Register with GameManager if it exists
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.RegisterSpawnedEnemy(enemyGO);
             }
-            else { Debug.LogWarning("GameManager instance not found when trying to register spawned enemy.", enemyGO); }
+            // else { Debug.LogWarning("GameManager instance not found when trying to register spawned enemy.", enemyGO); } // Less verbose
         }
     }
 
     // Utility Method to find a point on the ground within the radius
     public Vector3 GetRandomPointInCircle(Vector3 center, float radius)
     {
-        for (int attempt = 0; attempt < 5; attempt++)
+        // Increased attempts slightly
+        for (int attempt = 0; attempt < 10; attempt++)
         {
-            float angle = Random.Range(0f, Mathf.PI * 2);
-            float u = Random.Range(0f, 1f) + Random.Range(0f, 1f);
-            float r = radius * (u > 1 ? 2 - u : u);
-            Vector3 potentialPos = new Vector3(center.x + r * Mathf.Cos(angle), center.y + 10f, center.z + r * Mathf.Sin(angle));
+            // Simple random point within circle bounds
+            Vector2 randomCirclePoint = Random.insideUnitCircle * radius;
+            Vector3 potentialPos = center + new Vector3(randomCirclePoint.x, 0, randomCirclePoint.y);
 
+            // Raycast down from slightly above to find ground
+            float raycastHeight = 15f; // Height to cast down from
             RaycastHit hit;
-            if (Physics.Raycast(potentialPos, Vector3.down, out hit, 20f))
+            if (Physics.Raycast(potentialPos + Vector3.up * raycastHeight, Vector3.down, out hit, raycastHeight * 2f)) // Increased ray length
             {
-                return hit.point + Vector3.up * 0.5f;
+                // Return point slightly above the ground hit
+                return hit.point + Vector3.up * 0.5f; // Adjust offset as needed
             }
         }
-        Debug.LogWarning("Could not find suitable ground point for enemy spawn near " + center + ", using center point plus offset.");
-        return center + Vector3.up * 0.5f;
+        Debug.LogWarning("Could not find suitable ground point for enemy spawn near " + center + " after 10 attempts, using center point plus offset.");
+        return center + Vector3.up * 0.5f; // Fallback
     }
 }

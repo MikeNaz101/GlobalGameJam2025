@@ -45,7 +45,7 @@ public class GlobalAmbianceController : MonoBehaviour
             {
                 skyboxHasTintProperty = true;
                 // Optional: Initialize targetSkyboxTint from the material's current tint if preferred
-                // targetSkyboxTint = currentSkyboxMat.GetColor("_Tint");
+                targetSkyboxTint = currentSkyboxMat.GetColor("_Tint");
                 currentSkyboxMat.SetColor("_Tint", targetSkyboxTint); // Set initial tint
                  Debug.Log("GlobalAmbianceController: Found Skybox with _Tint property.");
             } else {
