@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/Scenes/StartMenu.unity
     guid: 9f74daef0e55f394ab6c07dcbcf9bc1f
   - enabled: 1
-    path: Assets/Mike/VinnySceneMikeRevised.unity
+    path: Assets/Scenes/VinnySceneMikeRevised.unity
     guid: 10c52619f65f7fd4c83dff78217359c9
   - enabled: 1
     path: Assets/Scenes/EndScene.unity
