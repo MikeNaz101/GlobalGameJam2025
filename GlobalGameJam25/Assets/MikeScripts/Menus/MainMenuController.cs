@@ -1,78 +1,64 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // Required for scene management
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenuController : MonoBehaviour
 {
-    public string gameSceneName = "GameScene"; // Set the exact name of your main game scene
+    public string gameSceneName = "GameScene";
 
-    [Header("UI Panels")] // Optional: Adds a header in the Inspector for organization
-    public GameObject mainMenuPanel;        // Assign the Panel containing your main menu buttons (Start, Credits, Quit)
-    public GameObject creditsPanel;         // Assign your Credits Panel here
+    [Header("Main Menu Elements")]
+    public GameObject mainMenuElementsContainer; 
+
+    [Header("Credits Elements")]
+    public GameObject creditsScrollView;   
+    public GameObject creditsBackButton;    
+
 
     void Start()
     {
-        // Ensure main menu is visible and credits are hidden at start
-        if (mainMenuPanel != null)
-        {
-            mainMenuPanel.SetActive(true);
-        }
-        else
-        {
-             Debug.LogError("Main Menu Panel not assigned in the Inspector!");
-        }
+        // Initial setup: Show main menu items, hide credits items
+        mainMenuElementsContainer.SetActive(true);
+        creditsScrollView.SetActive(false);
+        creditsBackButton.SetActive(false);
 
-        if (creditsPanel != null)
-        {
-            creditsPanel.SetActive(false);
-        }
-        else
-        {
-             Debug.LogError("Credits Panel not assigned in the Inspector!");
-        }
-
-        // Ensure cursor is visible and unlocked in the main menu
+        // Ensure cursor is visible and unlocked
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
-    // --- Public Methods for UI Buttons ---
+    // --- Button Methods ---
 
     public void StartGame()
     {
-        // Optional: Ensure main menu is visible before starting, just in case
-        // if(mainMenuPanel != null) mainMenuPanel.SetActive(true);
-        // if(creditsPanel != null) creditsPanel.SetActive(false);
         SceneManager.LoadScene(gameSceneName);
         Debug.Log("Starting Game: " + gameSceneName);
     }
 
-    // This function now toggles BOTH the credits panel and the main menu panel
+    // This function now toggles between showing main menu elements and credits elements
     public void ToggleCredits()
     {
-        // Safety check: ensure both panels are assigned before proceeding
-        if (creditsPanel == null || mainMenuPanel == null)
-        {
-            Debug.LogError("Cannot toggle panels: Either Credits Panel or Main Menu Panel is not assigned in the Inspector!");
-            return;
-        }
+        // Determine if credits are currently shown by checking the scroll view's state
+        bool isCreditsCurrentlyActive = creditsScrollView.activeSelf;
 
-        // Determine the new state for the credits panel
-        bool shouldShowCredits = !creditsPanel.activeSelf;
+        // Calculate the new state
+        bool showCredits = !isCreditsCurrentlyActive;
 
-        // Set the credits panel to the new state
-        creditsPanel.SetActive(shouldShowCredits);
-        // Set the main menu panel to the OPPOSITE state
-        mainMenuPanel.SetActive(!shouldShowCredits);
+        // Toggle main menu elements container (opposite of credits state)
+        mainMenuElementsContainer.SetActive(!showCredits);
+
+        // Toggle Credits Scroll View
+        creditsScrollView.SetActive(showCredits);
+
+        // Toggle Credits Back Button
+        creditsBackButton.SetActive(showCredits);
+
 
         // Update debug log
-        if (shouldShowCredits)
-        {
-            Debug.Log("Showing Credits, Hiding Main Menu");
-        }
-        else
-        {
-            Debug.Log("Hiding Credits, Showing Main Menu");
+        if (showCredits) {
+            Debug.Log("Showing Credits View");
+        } else {
+            Debug.Log("Showing Main Menu View");
         }
     }
 
