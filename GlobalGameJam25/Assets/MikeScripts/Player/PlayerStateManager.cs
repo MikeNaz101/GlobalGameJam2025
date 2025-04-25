@@ -153,6 +153,10 @@ public class PlayerStateManager : MonoBehaviour
 
     void OnFire(InputValue value)
     {
+        if (PauseMenuController.GameIsPaused)
+        {
+            return; // Exit the Update method early
+        }
         PlayerShooting shooter = GetComponent<PlayerShooting>();
         if (shooter == null) return;
         if (value.isPressed) shooter.StartCharge();

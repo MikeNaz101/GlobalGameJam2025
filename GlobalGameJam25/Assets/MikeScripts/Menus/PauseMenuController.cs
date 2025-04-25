@@ -1,53 +1,46 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // Required for scene management
-using UnityEngine.UI;           // Required for Slider
-// using UnityEngine.Audio;      // Optional: Add if using Audio Mixers
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+// using UnityEngine.Audio;
 
 public class PauseMenuController : MonoBehaviour
 {
-    public GameObject pauseMenuUI;        // Assign your main Pause Menu Panel/CanvasGroup here in the Inspector
-    public Slider volumeSlider;           // Assign your volume Slider UI element here
-    public string mainMenuSceneName = "MainMenu"; // Set the exact name of your main menu scene
+    public GameObject pauseMenuUI;
+    public Slider volumeSlider;
+    public string mainMenuSceneName = "MainMenu";
 
-    private bool isPaused = false;
+    // Make a public static property to track pause state globally
+    public static bool GameIsPaused { get; private set; } // Other scripts can read this
+
+    // private bool isPaused = false; // We can now rely solely on the static variable
 
     void Start()
     {
-        // Ensure the pause menu is hidden at the start
-        if (pauseMenuUI != null)
-        {
+        // Ensure game starts unpaused
+        GameIsPaused = false; // Set static state
+        Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        if (pauseMenuUI != null) {
             pauseMenuUI.SetActive(false);
-        }
-        else
-        {
+        } else {
             Debug.LogError("Pause Menu UI not assigned in the Inspector!");
         }
 
-        // Initialize the slider's value to the current game volume
-        if (volumeSlider != null)
-        {
+        if (volumeSlider != null) {
             volumeSlider.value = AudioListener.volume;
-            // Add a listener to call SetVolume when the slider value changes
             volumeSlider.onValueChanged.AddListener(SetVolume);
-        }
-        else
-        {
+        } else {
              Debug.LogWarning("Volume Slider not assigned in the Inspector. Volume control disabled.");
         }
-
-        // Ensure game starts unpaused (in case we came from a paused state)
-        Time.timeScale = 1f;
-        // Ensure cursor is locked and hidden for gameplay
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
     }
 
     void Update()
     {
-        // Check for the pause button press (Enter key)
-        if (Input.GetKeyDown(KeyCode.Return)) // Or KeyCode.Escape
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Escape))
         {
-            if (isPaused)
+            if (GameIsPaused) // Check the static state
             {
                 ResumeGame();
             }
@@ -60,35 +53,32 @@ public class PauseMenuController : MonoBehaviour
 
     void PauseGame()
     {
-        if (pauseMenuUI == null) return; // Safety check
+        if (pauseMenuUI == null) return;
 
-        pauseMenuUI.SetActive(true);    // Show the pause menu
-        Time.timeScale = 0f;            // Freeze game time
-        Cursor.lockState = CursorLockMode.None; // Unlock the cursor
-        Cursor.visible = true;          // Make the cursor visible
-        isPaused = true;
+        pauseMenuUI.SetActive(true);
+        Time.timeScale = 0f;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        GameIsPaused = true; // Set static state
         Debug.Log("Game Paused");
     }
 
-    // --- Public Methods for UI Buttons ---
-
     public void ResumeGame()
     {
-        if (pauseMenuUI == null) return; // Safety check
+        if (pauseMenuUI == null) return;
 
-        pauseMenuUI.SetActive(false);   // Hide the pause menu
-        Time.timeScale = 1f;            // Resume game time
-        Cursor.lockState = CursorLockMode.Locked; // Lock the cursor
-        Cursor.visible = false;         // Hide the cursor
-        isPaused = false;
+        pauseMenuUI.SetActive(false);
+        Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        GameIsPaused = false; // Set static state
         Debug.Log("Game Resumed");
     }
 
     public void RestartScene()
     {
-        // IMPORTANT: Unpause time before loading the scene
         Time.timeScale = 1f;
-        // Get the current scene's build index and reload it
+        GameIsPaused = false; // Ensure state is correct before reload
         Scene currentScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(currentScene.buildIndex);
         Debug.Log("Restarting Scene: " + currentScene.name);
@@ -96,29 +86,22 @@ public class PauseMenuController : MonoBehaviour
 
     public void LoadMainMenu()
     {
-        // IMPORTANT: Unpause time before loading the scene
         Time.timeScale = 1f;
+         GameIsPaused = false; // Ensure state is correct before reload
         SceneManager.LoadScene(mainMenuSceneName);
         Debug.Log("Loading Main Menu: " + mainMenuSceneName);
     }
 
-    // --- Public Method for Volume Slider ---
-
     public void SetVolume(float volume)
     {
-        AudioListener.volume = volume; // Set the global volume
-        // If using AudioMixers, you would set a parameter here instead:
-        // audioMixer.SetFloat("MasterVolume", Mathf.Log10(volume) * 20); // Example for decibels
-        // Debug.Log("Volume set to: " + volume);
+        AudioListener.volume = volume;
     }
 
-     // Optional: Add a Quit Game button directly to the pause menu
      public void QuitGame()
      {
          Debug.Log("Quitting Game from Pause Menu...");
+         GameIsPaused = false; // Reset state just in case
          Application.Quit();
-
-         // If running in the Unity Editor, stop playing
          #if UNITY_EDITOR
          UnityEditor.EditorApplication.isPlaying = false;
          #endif
