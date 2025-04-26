@@ -7,6 +7,9 @@ using System; // Needed for Action event
 
 public class PlayerStateManager : MonoBehaviour
 {
+    [Header("Animation")]
+    [SerializeField] private PlayerAnimationManager animationManager; // Assign in Inspector or find in Awake
+
     [Header("Core Stats")]
     public int maxHealth = 100;
     public int currentHealth;
@@ -129,6 +132,17 @@ public class PlayerStateManager : MonoBehaviour
         // Start in Idle state
         SwitchState(idleState);
     }
+    /*void OnEnable()
+     {
+        // Subscribe to the Area Cleared event (if using event-based system)
+        AreaCleansingManager.OnAreaCleared += HandleAreaClearedForAnimation;
+     }
+
+     void OnDisable()
+     {
+        // Unsubscribe
+        AreaCleansingManager.OnAreaCleared -= HandleAreaClearedForAnimation;
+     }*/
 
     // --- Input System Handlers ---
     void OnMove(InputValue value) { movement = value.Get<Vector2>(); }
@@ -142,6 +156,8 @@ public class PlayerStateManager : MonoBehaviour
             Debug.Log("Performing Ground Jump");
             hasJumped = true;
             Jump(); // Handle ground jump
+            // --- Animation Trigger ---
+            animationManager?.TriggerJump(); // Safely call the trigger method
         }
         else
         {
@@ -228,13 +244,15 @@ public class PlayerStateManager : MonoBehaviour
     {
         if (currentHealth > 0 && currentState != hitState)
         {
+            // --- Animation Trigger ---
+            animationManager?.TriggerHit(); // Trigger BEFORE changing state potentially
             hitState.SetDamage(damage);
             SwitchState(hitState);
         }
         else if (currentHealth <= 0)
         {
             // Already dead or dying, ensure Die is called or handled appropriately
-            // Die(); // Could potentially call Die here, but HitState likely handles it
+            Die(); // Could potentially call Die here, but HitState likely handles it
         }
     }
 
@@ -483,6 +501,8 @@ public class PlayerStateManager : MonoBehaviour
         CalculateXPForNextLevel();
 
         Debug.Log($"<color=lime>LEVEL UP! Reached Level {currentLevel}. Multiplier: {bulletEffectMultiplier:F2}. Next Level at {xpToNextLevel} XP.</color>");
+        // --- Animation Trigger ---
+        animationManager?.TriggerCelebrate();
 
         // Invoke UI updates for level and multiplier change
         OnLevelChanged?.Invoke(currentLevel);
@@ -492,9 +512,15 @@ public class PlayerStateManager : MonoBehaviour
 
         // --- Add any level-up effects here! ---
         // e.g., Play sound, particle effects, maybe refill health/mana?
-        // currentHealth = maxHealth;
-        // currentMana = maxMana;
-        // UpdateShellCountVisuals(); // Update shells if mana refilled
+        currentHealth = maxHealth;
+        currentMana = maxMana;
+        UpdateShellCountVisuals(); // Update shells if mana refilled
+    }
+
+    // --- NEW Method for Teleport Bullet to Call ---
+    public void TriggerTeleportAnimation()
+    {
+        animationManager?.TriggerTeleported();
     }
 
     // Optional: Method to manually set level/XP for testing

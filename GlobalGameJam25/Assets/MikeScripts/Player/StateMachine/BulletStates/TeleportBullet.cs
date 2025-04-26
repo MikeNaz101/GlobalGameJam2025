@@ -90,10 +90,9 @@ public class TeleportBullet : MonoBehaviour
                 _player.transform.position = finalTeleportPosition; // Set position *while* disabled
                 _player.controller.enabled = true;    // Re-enable the controller
                 // --- ---
-
-                // --- COMMENT OUT OR DELETE THIS LINE (as it conflicts) ---
-                // _player.transform.position = targetPosition + Vector3.up * 0.1f;
-                // --- ---
+                
+                // --- Animation Trigger ---
+                _player.TriggerTeleportAnimation(); // Call the method on PlayerStateManager
 
             }
             // --- Fallback: Direct Transform Setting ---

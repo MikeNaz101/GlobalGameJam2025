@@ -42,9 +42,7 @@ public class PlayerShooting : MonoBehaviour
     private Camera mainCamera;                  // Cached reference to the main rendering camera
     private int teleportAimVCamOriginalPriority = 0; // Stores the teleport VCam's default low priority
     private ParticleSystem.EmissionModule aimingSpotEmission; // Cache emission module for aiming effect
-
-
-    // Called once when the script instance is first enabled
+    public PlayerAnimationManager animationManager; // Add reference
     void Start()
     {
         // --- Cache Main Camera ---
@@ -226,6 +224,8 @@ public class PlayerShooting : MonoBehaviour
         if (basic != null) { chargeMultiplier = basic.StopCharging(); }
         else if (freeze != null) { freeze.StopCharging(); }
 
+        // --- Animation Trigger ---
+        animationManager?.TriggerShoot(); // Trigger the shoot animation
 
         // ===== Calculate Fire Direction (Towards OFFSET Target Point) =====
         Vector3 fireDirection;
