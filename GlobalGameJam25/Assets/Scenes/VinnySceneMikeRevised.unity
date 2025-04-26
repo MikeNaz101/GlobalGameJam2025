@@ -799,6 +799,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8f47ca98a12f1c74cba6c3421eeb4e9a, type: 3}
+--- !u!1 &685175618 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7580278290753305502, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
+  m_PrefabInstance: {fileID: 1745138467}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &687824133 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8812788290266979325, guid: f130f6709e0435d4987c6570375549d6, type: 3}
@@ -6415,12 +6420,31 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6712753400188939037, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
   m_PrefabInstance: {fileID: 1745138467}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 685175618}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b54432a691592fc4b8d465a53fea146c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!143 &1166066721 stripped
+CharacterController:
+  m_CorrespondingSourceObject: {fileID: 8693482291972667817, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
+  m_PrefabInstance: {fileID: 1745138467}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1166066722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 685175618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bf0383a7a82e134db71c3642f4d79d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerStateManager: {fileID: 1166066715}
+  characterController: {fileID: 1166066721}
 --- !u!1 &1172537984
 GameObject:
   m_ObjectHideFlags: 0
@@ -7567,6 +7591,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 7789802282185890204, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7838747612350494659, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
       propertyPath: m_Layer
       value: 3
@@ -7619,6 +7647,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 8693482291972667817, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
+      propertyPath: m_SlopeLimit
+      value: 40.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 8693482291972667817, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
+      propertyPath: m_StepOffset
+      value: 0.15
+      objectReference: {fileID: 0}
     - target: {fileID: 8750643936693970032, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
       propertyPath: m_Layer
       value: 3
@@ -7631,6 +7667,10 @@ PrefabInstance:
       propertyPath: aimingSpotEffect
       value: 
       objectReference: {fileID: 1123223608}
+    - target: {fileID: 8804623410098083236, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
+      propertyPath: animationManager
+      value: 
+      objectReference: {fileID: 1166066722}
     - target: {fileID: 8849820012332608361, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
       propertyPath: m_Layer
       value: 3
@@ -7649,7 +7689,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7246538742725181656, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1172537985}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7580278290753305502, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1166066722}
   m_SourcePrefab: {fileID: 100100000, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
 --- !u!224 &1745138468 stripped
 RectTransform:
