@@ -1,10 +1,15 @@
 using UnityEngine;
 using UnityEngine.Rendering; // Optional: For Post-Processing
+using System;
 
 // Manages a SINGLE grove and tells the Global Controller about ambiance needs.
 [RequireComponent(typeof(Collider))]
 public class AreaCleansingManager : MonoBehaviour
 {
+    // --- Event for Global Notification ---
+    public static event Action<AreaCleansingManager> OnAreaCleared; // Event signature
+    private bool _areaHasBeenCleared = false; // Prevent multiple invocations
+
     [Header("Pest Tracking")]
     [Tooltip("How many pesky critters start in THIS grove?")]
     public int totalMonstersInArea = 10;
@@ -113,7 +118,16 @@ public class AreaCleansingManager : MonoBehaviour
                 globalAmbianceController.UpdateActiveAreaTargets(this);
             }
         }
-         if (monstersKilled >= totalMonstersInArea) { Debug.Log($"{gameObject.name} is perfectly ripe!"); }
+        // --- Check if Area Just Got Cleared ---
+        if (!_areaHasBeenCleared && monstersKilled >= totalMonstersInArea)
+        {
+            _areaHasBeenCleared = true; // Mark as cleared
+            Debug.Log($"{gameObject.name} is perfectly ripe! Invoking OnAreaCleared event.");
+
+            // --- Invoke the static event ---
+            OnAreaCleared?.Invoke(this); // Notify subscribers (like PlayerAnimationManager)
+            // -----------------------------
+        }
     }
 
     void UpdateBlightPotency()
