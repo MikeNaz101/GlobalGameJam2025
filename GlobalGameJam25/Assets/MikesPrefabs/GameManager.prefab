@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 541345049283029973}
   - component: {fileID: 604431163475789616}
   - component: {fileID: 5244568340785563921}
+  - component: {fileID: 7251527983600727770}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -32,7 +33,8 @@ Transform:
   m_LocalPosition: {x: 275.57025, y: 205.2125, z: 537.0668}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 4805790127859876738}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1214674146152360735
@@ -48,7 +50,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   basicBullet: {fileID: 1248408006104775272, guid: b16b1f2b09a408b468d5cdc9749b5110, type: 3}
-  freezeBullet: {fileID: 8293114827483298198, guid: 78541d79fa73ce04c8041df428382966, type: 3}
+  freezeBullet: {fileID: 1248408006104775272, guid: 4696d624850c4a1429918ee5a0358d4f, type: 3}
   teleportBullet: {fileID: 1792848943308623929, guid: 50851b897ca522d41a08f3952eda6d5d, type: 3}
   OnBulletTypeChanged:
     m_PersistentCalls:
@@ -84,14 +86,57 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60dac37c6ed1c3949a1a2e443feeeb01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sludgePrefab: {fileID: 9086509785562928389, guid: ff711e855316b324b87acfddd6ae2584, type: 3}
-  gasPrefab: {fileID: 9086509785562928389, guid: 35ceecdb1a6bb544cb3754a083b1c8a8, type: 3}
-  spawnArea1Center: {fileID: 0}
-  spawnArea1Radius: 15
-  numSludgeToSpawn: 5
-  spawnArea2Center: {fileID: 0}
-  spawnArea2Radius: 15
-  numGasToSpawn: 5
+  sludgePrefab: {fileID: 6930522098195016613, guid: 3ba6150a029784c48941a0cbe18a3c33, type: 3}
+  gasPrefab: {fileID: 9086509785562928389, guid: a4d85520cabf78543bb3130fa47845d8, type: 3}
+  spawnAreas:
+  - spawnAreaCenter: {fileID: 0}
+    spawnAreaRadius: 20.03
+    numSludgeToSpawn: 5
+    numGasToSpawn: 3
+    areaManager: {fileID: 0}
+    enemiesHaveSpawned: 0
+  - spawnAreaCenter: {fileID: 0}
+    spawnAreaRadius: 69.9
+    numSludgeToSpawn: 0
+    numGasToSpawn: 4
+    areaManager: {fileID: 0}
+    enemiesHaveSpawned: 0
+  - spawnAreaCenter: {fileID: 0}
+    spawnAreaRadius: 69.9
+    numSludgeToSpawn: 0
+    numGasToSpawn: 4
+    areaManager: {fileID: 0}
+    enemiesHaveSpawned: 0
+  - spawnAreaCenter: {fileID: 0}
+    spawnAreaRadius: 69.9
+    numSludgeToSpawn: 0
+    numGasToSpawn: 4
+    areaManager: {fileID: 0}
+    enemiesHaveSpawned: 0
+  - spawnAreaCenter: {fileID: 0}
+    spawnAreaRadius: 69.9
+    numSludgeToSpawn: 0
+    numGasToSpawn: 4
+    areaManager: {fileID: 0}
+    enemiesHaveSpawned: 0
+  - spawnAreaCenter: {fileID: 0}
+    spawnAreaRadius: 69.9
+    numSludgeToSpawn: 0
+    numGasToSpawn: 4
+    areaManager: {fileID: 0}
+    enemiesHaveSpawned: 0
+  - spawnAreaCenter: {fileID: 0}
+    spawnAreaRadius: 69.9
+    numSludgeToSpawn: 0
+    numGasToSpawn: 4
+    areaManager: {fileID: 0}
+    enemiesHaveSpawned: 0
+  - spawnAreaCenter: {fileID: 0}
+    spawnAreaRadius: 69.9
+    numSludgeToSpawn: 0
+    numGasToSpawn: 4
+    areaManager: {fileID: 0}
+    enemiesHaveSpawned: 0
 --- !u!114 &5244568340785563921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -105,7 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tutorialMessages:
-  - Greetings Young Godling!  Use WASP to move around the forest, and space to jump.
+  - Greetings Young Godling!  Use WASD to move around the forest, and space to jump.
   - Ishana,You Must Protect The Forrest! Defeat the Decay and SAVE the Forest Realm!
   - Those are Slimemaw! Use Left Mouse to fire a SPIRIT shot at them!
   - Your bullet will land where the light shows
@@ -113,7 +158,7 @@ MonoBehaviour:
     after the Aura has fully grown.
   - You can also switch to your ICE spirit enemy's to defeat those more viseral Enemies
     (USING THE SCROLL WHEEL!)
-  - That is a sacred tree!. They will heal you if yo are low on health.
+  - That is a sacred tree! They will heal you if you are low on health.
   - You can also switch to your ICE spirit enemy's to defeat those more viseral Enemies
     (USING THE SCROLL WHEEL!)
   - You can also switch to your ICE spirit enemy's to defeat those more viseral Enemies
@@ -122,3 +167,145 @@ MonoBehaviour:
   tutorialPanelUI: {fileID: 0}
   typeWriterEffect: {fileID: 0}
   messageVisibleDuration: 3
+--- !u!114 &7251527983600727770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 225861933715559730}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3852feb83980b54459602741006f6303, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sludgeInstanceToTest: {fileID: 0}
+--- !u!1 &3107935307999300619
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4805790127859876738}
+  - component: {fileID: 2015689308640410847}
+  m_Layer: 0
+  m_Name: BackGroundMusic
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4805790127859876738
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3107935307999300619}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -274.9788, y: -166.27518, z: -537.6771}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2840906729972597821}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &2015689308640410847
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3107935307999300619}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 8b7e088d02443be4da652c28958862d3, type: 3}
+  m_Resource: {fileID: 8300000, guid: 8b7e088d02443be4da652c28958862d3, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.221
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

@@ -6,14 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="fce460ab-96da-436b-be79-13280ac23597" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GlobalGameJam25/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GlobalGameJam25/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Animations/GirlRigged1.controller" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Animations/GirlRigged1.controller" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerStateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerStateManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/PlayerStates/PlayerAnimationManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/PlayerAnimationManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/PlayerStates/PlayerAnimationManager.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/PlayerAnimationManager.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/PlayerStates/PlayerIdleState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/PlayerStates/PlayerIdleState.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/PlayerStates/PlayerWalkingState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/PlayerStates/PlayerWalkingState.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/VinnySceneMikeRevised.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/VinnySceneMikeRevised.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Anton SDF.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Anton SDF.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +112,7 @@
       <workItem from="1745183362518" duration="26281000" />
       <workItem from="1745392304347" duration="1775000" />
       <workItem from="1745554824959" duration="5109000" />
-      <workItem from="1745720299804" duration="8112000" />
+      <workItem from="1745720299804" duration="9302000" />
     </task>
     <servers />
   </component>
