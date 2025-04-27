@@ -7464,9 +7464,17 @@ PrefabInstance:
       value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 6712753400188939037, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
+      propertyPath: animationManager
+      value: 
+      objectReference: {fileID: 1166066722}
+    - target: {fileID: 6712753400188939037, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
       propertyPath: shellOrbitCenter
       value: 
       objectReference: {fileID: 986686350}
+    - target: {fileID: 6712753400188939037, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
+      propertyPath: groundCheckRadius
+      value: 0.49
+      objectReference: {fileID: 0}
     - target: {fileID: 6712753400188939037, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
       propertyPath: xpBaseRequirement
       value: 50
@@ -7592,6 +7600,10 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7789802282185890204, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 780f56207566b0b46bd9299aca2d2cce, type: 2}
+    - target: {fileID: 7789802282185890204, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 1
       objectReference: {fileID: 0}
@@ -7682,6 +7694,14 @@ PrefabInstance:
     - target: {fileID: 9077404170492095589, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
       propertyPath: m_Layer
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 9184776978381332160, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.126
+      objectReference: {fileID: 0}
+    - target: {fileID: 9184776978381332160, guid: c4a7d82f68704574e99ae78ea515d3d2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.003
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

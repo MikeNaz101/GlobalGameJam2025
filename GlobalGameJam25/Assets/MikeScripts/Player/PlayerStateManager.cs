@@ -29,6 +29,7 @@ public class PlayerStateManager : MonoBehaviour
     public float flySpeed = 15f;
     public float jumpForce = 20f; // Ground jump initial strength
     public float flapStrength = 10f; // Flying flap upward strength
+    [HideInInspector] public Vector3 currentHorizontalVelocity = Vector3.zero; // Store horizontal movement decided by state
 
     [Header("Physics & Ground Check")]
     public float gravity = -9.81f; // Standard gravity
@@ -38,6 +39,8 @@ public class PlayerStateManager : MonoBehaviour
     [HideInInspector] public bool isGrounded; // Note: CheckGrounded() is commented out, controller.isGrounded is used
     [HideInInspector] public float verticalVelocity = 0f;
     private bool hasJumped = false; // Used for double jump / flight entry
+    private bool wasGroundedLastFrame = false; // Add this variable
+    
 
     [Header("Shooting & Abilities")]
     public BulletSpawnerState bulletSpawner; // Assign in Inspector
@@ -128,6 +131,10 @@ public class PlayerStateManager : MonoBehaviour
         OnXPChanged?.Invoke(currentXP, xpToNextLevel);
         OnLevelChanged?.Invoke(currentLevel);
         OnMultiplierChanged?.Invoke(bulletEffectMultiplier);
+        
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore);
+        wasGroundedLastFrame = isGrounded; // Initialize based on starting state
+
 
         // Start in Idle state
         SwitchState(idleState);
@@ -148,7 +155,7 @@ public class PlayerStateManager : MonoBehaviour
     void OnMove(InputValue value) { movement = value.Get<Vector2>(); }
     void OnSprint(InputValue value) { if (value.isPressed) isSneaking = !isSneaking; } // Toggle Sneak on press
     void OnRun(InputValue value) { isRunning = value.isPressed; } // Hold Run
-    void OnJump()
+    /*void OnJump()
     {
         Debug.Log("Jump Input Received"); // Simplified log
         if (controller.isGrounded)
@@ -165,7 +172,7 @@ public class PlayerStateManager : MonoBehaviour
             // Add double jump / flight entry logic here if desired
         }
         // The jumpInputPressedThisFrame = true logic was commented out, keep as is unless needed for other states like flying
-    }
+    }*/
 
     void OnFire(InputValue value)
     {
@@ -199,10 +206,20 @@ public class PlayerStateManager : MonoBehaviour
     // --- Core Update Loop ---
     void Update()
     {
-        // Ground check using CharacterController.isGrounded
-        isGrounded = controller.isGrounded; // Update internal isGrounded flag
+        HandleGroundCheck(); // Call the ground check logic
+        ApplyGravity();      // Apply gravity based on the check
+        HandleMovement();    // Handle state updates and movement application
 
-        if (isGrounded && verticalVelocity < 0)
+        
+        // Ground check using CharacterController.isGrounded
+        //isGrounded = controller.isGrounded; // Update internal isGrounded flag
+        //Debug.Log($"Frame {Time.frameCount} - isGrounded: {controller.isGrounded} | Vertical Velocity: {verticalVelocity}");
+        // --- Apply Combined Movement ---
+        // Combine horizontal velocity from the state and vertical velocity from gravity/jump
+        Vector3 finalVelocity = currentHorizontalVelocity + (Vector3.up * verticalVelocity);
+        controller.Move(finalVelocity * Time.deltaTime);
+
+        /*if (isGrounded && verticalVelocity < 0)
         {
             verticalVelocity = -2f; // Keep player grounded
             hasJumped = false; // Reset jump flag when grounded
@@ -211,16 +228,17 @@ public class PlayerStateManager : MonoBehaviour
         {
             // Apply gravity when not grounded
             verticalVelocity += gravity * Time.deltaTime;
-        }
+        }*/
 
         // --- State Update ---
-        currentState?.UpdateState(this);
+        //currentState?.UpdateState(this);
 
         // --- Reset Per-Frame Input Flags ---
-        jumpInputPressedThisFrame = false;
+        //jumpInputPressedThisFrame = false;
 
         // --- Other Updates ---
         UpdateShellPositions(); // Update orbiting shell visuals
+        wasGroundedLastFrame = isGrounded;
     }
 
     // --- Player Movement ---
@@ -231,13 +249,95 @@ public class PlayerStateManager : MonoBehaviour
         controller.Move(finalMovement * Time.deltaTime);
     }
 
+    void HandleGroundCheck()
+    {
+        // --- Perform the Sphere Check ---
+        isGrounded = Physics.CheckSphere(
+            groundCheck.position,  // Position of the sphere (assign/position this empty GameObject at player's feet)
+            groundCheckRadius,     // How large the sphere is
+            groundLayer,           // Which layers count as ground? (Set in Inspector)
+            QueryTriggerInteraction.Ignore // Usually ignore triggers for ground checks
+        );
+        // ---------------------------------
+
+        // Optional Debugging: Visualize if grounded
+        // if(isGrounded) Debug.Log($"Frame {Time.frameCount} - Grounded (CheckSphere)");
+        // else Debug.Log($"Frame {Time.frameCount} - Not Grounded (CheckSphere)");
+    }
+
+    void ApplyGravity()
+    {
+        // --- Detect state change ---
+        // 'justLanded' is true only on the frame we transition from !isGrounded to isGrounded
+        bool justLanded = !wasGroundedLastFrame && isGrounded;
+
+        // --- Apply logic based on state ---
+        if (justLanded)
+        {
+            // LANDING FRAME: Apply a small downward velocity ONCE to ensure solid contact.
+            // This replaces the continuous sticking force. -0.5f is usually sufficient.
+            verticalVelocity = -0.5f;
+            Debug.Log($"Just Landed - Setting Vertical Velocity: {verticalVelocity}");
+            // Reset jump flag here as well
+            hasJumped = false;
+        }
+        else if (isGrounded) // If grounded, but NOT the first frame of landing
+        {
+            // STILL GROUNDED: Don't apply continuous downward force.
+            // Setting to 0 prevents accumulation of negative velocity from the previous frame's landing impulse
+            // or potential minor physics bumps. Only do this if velocity is negative.
+            if (verticalVelocity < 0f)
+            {
+                verticalVelocity = 0f;
+                // Debug.Log("Still Grounded - Clamping Negative Vertical Velocity to 0");
+            }
+            // Still reset jump flag while grounded
+            hasJumped = false;
+        }
+        else // AIRBORNE: Player is not grounded (!isGrounded)
+        {
+            // Apply gravity as usual
+            verticalVelocity += gravity * Time.deltaTime;
+        }
+    }
+
+    void HandleMovement()
+    {
+         // --- State Update ---
+        currentState?.UpdateState(this); // States can now use the reliable isGrounded
+
+         // Player movement is handled within states, calling MovePlayer
+         // MovePlayer already includes verticalVelocity, so it uses the gravity calculated in ApplyGravity
+    }
+
     // --- Jump Logic ---
+    void OnJump()
+    {
+        Debug.Log("Jump Input Received");
+        // --- Use the manually updated isGrounded flag ---
+        if (isGrounded) // Check our reliable flag
+        {
+            Debug.Log("Performing Ground Jump");
+            hasJumped = true;
+            Jump(); // Calculate vertical velocity
+            Debug.Log($"Attempting to call TriggerJump. animationManager is null? {animationManager == null}");
+            animationManager?.TriggerJump();
+        }
+        // ---------------------------------------------
+        else
+        {
+            Debug.Log("Jump Input while airborne (no action defined)");
+            // Coyote Time logic could go here (See Alternative 2)
+        }
+    }
+
+    // The Jump() method itself remains the same:
     public void Jump()
     {
-        // Assumes this is only called when controller.isGrounded is true (checked in OnJump)
         verticalVelocity = Mathf.Sqrt(jumpForce * -2f * gravity);
-        // Note: isGrounded will become false automatically after the Move call with positive verticalVelocity
+        // isGrounded will become false on the next HandleGroundCheck() after Move() applies velocity
     }
+
 
     // --- Damage & Death ---
     public void TakeDamage(int damage)
@@ -245,6 +345,7 @@ public class PlayerStateManager : MonoBehaviour
         if (currentHealth > 0 && currentState != hitState)
         {
             // --- Animation Trigger ---
+            Debug.Log($"Attempting to call TriggerHit. animationManager is null? {animationManager == null}");
             animationManager?.TriggerHit(); // Trigger BEFORE changing state potentially
             hitState.SetDamage(damage);
             SwitchState(hitState);
@@ -520,6 +621,7 @@ public class PlayerStateManager : MonoBehaviour
     // --- NEW Method for Teleport Bullet to Call ---
     public void TriggerTeleportAnimation()
     {
+        Debug.Log($"Attempting to call TriggerTeleported. animationManager is null? {animationManager == null}");
         animationManager?.TriggerTeleported();
     }
 
