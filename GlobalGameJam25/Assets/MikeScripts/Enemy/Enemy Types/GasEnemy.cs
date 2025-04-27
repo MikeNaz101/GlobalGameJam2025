@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(EnemyBubble))]
+//[RequireComponent(typeof(EnemyBubble))]
 public class GasEnemy : BaseEnemy
 {
     [Header("Gas Specific Stats")]
