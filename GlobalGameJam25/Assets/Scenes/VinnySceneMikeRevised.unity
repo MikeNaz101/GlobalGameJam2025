@@ -6698,6 +6698,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d4e1175a3137e6b49bd5d17e34243bc6, type: 3}
+--- !u!82 &1413359122 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 2015689308640410847, guid: 4395ae371e1c8184989acbb800f29f69, type: 3}
+  m_PrefabInstance: {fileID: 1061106230513155696}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1414413838
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7438,14 +7443,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 555988759388983118, guid: f130f6709e0435d4987c6570375549d6, type: 3}
-      propertyPath: eventName
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 650381416581985254, guid: f130f6709e0435d4987c6570375549d6, type: 3}
-      propertyPath: eventName
-      value: 4
-      objectReference: {fileID: 0}
+    - target: {fileID: 488803334125487890, guid: f130f6709e0435d4987c6570375549d6, type: 3}
+      propertyPath: backgroundMusicSource
+      value: 
+      objectReference: {fileID: 1413359122}
+    - target: {fileID: 1670876086002820006, guid: f130f6709e0435d4987c6570375549d6, type: 3}
+      propertyPath: backgroundMusicSource
+      value: 
+      objectReference: {fileID: 1413359122}
+    - target: {fileID: 2672575104166396431, guid: f130f6709e0435d4987c6570375549d6, type: 3}
+      propertyPath: backgroundMusicSource
+      value: 
+      objectReference: {fileID: 1413359122}
+    - target: {fileID: 2747312874696190639, guid: f130f6709e0435d4987c6570375549d6, type: 3}
+      propertyPath: backgroundMusicSource
+      value: 
+      objectReference: {fileID: 1413359122}
+    - target: {fileID: 2946005401970633801, guid: f130f6709e0435d4987c6570375549d6, type: 3}
+      propertyPath: backgroundMusicSource
+      value: 
+      objectReference: {fileID: 1413359122}
     - target: {fileID: 3641261364114331091, guid: f130f6709e0435d4987c6570375549d6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 936.17
@@ -7486,38 +7503,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3882022732441689933, guid: f130f6709e0435d4987c6570375549d6, type: 3}
-      propertyPath: eventName
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3891810674745646454, guid: f130f6709e0435d4987c6570375549d6, type: 3}
       propertyPath: m_Name
       value: spawnareas
       objectReference: {fileID: 0}
-    - target: {fileID: 6001604991937319908, guid: f130f6709e0435d4987c6570375549d6, type: 3}
-      propertyPath: eventName
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7387415015047463646, guid: f130f6709e0435d4987c6570375549d6, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 59.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7909522870035277964, guid: f130f6709e0435d4987c6570375549d6, type: 3}
-      propertyPath: eventName
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 8594287825111935713, guid: f130f6709e0435d4987c6570375549d6, type: 3}
-      propertyPath: eventName
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 8614583173491848343, guid: f130f6709e0435d4987c6570375549d6, type: 3}
-      propertyPath: m_Intensity
-      value: 0.54
-      objectReference: {fileID: 0}
-    - target: {fileID: 9091047753840014518, guid: f130f6709e0435d4987c6570375549d6, type: 3}
-      propertyPath: eventName
-      value: 10
-      objectReference: {fileID: 0}
+    - target: {fileID: 4570865730951936829, guid: f130f6709e0435d4987c6570375549d6, type: 3}
+      propertyPath: backgroundMusicSource
+      value: 
+      objectReference: {fileID: 1413359122}
+    - target: {fileID: 5325927335828793572, guid: f130f6709e0435d4987c6570375549d6, type: 3}
+      propertyPath: backgroundMusicSource
+      value: 
+      objectReference: {fileID: 1413359122}
+    - target: {fileID: 6372809436336106456, guid: f130f6709e0435d4987c6570375549d6, type: 3}
+      propertyPath: backgroundMusicSource
+      value: 
+      objectReference: {fileID: 1413359122}
+    - target: {fileID: 6825046272201208203, guid: f130f6709e0435d4987c6570375549d6, type: 3}
+      propertyPath: backgroundMusicSource
+      value: 
+      objectReference: {fileID: 1413359122}
+    - target: {fileID: 8510853915143715604, guid: f130f6709e0435d4987c6570375549d6, type: 3}
+      propertyPath: backgroundMusicSource
+      value: 
+      objectReference: {fileID: 1413359122}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

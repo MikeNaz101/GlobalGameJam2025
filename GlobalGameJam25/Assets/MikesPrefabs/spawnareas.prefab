@@ -506,8 +506,8 @@ MonoBehaviour:
   affectsGlobalFog: 1
   sicklyFogDensity: 0.009
   sicklyFogColor: {r: 0.5, g: 0.6, b: 0.5, a: 0.3254902}
-  cleanFogDensity: 0.001
-  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.22745098}
+  cleanFogDensity: 0
+  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.02745098}
   affectsSkyboxTint: 1
   sicklySkyboxTint: {r: 0, g: 0.3018868, b: 0.020125767, a: 1}
   cleanSkyboxTint: {r: 0, g: 0.64673597, b: 0.9622642, a: 1}
@@ -515,6 +515,9 @@ MonoBehaviour:
   sicklyLightColor: {r: 0.4716981, g: 0.26131693, b: 0, a: 0.8}
   cleanLightIntensity: 0.71
   cleanLightColor: {r: 0.949502, g: 1, b: 0.50980395, a: 0.4392157}
+  backgroundMusicSource: {fileID: 0}
+  quietVolume: 0.023
+  musicFadeDuration: 4
 --- !u!1 &1957774706712876549
 GameObject:
   m_ObjectHideFlags: 0
@@ -589,8 +592,8 @@ MonoBehaviour:
   affectsGlobalFog: 1
   sicklyFogDensity: 0.009
   sicklyFogColor: {r: 0.5, g: 0.6, b: 0.5, a: 0.3254902}
-  cleanFogDensity: 0.001
-  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.22745098}
+  cleanFogDensity: 0
+  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.02745098}
   affectsSkyboxTint: 1
   sicklySkyboxTint: {r: 0.0042274827, g: 0.1792453, b: 0.01746211, a: 1}
   cleanSkyboxTint: {r: 0, g: 0.64673597, b: 0.9622642, a: 1}
@@ -598,6 +601,9 @@ MonoBehaviour:
   sicklyLightColor: {r: 0.4716981, g: 0.26131693, b: 0, a: 0.8}
   cleanLightIntensity: 0.71
   cleanLightColor: {r: 0.949502, g: 1, b: 0.50980395, a: 0.4392157}
+  backgroundMusicSource: {fileID: 0}
+  quietVolume: 0.023
+  musicFadeDuration: 4
 --- !u!1 &2366184052681961629
 GameObject:
   m_ObjectHideFlags: 0
@@ -672,8 +678,8 @@ MonoBehaviour:
   affectsGlobalFog: 1
   sicklyFogDensity: 0.009
   sicklyFogColor: {r: 0.5, g: 0.6, b: 0.5, a: 0.3254902}
-  cleanFogDensity: 0.001
-  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.22745098}
+  cleanFogDensity: 0
+  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.02745098}
   affectsSkyboxTint: 1
   sicklySkyboxTint: {r: 0, g: 0.3018868, b: 0.020125767, a: 1}
   cleanSkyboxTint: {r: 0, g: 0.64673597, b: 0.9622642, a: 1}
@@ -681,6 +687,9 @@ MonoBehaviour:
   sicklyLightColor: {r: 0.4716981, g: 0.26131693, b: 0, a: 0.8}
   cleanLightIntensity: 0.71
   cleanLightColor: {r: 0.949502, g: 1, b: 0.50980395, a: 0.4392157}
+  backgroundMusicSource: {fileID: 0}
+  quietVolume: 0.023
+  musicFadeDuration: 4
 --- !u!1 &2554556492852994806
 GameObject:
   m_ObjectHideFlags: 0
@@ -1125,8 +1134,8 @@ MonoBehaviour:
   affectsGlobalFog: 1
   sicklyFogDensity: 0.009
   sicklyFogColor: {r: 0.5, g: 0.6, b: 0.5, a: 0.3254902}
-  cleanFogDensity: 0.001
-  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.22745098}
+  cleanFogDensity: 0
+  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.02745098}
   affectsSkyboxTint: 1
   sicklySkyboxTint: {r: 0, g: 0.3018868, b: 0.020125767, a: 1}
   cleanSkyboxTint: {r: 0, g: 0.64673597, b: 0.9622642, a: 1}
@@ -1134,6 +1143,9 @@ MonoBehaviour:
   sicklyLightColor: {r: 0.4716981, g: 0.26131693, b: 0, a: 0.8}
   cleanLightIntensity: 0.71
   cleanLightColor: {r: 0.949502, g: 1, b: 0.50980395, a: 0.4392157}
+  backgroundMusicSource: {fileID: 0}
+  quietVolume: 0.023
+  musicFadeDuration: 4
 --- !u!1 &4300234859011508476
 GameObject:
   m_ObjectHideFlags: 0
@@ -1161,7 +1173,7 @@ Transform:
   m_GameObject: {fileID: 4300234859011508476}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -23.95996, y: -0.65800005, z: 63.570007}
+  m_LocalPosition: {x: -23.95996, y: -0.65800005, z: 59.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1277,8 +1289,8 @@ MonoBehaviour:
   affectsGlobalFog: 1
   sicklyFogDensity: 0.009
   sicklyFogColor: {r: 0.5, g: 0.6, b: 0.5, a: 0.3254902}
-  cleanFogDensity: 0.001
-  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.22745098}
+  cleanFogDensity: 0
+  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.02745098}
   affectsSkyboxTint: 1
   sicklySkyboxTint: {r: 0, g: 0.3018868, b: 0.020125767, a: 1}
   cleanSkyboxTint: {r: 0, g: 0.64673597, b: 0.9622642, a: 1}
@@ -1286,6 +1298,9 @@ MonoBehaviour:
   sicklyLightColor: {r: 0.4716981, g: 0.26131693, b: 0, a: 0.8}
   cleanLightIntensity: 0.71
   cleanLightColor: {r: 0.949502, g: 1, b: 0.50980395, a: 0.4392157}
+  backgroundMusicSource: {fileID: 0}
+  quietVolume: 0.023
+  musicFadeDuration: 4
 --- !u!1 &5070761686286256378
 GameObject:
   m_ObjectHideFlags: 0
@@ -1481,8 +1496,8 @@ MonoBehaviour:
   affectsGlobalFog: 1
   sicklyFogDensity: 0.009
   sicklyFogColor: {r: 0.5, g: 0.6, b: 0.5, a: 0.3254902}
-  cleanFogDensity: 0.001
-  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.22745098}
+  cleanFogDensity: 0
+  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.02745098}
   affectsSkyboxTint: 1
   sicklySkyboxTint: {r: 0.0042274827, g: 0.1792453, b: 0.01746211, a: 1}
   cleanSkyboxTint: {r: 0, g: 0.64673597, b: 0.9622642, a: 1}
@@ -1490,6 +1505,9 @@ MonoBehaviour:
   sicklyLightColor: {r: 0.4716981, g: 0.26131693, b: 0, a: 0.8}
   cleanLightIntensity: 0.71
   cleanLightColor: {r: 0.949502, g: 1, b: 0.50980395, a: 0.4392157}
+  backgroundMusicSource: {fileID: 0}
+  quietVolume: 0.023
+  musicFadeDuration: 4
 --- !u!1 &5189613347680632100
 GameObject:
   m_ObjectHideFlags: 0
@@ -1564,8 +1582,8 @@ MonoBehaviour:
   affectsGlobalFog: 1
   sicklyFogDensity: 0.009
   sicklyFogColor: {r: 0.5, g: 0.6, b: 0.5, a: 0.3254902}
-  cleanFogDensity: 0.001
-  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.22745098}
+  cleanFogDensity: 0
+  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.02745098}
   affectsSkyboxTint: 1
   sicklySkyboxTint: {r: 0.0042274827, g: 0.1792453, b: 0.01746211, a: 1}
   cleanSkyboxTint: {r: 0, g: 0.64673597, b: 0.9622642, a: 1}
@@ -1573,6 +1591,9 @@ MonoBehaviour:
   sicklyLightColor: {r: 0.4716981, g: 0.26131693, b: 0, a: 0.8}
   cleanLightIntensity: 0.71
   cleanLightColor: {r: 0.949502, g: 1, b: 0.50980395, a: 0.4392157}
+  backgroundMusicSource: {fileID: 0}
+  quietVolume: 0.023
+  musicFadeDuration: 4
 --- !u!1 &5412810990198986616
 GameObject:
   m_ObjectHideFlags: 0
@@ -1755,7 +1776,7 @@ Light:
   serializedVersion: 11
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 0.81
+  m_Intensity: 0.54
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -1915,6 +1936,9 @@ MonoBehaviour:
   sicklyLightColor: {r: 0.4716981, g: 0.26131693, b: 0, a: 0.8}
   cleanLightIntensity: 0.71
   cleanLightColor: {r: 0.949502, g: 1, b: 0.50980395, a: 0.4392157}
+  backgroundMusicSource: {fileID: 0}
+  quietVolume: 0.2
+  musicFadeDuration: 1.5
 --- !u!1 &6016421846346499694
 GameObject:
   m_ObjectHideFlags: 0
@@ -2179,8 +2203,8 @@ MonoBehaviour:
   affectsGlobalFog: 1
   sicklyFogDensity: 0.009
   sicklyFogColor: {r: 0.5, g: 0.6, b: 0.5, a: 0.3254902}
-  cleanFogDensity: 0.001
-  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.22745098}
+  cleanFogDensity: 0
+  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.02745098}
   affectsSkyboxTint: 1
   sicklySkyboxTint: {r: 0, g: 0.3018868, b: 0.020125767, a: 1}
   cleanSkyboxTint: {r: 0, g: 0.64673597, b: 0.9622642, a: 1}
@@ -2188,6 +2212,9 @@ MonoBehaviour:
   sicklyLightColor: {r: 0.4716981, g: 0.26131693, b: 0, a: 0.8}
   cleanLightIntensity: 0.71
   cleanLightColor: {r: 0.949502, g: 1, b: 0.50980395, a: 0.4392157}
+  backgroundMusicSource: {fileID: 0}
+  quietVolume: 0.023
+  musicFadeDuration: 4
 --- !u!1 &6596388070076858439
 GameObject:
   m_ObjectHideFlags: 0
@@ -2262,8 +2289,8 @@ MonoBehaviour:
   affectsGlobalFog: 1
   sicklyFogDensity: 0.009
   sicklyFogColor: {r: 0.5, g: 0.6, b: 0.5, a: 0.3254902}
-  cleanFogDensity: 0.001
-  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.22745098}
+  cleanFogDensity: 0
+  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.02745098}
   affectsSkyboxTint: 1
   sicklySkyboxTint: {r: 0.0042274827, g: 0.1792453, b: 0.01746211, a: 1}
   cleanSkyboxTint: {r: 0, g: 0.64673597, b: 0.9622642, a: 1}
@@ -2271,6 +2298,9 @@ MonoBehaviour:
   sicklyLightColor: {r: 0.4716981, g: 0.26131693, b: 0, a: 0.8}
   cleanLightIntensity: 0.71
   cleanLightColor: {r: 0.949502, g: 1, b: 0.50980395, a: 0.4392157}
+  backgroundMusicSource: {fileID: 0}
+  quietVolume: 0.023
+  musicFadeDuration: 4
 --- !u!1 &7046215170688319133
 GameObject:
   m_ObjectHideFlags: 0
@@ -3036,8 +3066,8 @@ MonoBehaviour:
   affectsGlobalFog: 1
   sicklyFogDensity: 0.009
   sicklyFogColor: {r: 0.5, g: 0.6, b: 0.5, a: 0.3254902}
-  cleanFogDensity: 0.001
-  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.22745098}
+  cleanFogDensity: 0
+  cleanFogColor: {r: 0.68956923, g: 0.8382092, b: 0.9811321, a: 0.02745098}
   affectsSkyboxTint: 1
   sicklySkyboxTint: {r: 0.0042274827, g: 0.1792453, b: 0.01746211, a: 1}
   cleanSkyboxTint: {r: 0, g: 0.64673597, b: 0.9622642, a: 1}
@@ -3045,3 +3075,6 @@ MonoBehaviour:
   sicklyLightColor: {r: 0.4716981, g: 0.26131693, b: 0, a: 0.8}
   cleanLightIntensity: 0.71
   cleanLightColor: {r: 0.949502, g: 1, b: 0.50980395, a: 0.4392157}
+  backgroundMusicSource: {fileID: 0}
+  quietVolume: 0.023
+  musicFadeDuration: 4
