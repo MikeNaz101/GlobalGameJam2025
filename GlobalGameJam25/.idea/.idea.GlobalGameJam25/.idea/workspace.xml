@@ -6,6 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="fce460ab-96da-436b-be79-13280ac23597" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GlobalGameJam25/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GlobalGameJam25/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Base/BaseEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Base/BaseEnemy.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Enemy Types/GasEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Enemy Types/GasEnemy.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Enemy Types/SludgeEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Enemy Types/SludgeEnemy.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Environment/AreaCleansingManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Environment/AreaCleansingManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikesPrefabs/SmogType.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikesPrefabs/SmogType.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikesPrefabs/sludgrenPrefab 1.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikesPrefabs/sludgrenPrefab 1.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Simple FX Kit/Prefabs/Smoke.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Simple FX Kit/Prefabs/Smoke.prefab" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,6 +24,7 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/MikeScripts/Environment/GlobalAmbianceController.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/MikeScripts/Player/MouseLook.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/PanelSizeToText.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/TurnCanvas.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/MikeScripts/Random Scripts/TutorialManager.cs" root0="FORCE_HIGHLIGHTING" />
@@ -113,6 +121,8 @@
       <workItem from="1745392304347" duration="1775000" />
       <workItem from="1745554824959" duration="5109000" />
       <workItem from="1745720299804" duration="9302000" />
+      <workItem from="1745784122639" duration="3604000" />
+      <workItem from="1745796989644" duration="3416000" />
     </task>
     <servers />
   </component>

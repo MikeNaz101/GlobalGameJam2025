@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering; // Optional: For Post-Processing
 using System;
+using System.Collections; // Needed for Coroutines
 
 // Manages a SINGLE grove and tells the Global Controller about ambiance needs.
 [RequireComponent(typeof(Collider))]
@@ -20,7 +21,6 @@ public class AreaCleansingManager : MonoBehaviour
     [Tooltip("A light source PRIMARILY affecting this local area.")]
     public Light areaLight;
 
-    // --- UPDATED SECTION: Grove Ambiance Flavors ---
     [Header("Grove Ambiance Flavors (Fog)")]
     [Tooltip("Check this if this area should influence global fog when player is present.")]
     public bool affectsGlobalFog = true;
@@ -33,17 +33,17 @@ public class AreaCleansingManager : MonoBehaviour
     [Tooltip("The color of the air when this area is peachy!")]
     public Color cleanFogColor = new Color(0.8f, 0.9f, 1.0f);
 
-    [Header("Grove Ambiance Flavors (Skybox)")] // <-- NEW SKYBOX SECTION
+    [Header("Grove Ambiance Flavors (Skybox)")]
     [Tooltip("Check this if this area should influence the skybox tint when player is present.")]
-    public bool affectsSkyboxTint = true;      // <-- NEW
-    [ColorUsage(false, true)] // Show HDR color picker, but not for emission
+    public bool affectsSkyboxTint = true;
+    [ColorUsage(false, true)]
     [Tooltip("The tint color of the skybox when the area is blighted.")]
-    public Color sicklySkyboxTint = Color.grey; // <-- NEW (Example: Greyish tint)
+    public Color sicklySkyboxTint = Color.grey;
     [ColorUsage(false, true)]
     [Tooltip("The tint color of the skybox when the area is clean.")]
-    public Color cleanSkyboxTint = Color.white;  // <-- NEW (Example: Normal white tint)
+    public Color cleanSkyboxTint = Color.white;
 
-    [Header("Grove Ambiance Flavors (Local Light)")] // <-- Renamed Header
+    [Header("Grove Ambiance Flavors (Local Light)")]
     [Tooltip("How dim the LOCAL light gets.")]
     public float sicklyLightIntensity = 0.5f;
     [Tooltip("The sour color of the LOCAL light.")]
@@ -52,12 +52,35 @@ public class AreaCleansingManager : MonoBehaviour
     public float cleanLightIntensity = 1.0f;
     [Tooltip("The warm, inviting color of the cleansed LOCAL light.")]
     public Color cleanLightColor = Color.white;
-    // --- END UPDATED SECTION ---
 
+    // --- NEW: Background Music Control ---
+    [Header("Background Music Control")]
+    [Tooltip("Assign the AudioSource playing the background music here.")]
+    public AudioSource backgroundMusicSource; // Assign this in the Inspector
+    [Tooltip("The target volume for the BGM when the player is INSIDE this area (e.g., 0.2).")]
+    [Range(0.0f, 1.0f)]
+    public float quietVolume = 0.2f;
+    [Tooltip("How many seconds the fade in/out should take.")]
+    public float musicFadeDuration = 1.5f;
+    private float originalMusicVolume; // To store the BGM volume before entering
+    private Coroutine currentFadeCoroutine = null; // To manage the active fade
+    // --- END NEW SECTION ---
 
     // --- Internal State ---
     private bool isPlayerCurrentlyInArea = false;
     private GlobalAmbianceController globalAmbianceController;
+
+    void Awake() // Use Awake for initialization that doesn't depend on others
+    {
+        if (backgroundMusicSource != null)
+        {
+            originalMusicVolume = backgroundMusicSource.volume; // Store the initial volume
+        }
+        else
+        {
+            Debug.LogWarning($"Background Music Source not assigned on {gameObject.name}. Music fading will not work for this area.", gameObject);
+        }
+    }
 
     void Start()
     {
@@ -79,11 +102,18 @@ public class AreaCleansingManager : MonoBehaviour
         {
             Debug.Log($"Player entered {gameObject.name}");
             isPlayerCurrentlyInArea = true;
-            if (globalAmbianceController != null) // Removed affectsGlobalFog check here, let controller handle it
+            if (globalAmbianceController != null)
             {
-                globalAmbianceController.SetActiveArea(this); // Controller checks affectsFog/affectsSkybox
+                globalAmbianceController.SetActiveArea(this);
             }
             ApplyLocalAmbiance(currentBlightPotency);
+
+            // --- NEW: Start Music Fade Down ---
+            if (backgroundMusicSource != null)
+            {
+                StartMusicFade(quietVolume, musicFadeDuration);
+            }
+            // --- END NEW SECTION ---
         }
     }
 
@@ -91,12 +121,19 @@ public class AreaCleansingManager : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-             Debug.Log($"Player exited {gameObject.name}");
+            Debug.Log($"Player exited {gameObject.name}");
             isPlayerCurrentlyInArea = false;
-            if (globalAmbianceController != null) // Removed affectsGlobalFog check here
+            if (globalAmbianceController != null)
             {
                 globalAmbianceController.ClearActiveArea(this);
             }
+
+            // --- NEW: Start Music Fade Up ---
+            if (backgroundMusicSource != null)
+            {
+                StartMusicFade(originalMusicVolume, musicFadeDuration);
+            }
+            // --- END NEW SECTION ---
         }
     }
 
@@ -111,22 +148,16 @@ public class AreaCleansingManager : MonoBehaviour
             UpdateBlightPotency();
             ApplyLocalAmbiance(currentBlightPotency);
 
-            // If the player is here, tell the global controller about the change
-            if (isPlayerCurrentlyInArea && globalAmbianceController != null) // Removed affectsGlobalFog check
+            if (isPlayerCurrentlyInArea && globalAmbianceController != null)
             {
-                // Tell controller to update ALL its targets from this area
                 globalAmbianceController.UpdateActiveAreaTargets(this);
             }
         }
-        // --- Check if Area Just Got Cleared ---
         if (!_areaHasBeenCleared && monstersKilled >= totalMonstersInArea)
         {
-            _areaHasBeenCleared = true; // Mark as cleared
+            _areaHasBeenCleared = true;
             Debug.Log($"{gameObject.name} is perfectly ripe! Invoking OnAreaCleared event.");
-
-            // --- Invoke the static event ---
-            OnAreaCleared?.Invoke(this); // Notify subscribers (like PlayerAnimationManager)
-            // -----------------------------
+            OnAreaCleared?.Invoke(this);
         }
     }
 
@@ -134,14 +165,13 @@ public class AreaCleansingManager : MonoBehaviour
     {
         if (totalMonstersInArea <= 0) { currentBlightPotency = 0.0f; return; }
         float fractionKilled = (float)monstersKilled / totalMonstersInArea;
-        if (fractionKilled >= 1.0f) currentBlightPotency = 0.0f;
-        else if (fractionKilled >= 2.0f / 3.0f) currentBlightPotency = 0.25f;
-        else if (fractionKilled >= 1.0f / 3.0f) currentBlightPotency = 0.5f;
-        else currentBlightPotency = 1.0f;
+        // Simplified lerp for potency (you might want smoother steps later)
+        currentBlightPotency = 1.0f - fractionKilled; // Linear decrease
+        currentBlightPotency = Mathf.Clamp01(currentBlightPotency); // Ensure it stays between 0 and 1
     }
 
     // --- Applying Effects ---
-    void ApplyLocalAmbiance(float intensity) // Only affects local things now
+    void ApplyLocalAmbiance(float intensity)
     {
         if (areaLight != null)
         {
@@ -151,16 +181,53 @@ public class AreaCleansingManager : MonoBehaviour
     }
 
     // --- Getters for Global Controller ---
-    // Provides target fog settings based on current blight level
     public void GetTargetFogSettings(out float density, out Color color)
     {
         density = Mathf.Lerp(cleanFogDensity, sicklyFogDensity, currentBlightPotency);
         color = Color.Lerp(cleanFogColor, sicklyFogColor, currentBlightPotency);
     }
 
-    // Provides target skybox tint based on current blight level <-- NEW
     public void GetTargetSkyboxSettings(out Color tint)
     {
         tint = Color.Lerp(cleanSkyboxTint, sicklySkyboxTint, currentBlightPotency);
     }
+
+    // --- NEW: Music Fading Logic ---
+    private void StartMusicFade(float targetVolume, float duration)
+    {
+        // Stop any previously running fade coroutine on this script instance
+        if (currentFadeCoroutine != null)
+        {
+            StopCoroutine(currentFadeCoroutine);
+        }
+        // Start the new fade and store its reference
+        currentFadeCoroutine = StartCoroutine(FadeAudio(targetVolume, duration));
+    }
+
+    private IEnumerator FadeAudio(float targetVolume, float duration)
+    {
+        if (backgroundMusicSource == null) yield break; // Exit if no source assigned
+
+        float startVolume = backgroundMusicSource.volume;
+        float startTime = Time.unscaledTime; // Use unscaled time if you want fade unaffected by Time.timeScale
+
+        while (Time.unscaledTime < startTime + duration)
+        {
+            float elapsed = Time.unscaledTime - startTime;
+            float progress = Mathf.Clamp01(elapsed / duration); // Value between 0 and 1
+
+            // You can add easing here if desired (e.g., SmoothStep)
+            // float easedProgress = Mathf.SmoothStep(0.0f, 1.0f, progress);
+            // backgroundMusicSource.volume = Mathf.Lerp(startVolume, targetVolume, easedProgress);
+
+            backgroundMusicSource.volume = Mathf.Lerp(startVolume, targetVolume, progress);
+
+            yield return null; // Wait for the next frame
+        }
+
+        // Ensure the volume is exactly the target volume at the end
+        backgroundMusicSource.volume = targetVolume;
+        currentFadeCoroutine = null; // Mark coroutine as finished
+    }
+    // --- END NEW SECTION ---
 }
