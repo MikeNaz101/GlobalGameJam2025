@@ -1215,7 +1215,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 90061388}
   m_HandleRect: {fileID: 90061387}
   m_Direction: 2
-  m_Value: 1.0000001
+  m_Value: 1
   m_Size: 0
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2714,6 +2714,10 @@ PrefabInstance:
       propertyPath: creditsPanel
       value: 
       objectReference: {fileID: 515422125}
+    - target: {fileID: 3927196072979991018, guid: 832b3f5d30493084e96f63294b6db9fd, type: 3}
+      propertyPath: gameSceneName
+      value: VinnyScenefinal
+      objectReference: {fileID: 0}
     - target: {fileID: 3927196072979991018, guid: 832b3f5d30493084e96f63294b6db9fd, type: 3}
       propertyPath: mainMenuPanel
       value: 
