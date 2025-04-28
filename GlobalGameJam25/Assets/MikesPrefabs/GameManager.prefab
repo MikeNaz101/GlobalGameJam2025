@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 604431163475789616}
   - component: {fileID: 5244568340785563921}
   - component: {fileID: 7251527983600727770}
+  - component: {fileID: 1991246055000214116}
+  - component: {fileID: 5034383044848461681}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -86,55 +88,73 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60dac37c6ed1c3949a1a2e443feeeb01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sludgePrefab: {fileID: 6930522098195016613, guid: 3ba6150a029784c48941a0cbe18a3c33, type: 3}
+  sludgePrefab: {fileID: 9086509785562928389, guid: a4d85520cabf78543bb3130fa47845d8, type: 3}
   gasPrefab: {fileID: 9086509785562928389, guid: a4d85520cabf78543bb3130fa47845d8, type: 3}
   spawnAreas:
   - spawnAreaCenter: {fileID: 0}
-    spawnAreaRadius: 20.03
-    numSludgeToSpawn: 5
+    spawnAreaRadius: 15
+    numSludgeToSpawn: 3
     numGasToSpawn: 3
     areaManager: {fileID: 0}
     enemiesHaveSpawned: 0
   - spawnAreaCenter: {fileID: 0}
-    spawnAreaRadius: 69.9
+    spawnAreaRadius: 20
     numSludgeToSpawn: 0
+    numGasToSpawn: 5
+    areaManager: {fileID: 0}
+    enemiesHaveSpawned: 0
+  - spawnAreaCenter: {fileID: 0}
+    spawnAreaRadius: 35
+    numSludgeToSpawn: 2
+    numGasToSpawn: 5
+    areaManager: {fileID: 0}
+    enemiesHaveSpawned: 0
+  - spawnAreaCenter: {fileID: 0}
+    spawnAreaRadius: 35
+    numSludgeToSpawn: 5
     numGasToSpawn: 4
     areaManager: {fileID: 0}
     enemiesHaveSpawned: 0
   - spawnAreaCenter: {fileID: 0}
-    spawnAreaRadius: 69.9
+    spawnAreaRadius: 15
     numSludgeToSpawn: 0
+    numGasToSpawn: 5
+    areaManager: {fileID: 0}
+    enemiesHaveSpawned: 0
+  - spawnAreaCenter: {fileID: 0}
+    spawnAreaRadius: 20
+    numSludgeToSpawn: 2
+    numGasToSpawn: 5
+    areaManager: {fileID: 0}
+    enemiesHaveSpawned: 0
+  - spawnAreaCenter: {fileID: 0}
+    spawnAreaRadius: 20
+    numSludgeToSpawn: 3
     numGasToSpawn: 4
     areaManager: {fileID: 0}
     enemiesHaveSpawned: 0
   - spawnAreaCenter: {fileID: 0}
-    spawnAreaRadius: 69.9
-    numSludgeToSpawn: 0
+    spawnAreaRadius: 20
+    numSludgeToSpawn: 5
     numGasToSpawn: 4
     areaManager: {fileID: 0}
     enemiesHaveSpawned: 0
   - spawnAreaCenter: {fileID: 0}
-    spawnAreaRadius: 69.9
-    numSludgeToSpawn: 0
-    numGasToSpawn: 4
+    spawnAreaRadius: 20
+    numSludgeToSpawn: 6
+    numGasToSpawn: 3
     areaManager: {fileID: 0}
     enemiesHaveSpawned: 0
   - spawnAreaCenter: {fileID: 0}
-    spawnAreaRadius: 69.9
-    numSludgeToSpawn: 0
-    numGasToSpawn: 4
+    spawnAreaRadius: 30
+    numSludgeToSpawn: 6
+    numGasToSpawn: 5
     areaManager: {fileID: 0}
     enemiesHaveSpawned: 0
   - spawnAreaCenter: {fileID: 0}
-    spawnAreaRadius: 69.9
-    numSludgeToSpawn: 0
-    numGasToSpawn: 4
-    areaManager: {fileID: 0}
-    enemiesHaveSpawned: 0
-  - spawnAreaCenter: {fileID: 0}
-    spawnAreaRadius: 69.9
-    numSludgeToSpawn: 0
-    numGasToSpawn: 4
+    spawnAreaRadius: 30
+    numSludgeToSpawn: 6
+    numGasToSpawn: 5
     areaManager: {fileID: 0}
     enemiesHaveSpawned: 0
 --- !u!114 &5244568340785563921
@@ -168,6 +188,32 @@ MonoBehaviour:
   typeWriterEffect: {fileID: 0}
   messageVisibleDuration: 3
 --- !u!114 &7251527983600727770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 225861933715559730}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3852feb83980b54459602741006f6303, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sludgeInstanceToTest: {fileID: 0}
+--- !u!114 &1991246055000214116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 225861933715559730}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3852feb83980b54459602741006f6303, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sludgeInstanceToTest: {fileID: 0}
+--- !u!114 &5034383044848461681
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
