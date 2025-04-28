@@ -1030,6 +1030,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &990765887 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9036146011851249319, guid: b45f392daa1acad4c844b6451a09cc10, type: 3}
+  m_PrefabInstance: {fileID: 2186934116420761962}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1084069811
 GameObject:
   m_ObjectHideFlags: 0
@@ -1792,11 +1797,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2454310513331098496, guid: b45f392daa1acad4c844b6451a09cc10, type: 3}
   m_PrefabInstance: {fileID: 2186934116420761962}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2186934116420761964 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8242381477547918322, guid: b45f392daa1acad4c844b6451a09cc10, type: 3}
-  m_PrefabInstance: {fileID: 2186934116420761962}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2186934116420761966
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1810,7 +1810,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameSceneName: VinnySceneMikeRevised
-  mainMenuElementsContainer: {fileID: 2186934116420761964}
+  mainMenuElementsContainer: {fileID: 990765887}
   creditsScrollView: {fileID: 601365027}
   creditsBackButton: {fileID: 601365027}
 --- !u!224 &3077153690160190481 stripped
