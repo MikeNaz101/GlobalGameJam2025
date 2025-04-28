@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 public class EnemyBubble : MonoBehaviour
-{
+{/*
     private bool _isFrozen = false;
     private float _freezeEndTime = 0f;
     public float detectionRadius = 5f;  // Range to detect player
@@ -138,6 +138,6 @@ public class EnemyBubble : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
-    }
+    }*/
 }
 

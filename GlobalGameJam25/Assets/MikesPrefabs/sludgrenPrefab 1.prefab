@@ -602,8 +602,8 @@ Transform:
   m_GameObject: {fileID: 8727797066984487304}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: -0.0022, y: -0, z: 0.0059}
-  m_LocalScale: {x: 0.01, y: 0.010000002, z: 0.010000002}
+  m_LocalPosition: {x: 0.00012, y: -0.0088, z: 0.00636}
+  m_LocalScale: {x: 0.0080555, y: 0.008055501, z: 0.008055501}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3518988592856861893}
@@ -4202,7 +4202,8 @@ ParticleSystem:
     multiplyColliderForceByParticleSize: 0
     multiplyColliderForceByParticleSpeed: 0
     multiplyColliderForceByCollisionAngle: 1
-    m_Planes: []
+    m_Planes:
+    - {fileID: 0}
     m_Dampen:
       serializedVersion: 2
       minMaxState: 0
@@ -4362,12 +4363,12 @@ ParticleSystem:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-    minKillSpeed: 0
-    maxKillSpeed: 10000
+    minKillSpeed: 1111
+    maxKillSpeed: 1
     radiusScale: 1
     collidesWith:
       serializedVersion: 2
-      m_Bits: 64
+      m_Bits: 320
     maxCollisionShapes: 256
     quality: 0
     voxelSize: 0.5
@@ -4509,7 +4510,7 @@ ParticleSystem:
         m_RotationOrder: 4
     maxLights: 20
   TrailModule:
-    enabled: 0
+    enabled: 1
     mode: 0
     ratio: 1
     lifetime:
@@ -5356,6 +5357,7 @@ ParticleSystemRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: e0d26ac5540545f49b8acc20473d1d82, type: 2}
+  - {fileID: 2100000, guid: 1a926215a436e2e45b93bbd726d0c634, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5460,6 +5462,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SludgeBody
       objectReference: {fileID: 0}
+    - target: {fileID: -5568371526223589888, guid: 149d5029e9147964db3c42f5a14c9c39, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 149d5029e9147964db3c42f5a14c9c39, type: 3}
       propertyPath: m_Name
       value: sludgrenPrefab 1
@@ -5541,7 +5547,7 @@ MonoBehaviour:
   chaseSound: {fileID: 8300000, guid: 43f14e7c0deee3e4087d7358dfe31b7c, type: 3}
   takeDamageSound: {fileID: 8300000, guid: 157ab3b561e341d4f8cc540928b0469d, type: 3}
   deathSound: {fileID: 8300000, guid: b10d9d84a0772bc4d8032a211f26cdcd, type: 3}
-  ambientGruntSound: {fileID: 8300000, guid: 1e6853f8c12eec54fbaea5e05c3e4b81, type: 3}
+  ambientGruntSound: {fileID: 8300000, guid: bda6f982bee3968468171d55d101dc1a, type: 3}
   deathSoundDelay: 1
   currentState: 0
   patrolRadius: 14.53
@@ -5551,6 +5557,8 @@ MonoBehaviour:
   stoppingDistanceBuffer: 1
   rotationSpeed: 180
   attackSound: {fileID: 8300000, guid: 722225e20ae7ebf44a06de541b5fa288, type: 3}
+  attackEffectInstance: {fileID: 6716933543107358038, guid: a2329f939ad5c7d41ac9b129bbcc3b09, type: 3}
+  attackEffectOrigin: {fileID: 753201606377761684}
   groundLayer:
     serializedVersion: 2
     m_Bits: 64

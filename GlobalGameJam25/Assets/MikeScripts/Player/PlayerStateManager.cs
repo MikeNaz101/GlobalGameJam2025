@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using System; // Needed for Action event
 
+[RequireComponent(typeof(AudioSource))] // Ensure AudioSource is present
 public class PlayerStateManager : MonoBehaviour
 {
     [Header("Animation")]
@@ -18,9 +19,10 @@ public class PlayerStateManager : MonoBehaviour
     public int manaCost = 10; // Base cost per shell / For shell count calc
     public int currentMana;
     public int manaRecoveryRate = 5;
-    public int maxStamina = 100; // Add stamina cost/recovery if using run state stamina
+    public int maxStamina = 100;
     public int currentStamina;
     public int staminaRecoveryRate = 10;
+    public float runStaminaCostPerSecond = 15f; // Stamina cost for running
 
     [Header("Movement Speeds")]
     public float walkSpeed = 10f;
@@ -29,24 +31,23 @@ public class PlayerStateManager : MonoBehaviour
     public float flySpeed = 15f;
     public float jumpForce = 20f; // Ground jump initial strength
     public float flapStrength = 10f; // Flying flap upward strength
-    [HideInInspector] public Vector3 currentHorizontalVelocity = Vector3.zero; // Store horizontal movement decided by state
+    [HideInInspector] public Vector3 currentHorizontalVelocity = Vector3.zero;
 
     [Header("Physics & Ground Check")]
-    public float gravity = -9.81f; // Standard gravity
-    public Transform groundCheck; // Assign in Inspector
+    public float gravity = -9.81f;
+    public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
-    public LayerMask groundLayer; // Assign in Inspector
-    [HideInInspector] public bool isGrounded; // Note: CheckGrounded() is commented out, controller.isGrounded is used
+    public LayerMask groundLayer;
+    [HideInInspector] public bool isGrounded;
     [HideInInspector] public float verticalVelocity = 0f;
-    private bool hasJumped = false; // Used for double jump / flight entry
-    private bool wasGroundedLastFrame = false; // Add this variable
-    
+    private bool hasJumped = false;
+    private bool wasGroundedLastFrame = false;
 
     [Header("Shooting & Abilities")]
-    public BulletSpawnerState bulletSpawner; // Assign in Inspector
-    public Transform firePoint; // Assign in Inspector (Still useful for firing direction/origin)
-    public Transform shellOrbitCenter; // Assign in Inspector (Center for shell spawning/orbiting)
-    public List<GameObject> shellPrefabs; // Assign in Inspector (match BulletType order)
+    public BulletSpawnerState bulletSpawner;
+    public Transform firePoint;
+    public Transform shellOrbitCenter;
+    public List<GameObject> shellPrefabs;
     public float orbitRadius = 2f;
     public float orbitSpeed = 50f;
     [HideInInspector] public int maxShells;
@@ -54,19 +55,29 @@ public class PlayerStateManager : MonoBehaviour
     [HideInInspector] public List<GameObject> orbitingShells = new List<GameObject>();
 
     [Header("Visuals (Optional)")]
-    public GameObject rWingPrefab; // Assign Wing Prefab
-    public GameObject lWingPrefab; // Assign Wing Prefab
-    public Transform rWingPoint; // Assign Wing spawn/attach point
-    public Transform lWingPoint; // Assign Wing spawn/attach point
+    public GameObject rWingPrefab;
+    public GameObject lWingPrefab;
+    public Transform rWingPoint;
+    public Transform lWingPoint;
+
+    // --- Audio ---
+    [Header("Audio")]
+    public AudioClip damageSound;
+    public AudioClip jumpSound;
+    public AudioClip walkFootstepSound;
+    public AudioClip runFootstepSound;
+    public AudioClip shootSound;
+    public AudioClip chargeLoopSound; // Looping sound for charging
+    [HideInInspector] public AudioSource audioSource; // Reference to the AudioSource component
 
     // --- Components ---
     [HideInInspector] public CharacterController controller;
 
     // --- Input Flags / State ---
-    [HideInInspector] public Vector2 movement; // Input value from OnMove
-    [HideInInspector] public bool isSneaking = false; // Toggled by OnSprint
-    [HideInInspector] public bool isRunning = false; // Held true by OnRun
-    [HideInInspector] public bool jumpInputPressedThisFrame = false; // Flag set by OnJump for one frame
+    [HideInInspector] public Vector2 movement;
+    [HideInInspector] public bool isSneaking = false;
+    [HideInInspector] public bool isRunning = false;
+    [HideInInspector] public bool jumpInputPressedThisFrame = false;
 
     // --- State Machine ---
     [HideInInspector] public PlayerBaseState currentState;
@@ -75,111 +86,76 @@ public class PlayerStateManager : MonoBehaviour
     [HideInInspector] public PlayerSneakState sneakState = new PlayerSneakState();
     [HideInInspector] public PlayerRunningState runState = new PlayerRunningState();
     [HideInInspector] public PlayerHitState hitState = new PlayerHitState();
-    //[HideInInspector] public PlayerFlyingState flyingState = new PlayerFlyingState();
-    // TODO: Add a FallingState for better airborne control when not flying
+    // [HideInInspector] public PlayerFlyingState flyingState = new PlayerFlyingState();
     // [HideInInspector] public PlayerFallingState fallingState = new PlayerFallingState();
 
     // ----- XP & Leveling System -----
     [Header("Leveling System")]
     public int currentLevel = 1;
     public int currentXP = 0;
-    public int xpToNextLevel = 100; // Initial requirement for level 2
-    [Tooltip("The base XP required for level 2.")]
+    public int xpToNextLevel = 100;
     public int xpBaseRequirement = 100;
-    [Tooltip("How much the XP requirement increases per level (e.g., 1.5 means 50% more XP needed each level).")]
     public float xpRequirementMultiplier = 1.5f;
-    [Tooltip("The current multiplier applied to bullet effects (damage, duration, etc.). Starts at 1.0 (no bonus).")]
     public float bulletEffectMultiplier = 1.0f;
-    [Tooltip("How much the bulletEffectMultiplier increases each time the player levels up (e.g., 0.05 means +5% effect).")]
     public float effectMultiplierIncreasePerLevel = 0.05f;
 
-    // Optional events for UI updates
+    // Events for UI updates (XP bar should use these via ProgressBarManager or directly)
     public static event Action<int, int> OnXPChanged; // Sends current XP, XP to next level
     public static event Action<int> OnLevelChanged; // Sends new level
     public static event Action<float> OnMultiplierChanged; // Sends new multiplier
-    // ----- END XP & Leveling System -----
-
+    // NOTE: If using Event-Based updates for Health/Mana/Stamina, declare static events here too
 
     void Awake()
     {
         controller = GetComponent<CharacterController>();
+        audioSource = GetComponent<AudioSource>(); // Get the AudioSource
+
         if (controller == null) Debug.LogError("CharacterController not found on Player!");
+        if (audioSource == null) Debug.LogError("AudioSource not found on Player!");
         if (bulletSpawner == null) Debug.LogError("BulletSpawnerState not assigned in the Inspector!");
         if (groundCheck == null) Debug.LogError("GroundCheck Transform not assigned in the Inspector!");
-        if (shellOrbitCenter == null) Debug.LogError("ShellOrbitCenter Transform not assigned in the Inspector!"); // Added check
+        if (shellOrbitCenter == null) Debug.LogError("ShellOrbitCenter Transform not assigned in the Inspector!");
     }
 
     void Start()
     {
         currentHealth = maxHealth;
         currentMana = maxMana;
-        currentStamina = maxStamina; // Initialize stamina
+        currentStamina = maxStamina;
 
-        maxShells = (manaCost > 0) ? maxMana / manaCost : 0; // Calculate max shells safely
+        maxShells = (manaCost > 0) ? maxMana / manaCost : 0;
         currentShells = maxShells;
 
-        UpdateShellVisuals(); // Spawn initial shells
+        UpdateShellVisuals();
 
-        // Start recovery coroutines
         StartCoroutine(RecoverHealthOverTime());
         StartCoroutine(RecoverManaOverTime());
-        StartCoroutine(RecoverStaminaOverTime()); // Add stamina recovery if needed
+        StartCoroutine(RecoverStaminaOverTime()); // Stamina recovery coroutine
 
-        // Initialize Leveling System
-        CalculateXPForNextLevel(); // Set initial XP requirement based on starting level
-        // Invoke initial UI updates if necessary
+        CalculateXPForNextLevel();
+        // Invoke initial UI updates via events for systems listening (like ProgressBarManager if using events)
         OnXPChanged?.Invoke(currentXP, xpToNextLevel);
         OnLevelChanged?.Invoke(currentLevel);
         OnMultiplierChanged?.Invoke(bulletEffectMultiplier);
-        
+        // Note: ProgressBarManager in Update mode will pick up initial values anyway.
+        // If you have a separate StaminaBar script WITHOUT ProgressBarManager, call its init here.
+        // SetupInitialUI(); // Call this if you need to initialize bars outside ProgressBarManager
+
+
         isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore);
-        wasGroundedLastFrame = isGrounded; // Initialize based on starting state
+        wasGroundedLastFrame = isGrounded;
 
-
-        // Start in Idle state
         SwitchState(idleState);
     }
-    /*void OnEnable()
-     {
-        // Subscribe to the Area Cleared event (if using event-based system)
-        AreaCleansingManager.OnAreaCleared += HandleAreaClearedForAnimation;
-     }
-
-     void OnDisable()
-     {
-        // Unsubscribe
-        AreaCleansingManager.OnAreaCleared -= HandleAreaClearedForAnimation;
-     }*/
 
     // --- Input System Handlers ---
     void OnMove(InputValue value) { movement = value.Get<Vector2>(); }
-    void OnSprint(InputValue value) { if (value.isPressed) isSneaking = !isSneaking; } // Toggle Sneak on press
-    void OnRun(InputValue value) { isRunning = value.isPressed; } // Hold Run
-    /*void OnJump()
-    {
-        Debug.Log("Jump Input Received"); // Simplified log
-        if (controller.isGrounded)
-        {
-            Debug.Log("Performing Ground Jump");
-            hasJumped = true;
-            Jump(); // Handle ground jump
-            // --- Animation Trigger ---
-            animationManager?.TriggerJump(); // Safely call the trigger method
-        }
-        else
-        {
-            Debug.Log("Jump Input while airborne (no action defined)");
-            // Add double jump / flight entry logic here if desired
-        }
-        // The jumpInputPressedThisFrame = true logic was commented out, keep as is unless needed for other states like flying
-    }*/
+    void OnSprint(InputValue value) { if (value.isPressed) isSneaking = !isSneaking; }
+    void OnRun(InputValue value) { isRunning = value.isPressed; }
 
     void OnFire(InputValue value)
     {
-        if (PauseMenuController.GameIsPaused)
-        {
-            return; // Exit the Update method early
-        }
+        if (PauseMenuController.GameIsPaused) return; // Assuming PauseMenuController exists
         PlayerShooting shooter = GetComponent<PlayerShooting>();
         if (shooter == null) return;
         if (value.isPressed) shooter.StartCharge();
@@ -203,45 +179,24 @@ public class PlayerStateManager : MonoBehaviour
         }
     }
 
-    // --- Core Update Loop ---
     void Update()
     {
-        HandleGroundCheck(); // Call the ground check logic
-        ApplyGravity();      // Apply gravity based on the check
-        HandleMovement();    // Handle state updates and movement application
+        HandleGroundCheck();
+        ApplyGravity();
+        HandleMovement(); // This calls currentState.UpdateState()
 
-        
-        // Ground check using CharacterController.isGrounded
-        //isGrounded = controller.isGrounded; // Update internal isGrounded flag
-        //Debug.Log($"Frame {Time.frameCount} - isGrounded: {controller.isGrounded} | Vertical Velocity: {verticalVelocity}");
-        // --- Apply Combined Movement ---
-        // Combine horizontal velocity from the state and vertical velocity from gravity/jump
+        // Apply final calculated movement (horizontal from state + vertical from gravity/jump)
         Vector3 finalVelocity = currentHorizontalVelocity + (Vector3.up * verticalVelocity);
         controller.Move(finalVelocity * Time.deltaTime);
 
-        /*if (isGrounded && verticalVelocity < 0)
-        {
-            verticalVelocity = -2f; // Keep player grounded
-            hasJumped = false; // Reset jump flag when grounded
-        }
-        else
-        {
-            // Apply gravity when not grounded
-            verticalVelocity += gravity * Time.deltaTime;
-        }*/
-
-        // --- State Update ---
-        //currentState?.UpdateState(this);
-
-        // --- Reset Per-Frame Input Flags ---
-        //jumpInputPressedThisFrame = false;
-
-        // --- Other Updates ---
-        UpdateShellPositions(); // Update orbiting shell visuals
+        UpdateShellPositions();
         wasGroundedLastFrame = isGrounded;
     }
 
     // --- Player Movement ---
+    // Note: This method is primarily called BY states, not directly used for movement logic here.
+    // States calculate direction/speed and set currentHorizontalVelocity instead.
+    // Keep it if states need a direct Move call for specific scenarios.
     public void MovePlayer(Vector3 horizontalDirection, float speed)
     {
         horizontalDirection.y = 0;
@@ -249,138 +204,223 @@ public class PlayerStateManager : MonoBehaviour
         controller.Move(finalMovement * Time.deltaTime);
     }
 
+
     void HandleGroundCheck()
     {
-        // --- Perform the Sphere Check ---
-        isGrounded = Physics.CheckSphere(
-            groundCheck.position,  // Position of the sphere (assign/position this empty GameObject at player's feet)
-            groundCheckRadius,     // How large the sphere is
-            groundLayer,           // Which layers count as ground? (Set in Inspector)
-            QueryTriggerInteraction.Ignore // Usually ignore triggers for ground checks
-        );
-        // ---------------------------------
-
-        // Optional Debugging: Visualize if grounded
-        // if(isGrounded) Debug.Log($"Frame {Time.frameCount} - Grounded (CheckSphere)");
-        // else Debug.Log($"Frame {Time.frameCount} - Not Grounded (CheckSphere)");
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore);
     }
 
     void ApplyGravity()
     {
-        // --- Detect state change ---
-        // 'justLanded' is true only on the frame we transition from !isGrounded to isGrounded
         bool justLanded = !wasGroundedLastFrame && isGrounded;
 
-        // --- Apply logic based on state ---
         if (justLanded)
         {
-            // LANDING FRAME: Apply a small downward velocity ONCE to ensure solid contact.
-            // This replaces the continuous sticking force. -0.5f is usually sufficient.
-            verticalVelocity = -0.5f;
-            Debug.Log($"Just Landed - Setting Vertical Velocity: {verticalVelocity}");
-            // Reset jump flag here as well
+            verticalVelocity = -0.5f; // Stick slightly on landing
             hasJumped = false;
         }
-        else if (isGrounded) // If grounded, but NOT the first frame of landing
+        else if (isGrounded)
         {
-            // STILL GROUNDED: Don't apply continuous downward force.
-            // Setting to 0 prevents accumulation of negative velocity from the previous frame's landing impulse
-            // or potential minor physics bumps. Only do this if velocity is negative.
-            if (verticalVelocity < 0f)
-            {
-                verticalVelocity = 0f;
-                // Debug.Log("Still Grounded - Clamping Negative Vertical Velocity to 0");
-            }
-            // Still reset jump flag while grounded
+            // Prevent accumulating negative velocity while grounded
+            if (verticalVelocity < 0f) { verticalVelocity = 0f; }
             hasJumped = false;
         }
-        else // AIRBORNE: Player is not grounded (!isGrounded)
+        else // Airborne
         {
-            // Apply gravity as usual
             verticalVelocity += gravity * Time.deltaTime;
         }
     }
 
     void HandleMovement()
     {
-         // --- State Update ---
-        currentState?.UpdateState(this); // States can now use the reliable isGrounded
-
-         // Player movement is handled within states, calling MovePlayer
-         // MovePlayer already includes verticalVelocity, so it uses the gravity calculated in ApplyGravity
+        // Delegate state logic (which includes setting currentHorizontalVelocity)
+        currentState?.UpdateState(this);
     }
 
     // --- Jump Logic ---
     void OnJump()
     {
         Debug.Log("Jump Input Received");
-        // --- Use the manually updated isGrounded flag ---
-        if (isGrounded) // Check our reliable flag
+        if (isGrounded) // Use our reliable ground check flag
         {
             Debug.Log("Performing Ground Jump");
             hasJumped = true;
             Jump(); // Calculate vertical velocity
-            Debug.Log($"Attempting to call TriggerJump. animationManager is null? {animationManager == null}");
             animationManager?.TriggerJump();
+
+            // --- Play Jump Sound ---
+            PlaySoundOneShot(jumpSound); // Play the jump grunt
+            // ----------------------
         }
-        // ---------------------------------------------
         else
         {
             Debug.Log("Jump Input while airborne (no action defined)");
-            // Coyote Time logic could go here (See Alternative 2)
         }
     }
 
-    // The Jump() method itself remains the same:
     public void Jump()
     {
+        // Calculate the upward velocity needed to reach the desired jump height
         verticalVelocity = Mathf.Sqrt(jumpForce * -2f * gravity);
-        // isGrounded will become false on the next HandleGroundCheck() after Move() applies velocity
     }
-
 
     // --- Damage & Death ---
     public void TakeDamage(int damage)
     {
         if (currentHealth > 0 && currentState != hitState)
         {
-            // --- Animation Trigger ---
+            // --- Play Damage Sound ---
+            PlaySoundOneShot(damageSound); // Play the damage grunt
+            // -------------------------
             Debug.Log($"Attempting to call TriggerHit. animationManager is null? {animationManager == null}");
-            animationManager?.TriggerHit(); // Trigger BEFORE changing state potentially
-            hitState.SetDamage(damage);
+            animationManager?.TriggerHit();
+            hitState.SetDamage(damage); // Pass damage amount to HitState if needed
             SwitchState(hitState);
+            // Update Health value (HitState might reduce it, or do it here)
+            currentHealth -= damage;
+            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+            // If using events for health bar: OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            if (currentHealth <= 0) { Die(); } // Check for death immediately after taking damage
         }
-        else if (currentHealth <= 0)
-        {
-            // Already dead or dying, ensure Die is called or handled appropriately
-            Die(); // Could potentially call Die here, but HitState likely handles it
-        }
+        // Removed else if (currentHealth <= 0) as it's handled above now.
     }
+
 
     public void Die()
     {
         Debug.Log("Player Died! Loading End Scene...");
-        // Consider disabling controls, playing effects etc.
-        // controller.enabled = false;
+        // Add death animation/effects trigger here if desired
+        // animationManager?.TriggerDeath();
+        // Stop player input/movement if needed
+        this.enabled = false; // Disable this script
+        controller.enabled = false; // Disable character controller
+        // Load end scene after a short delay?
         SceneManager.LoadScene("EndScene"); // Ensure "EndScene" is in Build Settings
     }
 
     // --- Mana & Shells ---
-    public bool UseMana(int mCost) // Removed redundant player parameter
+    public bool UseMana(int mCost)
     {
         if (currentMana >= mCost)
         {
             currentMana -= mCost;
             currentMana = Mathf.Clamp(currentMana, 0, maxMana);
-            UpdateShellCountVisuals();
+            UpdateShellCountVisuals(); // Update orbiting shells based on new mana
+            // If using events for mana bar: OnManaChanged?.Invoke(currentMana, maxMana);
             return true;
         }
         else
         {
-            return false;
+            return false; // Not enough mana
         }
     }
 
+    // --- Stamina ---
+    public bool UseStamina(float amount)
+    {
+        if (currentStamina > 0) // Check if there's *any* stamina left
+        {
+            currentStamina -= (int)amount; // Deduct stamina
+            currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina); // Ensure it doesn't go below 0
+            // REMOVED: FindObjectOfType<StaminaBar>()?.SetStamina(currentStamina);
+            // ProgressBarManager will handle the UI update.
+            // If using events for stamina bar: OnStaminaChanged?.Invoke(currentStamina, maxStamina);
+            return true; // Indicate stamina was used (even if it hit 0 this frame)
+        }
+        return false; // Indicate no stamina was available to use
+    }
+
+
+    // --- Recovery Coroutines ---
+    private IEnumerator RecoverHealthOverTime()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(5f); // How often to recover
+            if (currentHealth < maxHealth && currentHealth > 0) // Don't recover if dead or full
+            {
+                currentHealth += healthRecoveryRate;
+                currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+                // If using events for health bar: OnHealthChanged?.Invoke(currentHealth, maxHealth);
+                // ProgressBarManager will handle the UI update.
+            }
+        }
+    }
+    private IEnumerator RecoverManaOverTime()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1f); // How often to recover
+            if (currentMana < maxMana)
+            {
+                currentMana += manaRecoveryRate;
+                currentMana = Mathf.Clamp(currentMana, 0, maxMana);
+                UpdateShellCountVisuals(); // Update shells as mana recovers
+                // If using events for mana bar: OnManaChanged?.Invoke(currentMana, maxMana);
+                // ProgressBarManager will handle the UI update.
+            }
+        }
+    }
+    private IEnumerator RecoverStaminaOverTime()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1f); // Check every second
+            // Recover ONLY if not running AND stamina is below max
+            if (currentState != runState && currentStamina < maxStamina)
+            {
+                currentStamina += staminaRecoveryRate;
+                currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+                 // REMOVED: FindObjectOfType<StaminaBar>()?.SetStamina(currentStamina);
+                 // ProgressBarManager will handle the UI update.
+                 // If using events for stamina bar: OnStaminaChanged?.Invoke(currentStamina, maxStamina);
+            }
+        }
+    }
+
+    // --- Audio Helper Methods ---
+    public void PlaySoundOneShot(AudioClip clip, float volumeScale = 1.0f)
+    {
+        if (audioSource != null && clip != null)
+        {
+            audioSource.PlayOneShot(clip, volumeScale);
+        }
+    }
+
+    public void PlayLoopingSound(AudioClip clip, bool loop = true)
+    {
+        if (audioSource != null && clip != null)
+        {
+            audioSource.clip = clip;
+            audioSource.loop = loop;
+            audioSource.Play();
+        }
+    }
+
+    public void StopLoopingSound()
+    {
+        if (audioSource != null && audioSource.loop) // Only stop if it was looping
+        {
+             audioSource.Stop();
+             audioSource.clip = null; // Clear the clip to prevent accidental replay
+             audioSource.loop = false;
+        }
+    }
+
+
+    // --- State Switching ---
+    public void SwitchState(PlayerBaseState newState)
+    {
+        if (newState == null || newState == currentState) return;
+
+        currentState?.ExitState(this);
+        // Debug.Log($"Switching from {currentState?.GetType().Name ?? "None"} to {newState.GetType().Name}"); // Optional log
+        currentState = newState;
+        currentState.EnterState(this);
+    }
+
+
+    // --- Shell Visuals --- (Keep these methods as they are)
     public void UpdateShellCountVisuals()
     {
         if (manaCost <= 0) return;
@@ -402,155 +442,67 @@ public class PlayerStateManager : MonoBehaviour
         currentShells = targetShells;
     }
 
-    // --- Modified Shell Spawning ---
     void SpawnSpiritBubbleShells()
     {
-        // Check essential dependencies including the new shellOrbitCenter
         if (bulletSpawner == null || shellPrefabs == null || shellPrefabs.Count == 0 || manaCost <= 0 || shellOrbitCenter == null)
         {
-            Debug.LogError("Cannot spawn shells: Dependencies missing (BulletSpawner, ShellPrefabs, ShellOrbitCenter), manaCost is zero, or ShellOrbitCenter is not assigned.");
+            Debug.LogError("Cannot spawn shells: Dependencies missing.");
             return;
         }
         int currentTypeIndex = (int)bulletSpawner.CurrentBulletType;
         if (currentTypeIndex < 0 || currentTypeIndex >= shellPrefabs.Count || shellPrefabs[currentTypeIndex] == null)
         {
-            Debug.LogError($"Invalid shell prefab index {currentTypeIndex}. Check shellPrefabs list.");
-            currentTypeIndex = 0; // Fallback
-            if (shellPrefabs.Count == 0 || shellPrefabs[0] == null) return; // No valid fallback
+             Debug.LogError($"Invalid shell prefab index {currentTypeIndex}. Check shellPrefabs list.");
+             currentTypeIndex = 0;
+             if (shellPrefabs.Count == 0 || shellPrefabs[0] == null) return;
         }
         GameObject shellPrefabToSpawn = shellPrefabs[currentTypeIndex];
 
-        // Clear existing shells
         foreach (GameObject oldShell in orbitingShells) { if (oldShell != null) Destroy(oldShell); }
         orbitingShells.Clear();
 
         maxShells = maxMana / manaCost;
         currentShells = Mathf.Clamp(currentMana / manaCost, 0, maxShells);
-
-        // Use the assigned Transform's position as the center point for spawning
         Vector3 centerPoint = shellOrbitCenter.position;
 
-        // Spawn max potential shells around the centerPoint
         for (int i = 0; i < maxShells; i++)
         {
-            float angle = i * (360f / Mathf.Max(1, maxShells)); // Avoid division by zero
-            // Calculate orbital position relative to the centerPoint
-            float x = centerPoint.x + orbitRadius * Mathf.Cos(angle * Mathf.Deg2Rad);
-            float z = centerPoint.z + orbitRadius * Mathf.Sin(angle * Mathf.Deg2Rad);
-            Vector3 spawnPosition = new Vector3(x, centerPoint.y, z); // Use centerPoint's y
+             float angle = i * (360f / Mathf.Max(1, maxShells));
+             float x = centerPoint.x + orbitRadius * Mathf.Cos(angle * Mathf.Deg2Rad);
+             float z = centerPoint.z + orbitRadius * Mathf.Sin(angle * Mathf.Deg2Rad);
+             Vector3 spawnPosition = new Vector3(x, centerPoint.y, z);
 
-            // Instantiate and parent the shell
-            GameObject shell = Instantiate(shellPrefabToSpawn, spawnPosition, Quaternion.identity, transform); // Consider parenting to shellOrbitCenter? Or keep on player?
-            orbitingShells.Add(shell);
+             GameObject shell = Instantiate(shellPrefabToSpawn, spawnPosition, Quaternion.identity, shellOrbitCenter); // Parent to center
+             orbitingShells.Add(shell);
 
-            // Enable renderer based on current available mana/shells
-            Renderer shellRenderer = shell.GetComponent<Renderer>();
-            if (shellRenderer != null) { shellRenderer.enabled = (i < currentShells); }
+             Renderer shellRenderer = shell.GetComponent<Renderer>();
+             if (shellRenderer != null) { shellRenderer.enabled = (i < currentShells); }
         }
     }
+
 
     public void UpdateShellVisuals()
     {
-        SpawnSpiritBubbleShells(); // This is called on type change or initialization
+        SpawnSpiritBubbleShells();
     }
 
-    // --- Modified Shell Orbiting ---
     void UpdateShellPositions()
     {
-        // Ensure the orbit center is assigned
-        if (shellOrbitCenter == null)
-        {
-            // Optional: Log warning only once or less frequently
-            // Debug.LogWarning("ShellOrbitCenter is not assigned. Shells cannot update position.");
-            return; // Stop updating if center is missing
-        }
-
-        // Use the assigned Transform's position as the orbit center
-        Vector3 orbitCenter = shellOrbitCenter.position;
-
-        // Update position for each active shell
-        for (int i = 0; i < orbitingShells.Count; i++)
-        {
-            if (orbitingShells[i] != null)
-            {
-                // Calculate angle based on time, speed, and index
-                float angle = Time.time * orbitSpeed + (i * 360f / Mathf.Max(1, maxShells)); // Avoid division by zero if maxShells is 0
-                // Calculate world position based on orbit parameters
-                float x = orbitCenter.x + orbitRadius * Mathf.Cos(angle * Mathf.Deg2Rad);
-                float z = orbitCenter.z + orbitRadius * Mathf.Sin(angle * Mathf.Deg2Rad);
-                float y = orbitCenter.y; // Orbit horizontally at the center's height
-                // Apply the calculated position
-                orbitingShells[i].transform.position = new Vector3(x, y, z);
-                // Optional: Make shells face the orbit center
-                // orbitingShells[i].transform.LookAt(orbitCenter);
-            }
-        }
+        if (shellOrbitCenter == null) return;
+        Vector3 orbitCenter = shellOrbitCenter.position; // Get position every frame
+        // Use local rotation for orbiting the center point
+        shellOrbitCenter.Rotate(Vector3.up, orbitSpeed * Time.deltaTime);
     }
 
-
-    // --- State Switching ---
-    public void SwitchState(PlayerBaseState newState)
-    {
-        if (newState == null || newState == currentState) return;
-
-        currentState?.ExitState(this);
-        // Debug.Log($"Switching from {currentState?.GetType().Name ?? "None"} to {newState.GetType().Name}"); // Optional state change logging
-        currentState = newState;
-        currentState.EnterState(this);
-    }
-
-    // --- Recovery Coroutines ---
-    private IEnumerator RecoverHealthOverTime()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(5f);
-            if (currentHealth < maxHealth && currentHealth > 0)
-            {
-                currentHealth += healthRecoveryRate;
-                currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-                // Update UI if needed
-            }
-        }
-    }
-    private IEnumerator RecoverManaOverTime()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(1f);
-            if (currentMana < maxMana)
-            {
-                currentMana += manaRecoveryRate;
-                currentMana = Mathf.Clamp(currentMana, 0, maxMana);
-                UpdateShellCountVisuals(); // Update shells as mana recovers
-            }
-        }
-    }
-    private IEnumerator RecoverStaminaOverTime()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(1f);
-            // Recover only if not performing stamina-draining actions (e.g., not running)
-            if (currentState != runState && currentStamina < maxStamina)
-            { // Example condition
-                currentStamina += staminaRecoveryRate;
-                currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
-                // Update UI if needed
-            }
-        }
-    }
 
     // --- Gizmos ---
     void OnDrawGizmosSelected()
     {
-        // Draw ground check sphere gizmo
         if (groundCheck != null)
         {
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
         }
-        // Draw orbit radius gizmo around the shellOrbitCenter
         if (shellOrbitCenter != null)
         {
             Gizmos.color = Color.cyan;
@@ -559,30 +511,20 @@ public class PlayerStateManager : MonoBehaviour
     }
 
     // ----- XP & Leveling Methods -----
-
     private void CalculateXPForNextLevel()
     {
-        // Formula: Base * Multiplier^(Level-1)
-        // Level 1 -> 2: Base * Multiplier^0 = Base
-        // Level 2 -> 3: Base * Multiplier^1 = Base * Multiplier
-        // Level 3 -> 4: Base * Multiplier^2 = Base * Multiplier * Multiplier
-        if (currentLevel <= 0) currentLevel = 1; // Sanity check
+        if (currentLevel <= 0) currentLevel = 1;
         xpToNextLevel = Mathf.FloorToInt(xpBaseRequirement * Mathf.Pow(xpRequirementMultiplier, currentLevel - 1));
-        // Ensure XP requirement is at least 1
         xpToNextLevel = Mathf.Max(1, xpToNextLevel);
     }
 
     public void GainXP(int amount)
     {
         if (amount <= 0) return;
-
         currentXP += amount;
         Debug.Log($"Gained {amount} XP. Current XP: {currentXP}/{xpToNextLevel}");
+        OnXPChanged?.Invoke(currentXP, xpToNextLevel); // Event for UI
 
-        // Invoke UI update for XP change
-        OnXPChanged?.Invoke(currentXP, xpToNextLevel);
-
-        // Check for level up
         while (currentXP >= xpToNextLevel)
         {
             LevelUp();
@@ -592,30 +534,29 @@ public class PlayerStateManager : MonoBehaviour
     private void LevelUp()
     {
         currentLevel++;
-        int excessXP = currentXP - xpToNextLevel; // Calculate leftover XP
-        currentXP = excessXP; // Carry over excess XP
+        int excessXP = currentXP - xpToNextLevel;
+        currentXP = excessXP;
 
-        // Increase the bullet effect multiplier
         bulletEffectMultiplier += effectMultiplierIncreasePerLevel;
-
-        // Calculate the requirement for the *next* level
-        CalculateXPForNextLevel();
+        CalculateXPForNextLevel(); // Calculate for the *new* next level
 
         Debug.Log($"<color=lime>LEVEL UP! Reached Level {currentLevel}. Multiplier: {bulletEffectMultiplier:F2}. Next Level at {xpToNextLevel} XP.</color>");
-        // --- Animation Trigger ---
         animationManager?.TriggerCelebrate();
 
-        // Invoke UI updates for level and multiplier change
+        // Invoke events for UI update
         OnLevelChanged?.Invoke(currentLevel);
         OnMultiplierChanged?.Invoke(bulletEffectMultiplier);
-        // Invoke XP change again to reflect the new target and excess XP
-        OnXPChanged?.Invoke(currentXP, xpToNextLevel);
+        OnXPChanged?.Invoke(currentXP, xpToNextLevel); // Update XP bar with new target and current XP
 
-        // --- Add any level-up effects here! ---
-        // e.g., Play sound, particle effects, maybe refill health/mana?
+        // Refill stats on level up
         currentHealth = maxHealth;
         currentMana = maxMana;
-        UpdateShellCountVisuals(); // Update shells if mana refilled
+        currentStamina = maxStamina; // Refill stamina too
+        UpdateShellCountVisuals();
+        // If using events:
+        // OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        // OnManaChanged?.Invoke(currentMana, maxMana);
+        // OnStaminaChanged?.Invoke(currentStamina, maxStamina);
     }
 
     // --- NEW Method for Teleport Bullet to Call ---
@@ -625,12 +566,26 @@ public class PlayerStateManager : MonoBehaviour
         animationManager?.TriggerTeleported();
     }
 
-    // Optional: Method to manually set level/XP for testing
+    // --- Optional: Debug Methods ---
     [ContextMenu("Add 50 XP")]
     void DebugAddXP() { GainXP(50); }
 
     [ContextMenu("Level Up Manually")]
     void DebugLevelUp() { GainXP(xpToNextLevel - currentXP); }
 
-    // ----- END XP & Leveling Methods -----
-}
+    // --- Optional: UI Initialization Helper (if NOT solely relying on ProgressBarManager) ---
+    /*
+    void SetupInitialUI()
+    {
+        // Example for StaminaBar if used independently
+        var staminaBar = FindObjectOfType<StaminaBar>();
+        if (staminaBar != null)
+        {
+            staminaBar.SetMaxStats(maxStamina);
+            staminaBar.SetStamina(currentStamina);
+        }
+        // Add similar setup for Health/Mana if needed
+    }
+    */
+
+} // End of PlayerStateManager class

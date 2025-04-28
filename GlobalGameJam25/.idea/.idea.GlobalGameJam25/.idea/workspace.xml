@@ -6,13 +6,26 @@
   <component name="ChangeListManager">
     <list default="true" id="fce460ab-96da-436b-be79-13280ac23597" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GlobalGameJam25/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GlobalGameJam25/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Base/BaseEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Base/BaseEnemy.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Enemy Types/GasEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Enemy Types/GasEnemy.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Enemy Types/SludgeEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/Enemy Types/SludgeEnemy.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Environment/AreaCleansingManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Environment/AreaCleansingManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemyBubble.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemyBubble.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemyProjectile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Enemy/EnemyProjectile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerProjectile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerProjectile.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerShooting.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerShooting.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerStateManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/PlayerStateManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/BulletStates/BasicBullet.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/BulletStates/BasicBullet.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/PlayerStates/PlayerWalkingState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikeScripts/Player/StateMachine/PlayerStates/PlayerWalkingState.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikesPrefabs/GameManager.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikesPrefabs/GameManager.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/MikesPrefabs/PlayerPrefab 1.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikesPrefabs/PlayerPrefab 1.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/MikesPrefabs/SmogType.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikesPrefabs/SmogType.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/MikesPrefabs/sludgrenPrefab 1.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/MikesPrefabs/sludgrenPrefab 1.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Simple FX Kit/Prefabs/Smoke.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Simple FX Kit/Prefabs/Smoke.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/EndScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/EndScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/MainGame.unity" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/MainGame.unity.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/VinnySceneMikeRevised.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/VinnySceneMikeRevised.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Simple FX Kit/Prefabs/SLudgeAttack.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Simple FX Kit/Prefabs/SLudgeAttack.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Anton SDF.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Anton SDF.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,7 +135,7 @@
       <workItem from="1745554824959" duration="5109000" />
       <workItem from="1745720299804" duration="9302000" />
       <workItem from="1745784122639" duration="3604000" />
-      <workItem from="1745796989644" duration="3416000" />
+      <workItem from="1745796989644" duration="19830000" />
     </task>
     <servers />
   </component>

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public class PlayerProjectile : MonoBehaviour
-{
+{/*
     public int damage = 20; // Adjust as needed
     public float speed = 15f;
     public float lifetime = 5f;
@@ -28,12 +28,12 @@ public class PlayerProjectile : MonoBehaviour
         if (other.CompareTag("Enemy"))
         {
             Debug.Log("Projectile hit the Enemy!");
-            EnemyBubble enemy = other.GetComponent<EnemyBubble>();
+            EnemyBubble enemy = other.GetComponent<BaseEnemy>();
             if (enemy != null)
             {
                 enemy.EnemyTakeDamage(damage);
                 Destroy(gameObject); // Destroy projectile on impact
             }
         }
-    }
+    }*/
 }

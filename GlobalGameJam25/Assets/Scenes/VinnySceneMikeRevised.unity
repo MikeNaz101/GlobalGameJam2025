@@ -337,58 +337,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: TargetLight 2
       objectReference: {fileID: 0}
-    - target: {fileID: 1179590729169339495, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
-      propertyPath: m_Color.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1179590729169339495, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
-      propertyPath: m_Color.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1179590729169339495, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
-      propertyPath: m_Color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1179590729169339495, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
-      propertyPath: m_Color.r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1179590729169339495, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
-      propertyPath: m_BoundingSphereOverride.w
-      value: 1e-45
-      objectReference: {fileID: 0}
-    - target: {fileID: 1179590729169339495, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
-      propertyPath: m_BoundingSphereOverride.x
-      value: 2.324013e+12
-      objectReference: {fileID: 0}
-    - target: {fileID: 1179590729169339495, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
-      propertyPath: m_BoundingSphereOverride.y
-      value: 1e-45
-      objectReference: {fileID: 0}
-    - target: {fileID: 1179590729169339495, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
-      propertyPath: m_BoundingSphereOverride.z
-      value: 1.445e-42
-      objectReference: {fileID: 0}
-    - target: {fileID: 2743105213488833596, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
-      propertyPath: LightsModule.color
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2743105213488833596, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
-      propertyPath: InitialModule.startColor.maxColor.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2743105213488833596, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
-      propertyPath: InitialModule.startColor.maxColor.g
-      value: 0.97136056
-      objectReference: {fileID: 0}
-    - target: {fileID: 2743105213488833596, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
-      propertyPath: InitialModule.startColor.maxColor.r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7070703062923327899, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
-      propertyPath: m_RenderMode
-      value: 5
-      objectReference: {fileID: 0}
     - target: {fileID: 7534424879350441737, guid: 92e1e3c10d1cc7947b000bdd0eca3e96, type: 3}
       propertyPath: m_LocalPosition.x
       value: 938.3
@@ -7209,6 +7157,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b8886632ee96bea488076610dc6409a4, type: 3}
+--- !u!1001 &2527970335307445813
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7336813967405913087, guid: 5e2ad22e3e747d74e806d0ddb87a693c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 587.87
+      objectReference: {fileID: 0}
+    - target: {fileID: 7336813967405913087, guid: 5e2ad22e3e747d74e806d0ddb87a693c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 63.28
+      objectReference: {fileID: 0}
+    - target: {fileID: 7336813967405913087, guid: 5e2ad22e3e747d74e806d0ddb87a693c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 682.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 7336813967405913087, guid: 5e2ad22e3e747d74e806d0ddb87a693c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7336813967405913087, guid: 5e2ad22e3e747d74e806d0ddb87a693c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7336813967405913087, guid: 5e2ad22e3e747d74e806d0ddb87a693c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7336813967405913087, guid: 5e2ad22e3e747d74e806d0ddb87a693c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7336813967405913087, guid: 5e2ad22e3e747d74e806d0ddb87a693c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7336813967405913087, guid: 5e2ad22e3e747d74e806d0ddb87a693c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7336813967405913087, guid: 5e2ad22e3e747d74e806d0ddb87a693c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8667505349662841607, guid: 5e2ad22e3e747d74e806d0ddb87a693c, type: 3}
+      propertyPath: m_Name
+      value: SmogAttack
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5e2ad22e3e747d74e806d0ddb87a693c, type: 3}
 --- !u!1001 &2785406825762312637
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7746,3 +7751,4 @@ SceneRoots:
   - {fileID: 192082734}
   - {fileID: 869765063}
   - {fileID: 2178865236350778996}
+  - {fileID: 2527970335307445813}

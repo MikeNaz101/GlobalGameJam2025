@@ -2,52 +2,55 @@ using UnityEngine;
 
 public class PlayerWalkingState : PlayerBaseState
 {
+    private float footstepTimer = 0f;
+    private float timeBetweenFootsteps = 0.5f; // Adjust based on walk speed and preference
+
     public override void EnterState(PlayerStateManager player)
     {
         Debug.Log("Entering Walking State");
+        footstepTimer = 0f; // Reset timer on entering state
     }
 
     public override void UpdateState(PlayerStateManager player)
     {
-        if (player.movement.magnitude < 0.1f) {
+        // --- Transitions ---
+        if (player.movement.magnitude < 0.1f)
+        {
             player.SwitchState(player.idleState);
-            return; // Exit early after state switch
+            return;
         }
-        if (player.isRunning && !player.isSneaking) {
+        // Transition to Run: Check shift key AND if player HAS STAMINA
+        if (player.isRunning && !player.isSneaking && player.currentStamina > 0)
+        {
             player.SwitchState(player.runState);
             return;
         }
-        // --- Calculate Character Body-Relative Movement ---
+        if (player.isSneaking) // Check for sneak transition
+        {
+            player.SwitchState(player.sneakState);
+            return;
+        }
 
-        // 1. Get Input
-        Vector2 input = player.movement; // e.g., (0, 1) for forward, (1, 0) for right
-
-        // 2. Get Character's Local Directions
-        // Get the forward/right vectors directly from the player's transform
-        // (which is being rotated by PlayerBodyRotator)
-        Vector3 bodyForward = player.transform.forward; // Player's current forward direction (Blue Axis)
-        Vector3 bodyRight = player.transform.right;   // Player's current right direction (Red Axis)
-
-        // Note: For standard CharacterController setups that don't tilt the main object,
-        // these vectors are usually already horizontal (Y=0). If your main player object *can* tilt,
-        // and you want purely horizontal ground movement, you might flatten these:
-        // bodyForward.y = 0; bodyRight.y = 0; bodyForward.Normalize(); bodyRight.Normalize();
-        // However, start without flattening first.
-
-        // 3. Calculate World-Space Move Direction based on Body Axes and Input
-        // Combine local directions scaled by input
+        // --- Movement Calculation (same as before) ---
+        Vector2 input = player.movement;
+        Vector3 bodyForward = player.transform.forward;
+        Vector3 bodyRight = player.transform.right;
         Vector3 desiredMoveDirection = (bodyForward * input.y) + (bodyRight * input.x);
+        player.currentHorizontalVelocity = desiredMoveDirection.normalized * player.walkSpeed; // Normalize direction
 
-        // 4. Set Horizontal Velocity for the State Manager
-        // No need to normalize desiredMoveDirection if input magnitude handles partial movement (like gamepad stick)
-        player.currentHorizontalVelocity = desiredMoveDirection * player.walkSpeed;
-
-        // 5. Rotation is handled entirely by PlayerBodyRotator based on Mouse X.
-        // The movement direction automatically follows the body's rotation.
-        // No specific rotation logic is needed here.
-        
+        // --- Footstep Sound ---
+        footstepTimer -= Time.deltaTime;
+        if (footstepTimer <= 0f)
+        {
+            player.PlaySoundOneShot(player.walkFootstepSound); // Play walk sound
+            footstepTimer = timeBetweenFootsteps; // Reset timer
+        }
+        // --------------------
     }
 
-
-     public override void ExitState(PlayerStateManager player) { }
+    public override void ExitState(PlayerStateManager player)
+    {
+        // Optional: Reset horizontal velocity if needed, though the next state will likely set it.
+        // player.currentHorizontalVelocity = Vector3.zero;
+    }
 }

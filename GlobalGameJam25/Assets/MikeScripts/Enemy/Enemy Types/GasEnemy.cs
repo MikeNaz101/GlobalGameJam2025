@@ -1,8 +1,6 @@
 using UnityEngine;
 
 // Requires the updated BaseEnemy script.
-// May also require an EnemyBubble script if that component is used.
-// //[RequireComponent(typeof(EnemyBubble))]
 public class GasEnemy : BaseEnemy
 {
     [Header("Gas Specific Stats")]
@@ -10,8 +8,10 @@ public class GasEnemy : BaseEnemy
     public float patrolRadius = 15f;
     [Tooltip("Range at which the enemy starts attacking.")]
     public float attackRange = 10f;
+    [Tooltip("Damage dealt by each projectile.")]
+    public int projectileDamage = 5; // Damage value for the projectile
     [Tooltip("The projectile prefab to instantiate when attacking.")]
-    public GameObject projectilePrefab;
+    public GameObject projectilePrefab; // Assign your new EnemyProjectile prefab
     [Tooltip("The point from which projectiles are fired.")]
     public Transform firePoint;
     [Tooltip("The speed of the fired projectiles.")]
@@ -21,38 +21,35 @@ public class GasEnemy : BaseEnemy
     [Tooltip("Damage reduction factor against 'Basic' damage type when not frozen (0.1 = 90% reduction, 1 = no reduction).")]
     [Range(0.1f, 1f)]
     public float basicDamageReductionFactor = 0.5f; // Takes 50% damage from Basic type
+    [Tooltip("How fast the enemy rotates to face its target (degrees per second).")]
+    public float rotationSpeed = 180f;
+    [Tooltip("How fast the wobble effect oscillates.")]
+    public float wobbleSpeed = 1.5f;
+    [Tooltip("How high the wobble effect moves the enemy.")]
+    public float wobbleAmplitude = 0.3f;
 
-    // ----- NEW AUDIO -----
+
     [Header("Gas Specific Audio")]
     [Tooltip("Sound played when the Gas Enemy attacks (fires projectile). Assign in Inspector.")]
     public AudioClip attackSound;
-    // ----- END NEW AUDIO -----
 
     [Header("References")]
     [Tooltip("Reference to the enemy's health bar UI.")]
     public HealthBar healthBar;
-    // Reference to the EnemyBubble component if used for size/damage scaling
-    private EnemyBubble enemyBubble;
 
     // Private variables
     private Vector3 spawnPosition; // Where the enemy originally spawned
     private Vector3 patrolTarget; // Current destination during patrol state
     private float fireTimer = 0f; // Timer to track attack cooldown
+    private bool hasPatrolTarget = false; // Tracks if a valid patrol target point was found
 
     // --- Unity Methods ---
 
-    // Awake is called when the script instance is being loaded.
-    // We inherit Awake behavior from BaseEnemy (getting AudioSource, setting health).
     protected override void Awake()
     {
         base.Awake(); // Call the BaseEnemy Awake method first
-        // Try to get the EnemyBubble component if it exists on this GameObject
-        enemyBubble = GetComponent<EnemyBubble>();
-        // Note: EnemyBubble script itself is not provided, assuming it exists if uncommented/used.
     }
 
-    // Start is called before the first frame update.
-    // We inherit Start behavior from BaseEnemy (finding player, playing spawn sound, starting ambient sound).
     protected override void Start()
     {
         base.Start(); // Call the BaseEnemy Start method
@@ -74,24 +71,25 @@ public class GasEnemy : BaseEnemy
         if (projectilePrefab == null)
         {
             Debug.LogError($"[{gameObject.name}] Projectile Prefab is not assigned in the Inspector!", this);
+        } else if (projectilePrefab.GetComponent<EnemyProjectile>() == null) {
+             Debug.LogError($"[{gameObject.name}] Assigned Projectile Prefab is missing the 'EnemyProjectile' script!", this);
         }
     }
 
-    // Update is called once per frame.
-    // We inherit Update behavior from BaseEnemy (state machine, freeze timer, ambient sound checks).
     protected override void Update()
     {
-        // Base Update MUST be called to handle state transitions, freezing, etc.
-        base.Update();
-
-        // Perform gas-specific actions if not frozen and player exists
-        if (!_isFrozen && playerTransform != null)
+        // Increment fire cooldown timer if not frozen
+        if (!_isFrozen)
         {
-            // Increment fire cooldown timer regardless of state (reset in Attack)
             fireTimer += Time.deltaTime;
-            // Apply visual wobble effect
-            Wobble();
         }
+
+        // Apply visual wobble effect regardless of state (unless frozen?)
+        // You might want to stop wobble when frozen: if(!_isFrozen) Wobble();
+        Wobble();
+
+        // Base Update MUST be called AFTER specific updates to handle state transitions, freezing, etc.
+        base.Update();
     }
 
     // --- Gas Specific Behaviors ---
@@ -100,7 +98,7 @@ public class GasEnemy : BaseEnemy
     void Wobble()
     {
         // Calculates vertical offset using a sine wave based on time
-        float yOffset = Mathf.Sin(Time.time * 1.5f) * 0.3f; // Adjust speed (1.5f) and amplitude (0.3f) as needed
+        float yOffset = Mathf.Sin(Time.time * wobbleSpeed) * wobbleAmplitude;
         // Applies the offset relative to the initial spawn height
         transform.position = new Vector3(transform.position.x, spawnPosition.y + yOffset, transform.position.z);
     }
@@ -109,36 +107,47 @@ public class GasEnemy : BaseEnemy
 
     protected override void Patrol()
     {
-        // If close to the current patrol target, find a new one
-        if (Vector3.Distance(transform.position, patrolTarget) < 1.0f)
+        // If we don't have a target OR we've reached the current target, find a new one.
+        if (!hasPatrolTarget || Vector3.Distance(transform.position, patrolTarget) < 1.0f)
         {
             SetNewPatrolTarget();
         }
-        // Move towards the target and look in the direction of movement
-        MoveTowards(patrolTarget);
-        Vector3 moveDir = (patrolTarget - transform.position).normalized;
-        if (moveDir != Vector3.zero) // Avoid looking down if target is directly below/above (shouldn't happen with patrol)
+
+        // If we successfully found a target, move towards it and look where going.
+        if (hasPatrolTarget)
         {
-            LookInDirection(moveDir);
+            MoveTowards(patrolTarget);
+            Vector3 moveDir = (patrolTarget - transform.position).normalized;
+             LookInDirection(moveDir); // Look in direction of movement
         }
     }
 
     // Calculates a new random patrol target within the radius around the spawn point.
     private void SetNewPatrolTarget()
     {
-        // Get a random point inside a sphere of patrolRadius
         Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
         // Set the target based on the spawn position plus the random offset (keeping Y the same initially)
         patrolTarget = spawnPosition + new Vector3(randomDirection.x, 0, randomDirection.z);
-        // Note: This doesn't guarantee the target is reachable or on navmesh. Consider NavMeshAgent for more robust patrolling.
+        hasPatrolTarget = true;
+        // Note: This simple patrol doesn't check for obstacles or ground height.
+        // Consider NavMeshAgent for more complex environments.
     }
 
     protected override void Chase()
     {
         if (playerTransform == null) return; // Exit if player doesn't exist
-        // Move towards the player's current position
-        MoveTowards(playerTransform.position);
-        // Look at the player (horizontally)
+
+        // Check distance to player
+        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+
+        // Move towards player only if outside attack range
+        if (distanceToPlayer > GetAttackRange())
+        {
+            MoveTowards(playerTransform.position);
+        }
+        // If inside attack range, might stop or strafe (optional, for now just stop moving forward)
+
+        // Always look at the player (horizontally)
         LookAtPlayer();
     }
 
@@ -171,10 +180,7 @@ public class GasEnemy : BaseEnemy
         // Move towards the flee target point
         MoveTowards(fleeTarget);
         // Look in the direction of fleeing
-        if (fleeDirection != Vector3.zero)
-        {
-            LookInDirection(fleeDirection);
-        }
+        LookInDirection(fleeDirection);
     }
 
     // --- Helper Methods ---
@@ -182,38 +188,35 @@ public class GasEnemy : BaseEnemy
     // Moves the enemy towards a target position.
     void MoveTowards(Vector3 target)
     {
-        // Calculate direction to the target
         Vector3 direction = (target - transform.position).normalized;
         // Move the enemy in that direction based on moveSpeed
-        // Note: This implementation ignores obstacles. Consider using NavMeshAgent.Move for pathfinding.
-        transform.position += direction * moveSpeed * Time.deltaTime;
+        // Note: This implementation ignores obstacles and verticality.
+        transform.position += new Vector3(direction.x, 0, direction.z).normalized * moveSpeed * Time.deltaTime;
     }
 
     // Rotates the enemy to look at the player (horizontally).
     void LookAtPlayer()
     {
         if (playerTransform == null) return;
-        // Calculate direction to the player
         Vector3 direction = playerTransform.position - transform.position;
-        // Look in that direction (handled by LookInDirection)
         LookInDirection(direction);
     }
 
     // Rotates the enemy smoothly to look in a specific direction (horizontally).
     void LookInDirection(Vector3 direction)
     {
-        if (direction == Vector3.zero) return; // Avoid looking down/up if direction is zero
+        if (direction.sqrMagnitude < 0.01f) return; // Avoid zero direction warning
+
         // Create rotation to look in the direction, ignoring vertical component
         Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
         // Smoothly interpolate towards the target rotation
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f); // Adjust rotation speed (5f) as needed
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
     }
 
     // Instantiates and fires the projectile.
     void FireProjectile()
     {
         // --- AUDIO: Play Attack Sound ---
-        // Uses the PlaySound helper from BaseEnemy and the assigned attackSound clip.
         PlaySound(attackSound, mainAudioSource);
         // -----------------------------
 
@@ -224,29 +227,47 @@ public class GasEnemy : BaseEnemy
             return;
         }
 
-        // Calculate direction towards the player from the fire point
-        Vector3 directionToPlayer = (playerTransform.position - firePoint.position).normalized;
-        // Point the firePoint directly at the player for accurate projectile spawn rotation
-        firePoint.rotation = Quaternion.LookRotation(directionToPlayer);
+        // --- Calculate Aiming Direction with Upward Angle ---
 
-        // Instantiate the projectile prefab at the fire point's position and rotation
-        GameObject projectile = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+        // 1. Calculate the base direction towards the player (horizontally flattened)
+        Vector3 directionToPlayerFlat = (playerTransform.position - firePoint.position);
+        directionToPlayerFlat.y = 0; // Ignore vertical difference for base aiming direction
+        directionToPlayerFlat.Normalize(); // Ensure it's a unit vector
 
-        // Get the Rigidbody component of the projectile
-        Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
-        if (projectileRb != null)
-        {
-            // Set the projectile's velocity to move it forward
-            projectileRb.linearVelocity = firePoint.forward * projectileSpeed; // Use velocity for consistent speed
-            // Alternatively use AddForce: projectileRb.AddForce(firePoint.forward * projectileSpeed, ForceMode.VelocityChange);
-        }
+        // 2. Calculate the rotation needed to aim directly at the player (for reference, might not be needed for instantiation)
+        // Quaternion directLookRotation = Quaternion.LookRotation(directionToPlayer); // Rotation aiming directly at player
 
-        // Get the EnemyProjectile script (assuming it exists) to set damage
-        EnemyProjectile projectileScript = projectile.GetComponent<EnemyProjectile>();
+        // 3. Calculate the desired upward rotation (40 degrees around the fire point's right axis)
+        // We use -40 degrees because rotating around the right axis with a positive angle tilts down.
+        Quaternion upwardTilt = Quaternion.AngleAxis(-15.0f, firePoint.right);
+
+        // 4. Apply the upward tilt to the flattened direction vector
+        Vector3 finalLaunchDirection = upwardTilt * directionToPlayerFlat;
+        // Ensure the final direction is normalized if needed, though LookRotation handles magnitude
+        // finalLaunchDirection.Normalize();
+
+        // 5. Calculate the final rotation for the projectile instance
+        // The projectile should face the direction it's actually going
+        Quaternion finalLaunchRotation = Quaternion.LookRotation(finalLaunchDirection);
+
+        // --- End Calculation ---
+
+
+        // Instantiate the projectile prefab at the fire point's position using the calculated final rotation
+        GameObject projectileGO = Instantiate(projectilePrefab, firePoint.position, finalLaunchRotation);
+
+        // Get the EnemyProjectile script from the instantiated object
+        EnemyProjectile projectileScript = projectileGO.GetComponent<EnemyProjectile>();
         if (projectileScript != null)
         {
-            // Set projectile damage, potentially based on EnemyBubble size if available
-            projectileScript.damageAmount = enemyBubble?.size ?? 1; // Use bubble size if available, otherwise default to 1
+            // Configure the projectile's properties
+            projectileScript.damageAmount = this.projectileDamage; // Set damage from GasEnemy stats
+            projectileScript.speed = this.projectileSpeed;     // Set speed from GasEnemy stats
+            // Note: The projectile sets its own velocity in its Start method using its forward direction (which is now tilted up)
+        }
+        else
+        {
+             Debug.LogError($"Projectile prefab '{projectilePrefab.name}' is missing the EnemyProjectile script!", projectileGO);
         }
     }
 
@@ -262,28 +283,17 @@ public class GasEnemy : BaseEnemy
         // Apply damage reduction only for 'Basic' damage and only if not frozen
         if (type == DamageType.Basic && !_isFrozen)
         {
-            damageToTake = Mathf.CeilToInt(damage * basicDamageReductionFactor); // Use CeilToInt to ensure at least 1 damage if factor is low but > 0
+            damageToTake = Mathf.CeilToInt(damage * basicDamageReductionFactor);
+            // Debug.Log($"[{gameObject.name}] Basic damage reduced by {(1 - basicDamageReductionFactor):P0}. Taking {damageToTake} from {damage}.");
         }
 
         // Call the base TakeDamage AFTER calculating the specific damage amount.
-        // Base method handles health reduction, state changes (Flee/Die), and health bar update.
         base.TakeDamage(damageToTake, type);
     }
 
-    // Override Freeze if GasEnemy has specific behavior when frozen (optional).
-    public override void Freeze(float baseDuration = 5f)
-    {
-        if (_isFrozen || currentState == EnemyState.Dying) return;
-        // Potentially add gas-specific visual changes on freeze here
-        base.Freeze(baseDuration); // Call base freeze logic (sets state, timer, stops movement)
-    }
-
-    // Override Unfreeze if GasEnemy has specific behavior when unfreezing (optional).
-    // protected override void Unfreeze()
-    // {
-    //     // Potentially revert gas-specific visual changes here
-    //     base.Unfreeze(); // Call base unfreeze logic
-    // }
+    // Override Freeze/Unfreeze if GasEnemy needs specific visual changes (optional).
+    // public override void Freeze(float baseDuration = 5f) { ... base.Freeze(baseDuration); }
+    // protected override void Unfreeze() { ... base.Unfreeze(); }
 
     // Returns the specific attack range for the Gas Enemy.
     protected override float GetAttackRange()
@@ -294,12 +304,7 @@ public class GasEnemy : BaseEnemy
     // Updates the health bar visuals.
     protected override void UpdateHealthBar()
     {
-        // Use null-conditional operator ?. for safety if healthBar is not assigned
         healthBar?.SetHealth(currentHealth);
     }
-
-    // Die method is now handled by DieCoroutine in BaseEnemy, triggered from TakeDamage.
-    // No need for an override here unless GasEnemy needs specific cleanup *before* the death sound/delay.
-    // protected override void Die() { base.Die(); } // Not needed
 
 } // End of GasEnemy class
