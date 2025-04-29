@@ -180,6 +180,14 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 4543934350008803212}
+    - target: {fileID: 3086975323970050016, guid: d0f1e5a4c9790cf468767152fc93fb80, type: 3}
+      propertyPath: m_Volume
+      value: 0.642
+      objectReference: {fileID: 0}
+    - target: {fileID: 3086975323970050016, guid: d0f1e5a4c9790cf468767152fc93fb80, type: 3}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 0.959
+      objectReference: {fileID: 0}
     - target: {fileID: 4371653699691776579, guid: d0f1e5a4c9790cf468767152fc93fb80, type: 3}
       propertyPath: m_ClearFlags
       value: 1
