@@ -14,7 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/StartMenu.unity
     guid: 9f74daef0e55f394ab6c07dcbcf9bc1f
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/VinnySceneMikeRevised.unity
     guid: 10c52619f65f7fd4c83dff78217359c9
   - enabled: 0
@@ -23,7 +23,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Mike/WorkingScript.unity
     guid: 0b1f0dd78b0a87844bf03754941bd4cc
-  - enabled: 1
+  - enabled: 0
     path: Assets/Mike/VinnyScenefinal.unity
     guid: bfe94375b1a313e439b156eb886bd00a
   - enabled: 1
