@@ -169,79 +169,88 @@ public class PlayerShooting : MonoBehaviour
         // --- Validate State ---
         if (!_isCharging || currentBulletVisual == null)
         {
-            // This can happen if StartCharge failed or if EndCharge gets called erroneously
-            _isCharging = false; // Ensure flag is reset
-            if(currentBulletVisual != null) { Destroy(currentBulletVisual); currentBulletVisual = null;} // Cleanup stray visual
+            _isCharging = false;
+            if(currentBulletVisual != null) { Destroy(currentBulletVisual); currentBulletVisual = null;}
             return;
         }
 
-        // --- Calculate Charge Level & Multipliers ---
+        // --- Calculate Charge Level & Base Multipliers ---
         float chargeDuration = Time.time - chargeStartTime;
-        // Clamp01 ensures value is between 0 (no charge) and 1 (full charge)
         float chargeRatio = Mathf.Clamp01(chargeDuration / maxChargeTime);
-
         float actualForceMultiplier = Mathf.Lerp(1.0f, maxForceMultiplier, chargeRatio);
         float actualManaCostMultiplier = Mathf.Lerp(1.0f, maxManaCostMultiplier, chargeRatio);
 
-        // --- Get Base Mana Cost and Calculate Final Cost ---
+        // --- Get Bullet Type and Base Cost ---
         BulletType currentType = player.bulletSpawner.CurrentBulletType;
         int baseManaCost = GetBaseManaCost(currentType);
-        int finalManaCost = Mathf.RoundToInt(baseManaCost * actualManaCostMultiplier);
+        int finalManaCost; // Declare final cost variable
 
-        Debug.Log($"Charge Ended: Duration={chargeDuration:F2}s, Ratio={chargeRatio:P0}, ForceMult={actualForceMultiplier:F2}, ManaCost={finalManaCost}");
-        
-        Debug.Log($"Checking Mana: Current Mana = {player.currentMana}, Base Cost = {baseManaCost}, Charge Ratio = {chargeRatio:P0}, Cost Multiplier = {actualManaCostMultiplier:F2}, Final Cost = {finalManaCost}");
+        // --- === NEW LOGIC: Check for Teleport Bullet === ---
+        if (currentType == BulletType.Type3)
+        {
+            // For Teleport, use the fixed base cost, ignore charge multiplier
+            finalManaCost = baseManaCost;
+            // Force multiplier is also likely irrelevant for teleport, can optionally reset it
+            // actualForceMultiplier = 1.0f; // Uncomment if force shouldn't scale either
+            Debug.Log($"Teleport Bullet (Type3) selected. Using fixed Mana Cost: {finalManaCost}");
+        }
+        else
+        {
+            // For other bullet types, calculate cost based on charge
+            finalManaCost = Mathf.RoundToInt(baseManaCost * actualManaCostMultiplier);
+            Debug.Log($"Charge Ended ({currentType}): Duration={chargeDuration:F2}s, Ratio={chargeRatio:P0}, ForceMult={actualForceMultiplier:F2}, ManaCost={finalManaCost}");
+        }
+        // --- === END NEW LOGIC === ---
+
+
         // --- Check Mana & Fire ---
         if (player.UseMana(finalManaCost)) // UseMana checks if currentMana >= finalManaCost
         {
-            Debug.Log("<color=lime>Firing Branch Entered (UseMana returned TRUE)</color>");
-            // SUCCESS: Enough mana for the charged shot
+            // SUCCESS: Enough mana
             Debug.Log($"<color=cyan>Firing {currentType}! Mana Cost: {finalManaCost}</color>");
 
             // --- Prepare Visual for Firing ---
-            currentBulletVisual.transform.parent = null; // Unparent
-            currentBulletVisual.transform.localScale = initialBulletScale * Mathf.Lerp(1.0f, maxVisualScaleMultiplier, chargeRatio); // Set final scale just in case
+            // ... (rest of the preparation code: unparent, scale, enable components) ...
+             currentBulletVisual.transform.parent = null;
+             currentBulletVisual.transform.localScale = initialBulletScale * Mathf.Lerp(1.0f, maxVisualScaleMultiplier, chargeRatio);
 
-            Rigidbody rb = currentBulletVisual.GetComponent<Rigidbody>();
-            Collider col = currentBulletVisual.GetComponent<Collider>();
-            // Re-enable components if they were disabled in StartCharge
-            // ...
-
-            if (rb != null) rb.isKinematic = false; // Enable physics
-            if (col != null) col.enabled = true; // Enable collisions
+             Rigidbody rb = currentBulletVisual.GetComponent<Rigidbody>();
+             Collider col = currentBulletVisual.GetComponent<Collider>();
+             if (rb != null) rb.isKinematic = false;
+             if (col != null) col.enabled = true;
 
 
             // --- Animation & Sound ---
             animationManager?.TriggerShoot();
-            player.PlaySoundOneShot(player.shootSound); // Play the shooting sound
+            player.PlaySoundOneShot(player.shootSound);
 
-            // --- Calculate Fire Direction (same as before) ---
+            // --- Calculate Fire Direction ---
             Vector3 fireDirection = CalculateFireDirection();
 
-            // --- Apply Launch Force (with multiplier) ---
-            var bulletScript = currentBulletVisual.GetComponent<IBulletChargeReceiver>(); // Get the script using the interface
-            if (bulletScript != null)
-            {
-                // Pass chargeRatio, forceMultiplier, AND the player reference
-                bulletScript.OnFire(chargeRatio, actualForceMultiplier, player);
-            }
-
-            // Apply Launch Force (code from before)
+            // --- Apply Launch Force (using potentially modified actualForceMultiplier) ---
             if (rb != null)
             {
                 rb.AddForce(fireDirection * bulletForce * actualForceMultiplier, ForceMode.VelocityChange);
             }
 
+             // --- Pass info to bullet ---
+             var bulletScript = currentBulletVisual.GetComponent<IBulletChargeReceiver>();
+             if (bulletScript != null)
+             {
+                 // Pass the player reference (important for TeleportBullet)
+                 bulletScript.OnFire(chargeRatio, actualForceMultiplier, player);
+             }
         }
         else
         {
-            // FAILURE: Not enough mana for the calculated cost
+            // FAILURE: Not enough mana
+            // Log message now includes the type and needed/have mana
             Debug.Log($"<color=red>Fire Failed! Not enough mana for {currentType}. Need {finalManaCost}, Have {player.currentMana}</color>");
-            // Play failure sound/effect (optional)
-            // player.PlaySoundOneShot(player.chargeFailSound);
 
-            // Destroy the unused visual
-            Destroy(currentBulletVisual);
+            if (currentBulletVisual != null)
+            {
+                Destroy(currentBulletVisual);
+            }
         }
 
         // --- Reset State ---

@@ -148,7 +148,20 @@ public class BasicBullet : MonoBehaviour, PlayerShooting.IBulletChargeReceiver
                 Debug.Log($"Applying {finalDamage} Basic damage to {enemy.gameObject.name} (found via GetComponentInChildren on {hitObject.name})");
                 enemy.TakeDamage(finalDamage, DamageType.Basic); // Use finalDamage
             }
-            else { Debug.Log($"{hitObject.name} was hit but doesn't have a BaseEnemy component on itself or children."); }
+            else // If it's not an enemy, check if it's a breakable boulder
+            {
+                BreakableBoulder boulder = hitObject.GetComponent<BreakableBoulder>(); // Check on the hit object itself
+                if (boulder != null)
+                {
+                    Debug.Log($"Applying {finalDamage} damage to BreakableBoulder: {boulder.gameObject.name}");
+                    boulder.TakeDamage(finalDamage); // Call the boulder's damage method
+                }
+                // You could add more 'else if' checks here for other damageable types
+                else
+                {
+                    Debug.Log($"{hitObject.name} was hit but doesn't have a BaseEnemy or BreakableBoulder component.");
+                }
+            }
 
             // --- Apply Splash Damage ---
             // Example radius scales with bullet size

@@ -1,165 +1,149 @@
 using UnityEngine;
 
-// Make sure you have assigned the Hit Effect Prefab in the Inspector!
-public class FreezeBullet : MonoBehaviour
+// Implement the interface defined in PlayerShooting
+public class FreezeBullet : MonoBehaviour, PlayerShooting.IBulletChargeReceiver
 {
     [Header("Damage & Scaling")]
+    [Tooltip("Base damage dealt by the bullet at minimum charge (scale=1).")]
     public int baseDamage = 5;
-    public int damageMultiplier = 3; // Damage added per unit of scale increase
-    public float maxSize = 3f; // Maximum scale the bullet can reach
+    [Tooltip("Additional damage added per unit of scale increase (from 1.0 up to maxSize).")]
+    public int damageMultiplier = 3;
+    [Tooltip("Maximum scale the bullet reaches at full charge (chargeRatio=1.0).")]
+    public float maxSize = 3f;
 
     [Header("Freeze Effect")]
-    public float freezeDurationMin = 1f; // Freeze duration at minimum size (scale 1)
-    public float freezeDurationMax = 5f; // Freeze duration at maximum size
+    [Tooltip("Freeze duration applied at minimum charge (scale=1).")]
+    public float freezeDurationMin = 1f;
+    [Tooltip("Freeze duration applied at maximum charge (scale=maxSize).")]
+    public float freezeDurationMax = 5f;
 
-    [Header("Charging")]
-    public float manaCostPerSecond = 5f;
-    public float maxChargeTime = 3f; // Time it takes to reach maxSize
-
-    [Header("Effects")] // Our fabulous effects section!
+    [Header("Lifetime & Effects")]
+    [Tooltip("How many seconds the bullet lasts before expiring.")]
+    public float lifetime = 7.0f; // Adjusted default lifetime slightly
+    [Tooltip("Particle effect prefab spawned on impact. Assign in Inspector.")]
     public GameObject hitEffectPrefab; // ✨ Drag your particle system PREFAB here ✨
 
     // --- Private Variables ---
-    private bool _isCharging = false;
-    private bool _wasStarted = false; // To prevent StopCharging() before StartCharging()
-    private float chargeStartTime;
-    private PlayerStateManager _player; // Reference to the player script for mana checks AND LEVEL MULTIPLIER
-    private Transform bulletTransform; // Cache the transform for performance
+    private PlayerStateManager _player; // Reference set by PlayerShooting via OnFire
+    private float finalScale = 1.0f;    // Stores the scale determined by chargeRatio
+    private bool initialized = false;   // Tracks if OnFire has been called
+    private bool hasHit = false;        // Prevents multiple hits/explosions
+    private Transform bulletTransform;  // Cache transform
 
     void Awake()
     {
-        // Cache the transform component on Awake
+        // Cache the transform component
         bulletTransform = transform;
     }
 
-    // Called by an external script (like PlayerShooting) when charging begins
-    public void StartCharging(PlayerStateManager playerRef)
+    // Start() is minimal, initialization happens in OnFire
+    void Start()
     {
-        if (playerRef == null)
+        // Debug.Log("FreezeBullet GameObject instantiated.");
+    }
+
+    // --- IBulletChargeReceiver Implementation ---
+    // This method is called by PlayerShooting exactly ONCE when the bullet is fired.
+    public void OnFire(float chargeRatio, float forceMultiplier, PlayerStateManager playerRef)
+    {
+        if (initialized) return; // Prevent multiple initializations
+
+        // 1. Store Player Reference
+        _player = playerRef;
+        if (_player == null)
         {
-            Debug.LogError("FreezeBullet received null PlayerStateManager reference! Destroying bullet.");
-            Destroy(gameObject); // Can't charge without a player reference
-            return;
+            Debug.LogError("FreezeBullet received null Player reference in OnFire! Multiplier will be 1.0.", this);
         }
-        _player = playerRef; // Store player reference
-        chargeStartTime = Time.time;
-        _isCharging = true;
-        _wasStarted = true; // Mark that charging has officially begun
-        Debug.Log("FreezeBullet charging started.");
-        // Ensure bullet starts at its base scale (important if reusing pooled objects)
-        bulletTransform.localScale = Vector3.one;
+
+        // 2. Calculate Final Scale based on chargeRatio
+        // Lerp between scale 1.0 (chargeRatio=0) and maxSize (chargeRatio=1)
+        finalScale = Mathf.Lerp(1.0f, maxSize, chargeRatio);
+        bulletTransform.localScale = Vector3.one * finalScale; // Set the scale immediately
+
+        // 3. Set Lifetime Timer
+        Destroy(gameObject, lifetime);
+
+        initialized = true; // Mark as initialized
+        hasHit = false;     // Reset hit flag
+
+        // Optional: Log received info
+        Debug.Log($"FreezeBullet Initialized: ChargeRatio={chargeRatio:P1}, FinalScale={finalScale:F2}, ForceMult={forceMultiplier:F2}");
     }
+    // --- End of Interface Implementation ---
 
-    // Called by an external script (like PlayerShooting) when charging ends (e.g., mouse release)
-    public void StopCharging()
-    {
-        if (!_wasStarted) return; // Don't do anything if charging never started
-        _isCharging = false; // Stop the charging state and mana drain/scaling
-        Debug.Log("FreezeBullet charging stopped. Final scale will be used on hit.");
-        // The final scale is determined by the last Update frame while _isCharging was true
-    }
 
-    // Update is called once per frame
-    private void Update()
-    {
-        // Only perform charging logic if currently charging
-        if (_isCharging)
-        {
-            float chargeTime = Time.time - chargeStartTime;
+    // Update is no longer needed for charging logic.
+    // Could be used for visual effects that change over the bullet's lifetime.
+    // void Update() { }
 
-            // --- Mana Drain ---
-            float manaToAttemptDeduct = manaCostPerSecond * Time.deltaTime;
-            // Use CeilToInt to ensure even small fractions cost at least 1 mana if > 0
-            int manaCostThisFrame = Mathf.CeilToInt(manaToAttemptDeduct);
 
-            // Check if player reference exists AND if mana can be used
-            if (manaCostThisFrame > 0 && (_player == null || !_player.UseMana(manaCostThisFrame)))
-            {
-                // If no player reference or out of mana, stop charging
-                _isCharging = false;
-                Debug.Log("Stopped charging FreezeBullet due to missing player reference or insufficient mana!");
-            }
-            else if (_player != null) // Only scale if mana was successfully deducted (or cost was 0)
-            {
-                // --- Scaling Logic ---
-                // Clamp charge time to maxChargeTime
-                float effectiveChargeTime = Mathf.Min(chargeTime, maxChargeTime);
-                // Calculate charge progress (0.0 to 1.0)
-                float chargePercentage = (maxChargeTime > 0) ? (effectiveChargeTime / maxChargeTime) : 1.0f; // Avoid division by zero
-                // Lerp scale between 1 (base size) and maxSize based on charge percentage
-                float newScale = Mathf.Lerp(1f, maxSize, chargePercentage);
-
-                // Apply the new scale uniformly
-                bulletTransform.localScale = Vector3.one * newScale;
-            }
-            else // Safety check: if player became null mid-charge somehow
-            {
-                _isCharging = false;
-            }
-        }
-    }
+    // --- Collision Handling ---
 
     // Called when this collider/rigidbody has begun touching another rigidbody/collider
     void OnCollisionEnter(Collision collision)
     {
+        // Don't process collision if not initialized or already hit something
+        if (!initialized || hasHit) return;
+
         // Ignore collisions with the player who fired it
-        if (collision.gameObject.CompareTag("Player")) // Make sure your player GameObject has the "Player" tag!
+        if (collision.gameObject.CompareTag("Player"))
         {
             return;
         }
 
-        // We need the exact point of contact to spawn the effect there.
+        // Ignore hitting other friendly projectiles
+        if (collision.gameObject.CompareTag("PlayerProjectile")) // Assuming you tag player bullets
+        {
+            return;
+        }
+
+        // Get contact point information
         if (collision.contacts.Length > 0)
         {
             ContactPoint contact = collision.contacts[0];
-            Vector3 contactPoint = contact.point;   // The world position of the impact
-            Vector3 contactNormal = contact.normal; // The direction the surface is facing at the impact point
-
-            // Call our central hit processing logic, passing necessary info
-            OnHit(collision.gameObject, contactPoint, contactNormal);
+            // Call the central hit processing logic
+            OnHit(collision.gameObject, contact.point, contact.normal);
         }
         else
         {
-            // Fallback if no contact points are available (should be rare with non-trigger collisions)
-            OnHit(collision.gameObject, bulletTransform.position, -bulletTransform.forward); // Hit at bullet center, normal opposite to bullet travel
+            // Fallback if no contact points (rare)
+            OnHit(collision.gameObject, bulletTransform.position, -bulletTransform.forward);
         }
     }
 
-    // Central logic for handling what happens when the bullet hits *anything* (except the player)
+    // Central logic for handling what happens when the bullet hits *anything* valid
     private void OnHit(GameObject hitObject, Vector3 hitPoint, Vector3 hitNormal)
     {
-        // Ensure scale is at least 1
-        float currentScale = Mathf.Max(1f, bulletTransform.localScale.x);
+        if (hasHit) return; // Double-check to prevent multiple calls
+        hasHit = true;      // Mark as hit
 
-        // --- Calculate Final Damage & Freeze Duration based on final scale ---
+        // --- Calculate Final Damage & Freeze Duration based on finalScale (set in OnFire) ---
         // Damage
-        int calculatedDamage = baseDamage + Mathf.FloorToInt((currentScale - 1f) * damageMultiplier);
+        int calculatedDamage = baseDamage + Mathf.FloorToInt((finalScale - 1.0f) * damageMultiplier);
+        // Duration - Calculate scale progress (0 to 1) based on current scale vs max scale
+        float scaleProgressRatio = (maxSize > 1.0f) ? Mathf.Clamp01((finalScale - 1.0f) / (maxSize - 1.0f)) : 0f;
+        float calculatedDuration = Mathf.Lerp(freezeDurationMin, freezeDurationMax, scaleProgressRatio);
 
-        // Duration
-        float scaleChargeRatio = (maxSize > 1f) ? Mathf.Clamp01((currentScale - 1f) / (maxSize - 1f)) : 0f;
-        float calculatedDuration = Mathf.Lerp(freezeDurationMin, freezeDurationMax, scaleChargeRatio);
-
-        // ----- APPLY PLAYER LEVEL MULTIPLIER -----
+        // --- Apply Player Level Multiplier ---
         float playerMultiplier = 1.0f; // Default
         if (_player != null)
         {
             playerMultiplier = _player.bulletEffectMultiplier;
         }
-        else { Debug.LogWarning("FreezeBullet: Player reference lost before hit!", this); }
+        else { Debug.LogWarning("FreezeBullet: Player reference was null during OnHit!", this); }
 
-        int finalDamage = Mathf.CeilToInt(calculatedDamage * playerMultiplier);
-        float finalDuration = calculatedDuration * playerMultiplier; // Apply to duration too
-        // ----- END APPLY MULTIPLIER -----
+        int finalDamage = Mathf.Max(1, Mathf.CeilToInt(calculatedDamage * playerMultiplier)); // Ensure at least 1 damage
+        float finalDuration = calculatedDuration * playerMultiplier; // Apply multiplier to duration too
+        // ------------------------------------
 
+        Debug.Log($"FreezeBullet hit {hitObject.name}, Scale: {finalScale:F2}, BaseDmg: {calculatedDamage}, FinalDmg (x{playerMultiplier:F2}): {finalDamage}, BaseDur: {calculatedDuration:F1}, FinalDur: {finalDuration:F1}s at point {hitPoint}");
 
-        Debug.Log($"FreezeBullet hit {hitObject.name}, Scale: {currentScale:F2}, BaseDmg: {calculatedDamage}, FinalDmg (x{playerMultiplier:F2}): {finalDamage}, BaseDur: {calculatedDuration:F1}, FinalDur: {finalDuration:F1}s at point {hitPoint}");
-
-        // --- Instantiate and Scale the Hit Effect! ---
+        // --- Instantiate and Scale the Hit Effect ---
         if (hitEffectPrefab != null)
         {
             GameObject effectInstance = Instantiate(hitEffectPrefab, hitPoint, Quaternion.LookRotation(hitNormal));
-            effectInstance.transform.localScale = Vector3.one * currentScale; // Scale effect by bullet size
-            // Manage effect lifetime
+            effectInstance.transform.localScale = Vector3.one * finalScale; // Scale effect by bullet size
+            // Ensure the effect prefab destroys itself after playing
         }
         else
         {
@@ -167,46 +151,40 @@ public class FreezeBullet : MonoBehaviour
         }
 
         // --- Apply Direct Hit Effects (Damage & Freeze) ---
-        EnemyBubble enemyBubble = hitObject.GetComponent<EnemyBubble>(); // Assuming direct hit on bubble?
-        BaseEnemy baseEnemy = hitObject.GetComponentInChildren<BaseEnemy>(); // More general check
-
-        if (baseEnemy != null) // Prioritize BaseEnemy component
+        // Use GetComponentInChildren for flexibility if collider is not on the main enemy object
+        BaseEnemy baseEnemy = hitObject.GetComponentInChildren<BaseEnemy>();
+        if (baseEnemy != null)
         {
-            baseEnemy.TakeDamage(finalDamage, DamageType.Freeze); // Use finalDamage
-            baseEnemy.Freeze(finalDuration); // Use finalDuration
+            Debug.Log($"Applying direct freeze ({finalDuration:F1}s) and damage ({finalDamage}) to {baseEnemy.gameObject.name}");
+            baseEnemy.TakeDamage(finalDamage, DamageType.Freeze); // Pass DamageType
+            baseEnemy.Freeze(finalDuration);
         }
-        else if (enemyBubble != null) // Fallback for older EnemyBubble structure if still used
-        {
-             // enemyBubble.EnemyTakeDamage(finalDamage); // Assuming method exists
-             // enemyBubble.Freeze(finalDuration); // Assuming method exists
-             Debug.LogWarning($"Hit {hitObject.name} with EnemyBubble but NO BaseEnemy. Applying effects via EnemyBubble.", this);
-        }
-
 
         // --- Handle Splash Damage & Freeze in an Area ---
-        float splashRadius = currentScale * 0.6f; // Example radius
-        Collider[] hitColliders = Physics.OverlapSphere(bulletTransform.position, splashRadius);
+        float splashRadius = finalScale * 0.75f; // Example: Splash radius scales with bullet size
+        Collider[] hitColliders = Physics.OverlapSphere(hitPoint, splashRadius); // Use hitPoint as center
 
         foreach (var hitCollider in hitColliders)
         {
-            // Skip the object that was directly hit and the player
-            if (hitCollider.gameObject == hitObject || hitCollider.CompareTag("Player")) continue;
+            // Skip the object that was directly hit, the player, and the bullet itself
+            if (hitCollider.gameObject == hitObject || hitCollider.gameObject == gameObject || hitCollider.CompareTag("Player")) continue;
 
             BaseEnemy splashEnemy = hitCollider.GetComponentInChildren<BaseEnemy>();
             if (splashEnemy != null)
             {
-                // Apply multiplier to splash effects too (can be reduced)
-                int splashDamage = finalDamage;           // Example: Or Mathf.CeilToInt(finalDamage * 0.5f);
-                float splashFreezeDuration = finalDuration; // Example: Or finalDuration * 0.75f;
+                // Apply multiplier to splash effects too (can be reduced if desired)
+                // Example: Splash damage/duration is 75% of direct hit
+                int splashDamage = Mathf.Max(1, Mathf.CeilToInt(finalDamage * 0.75f));
+                float splashFreezeDuration = finalDuration * 0.75f;
 
-                Debug.Log($"Applying splash freeze ({splashFreezeDuration:F1}s) and damage ({splashDamage}) to {splashEnemy.name}");
-                splashEnemy.TakeDamage(splashDamage, DamageType.Freeze);
+                Debug.Log($"Applying splash freeze ({splashFreezeDuration:F1}s) and damage ({splashDamage}) to {splashEnemy.gameObject.name}");
+                splashEnemy.TakeDamage(splashDamage, DamageType.Freeze); // Pass DamageType
                 splashEnemy.Freeze(splashFreezeDuration);
             }
-             // Add fallback for EnemyBubble if needed
         }
 
         // --- Destroy the Bullet GameObject ---
+        // Destroy immediately after processing the hit
         Destroy(gameObject);
     }
 }
