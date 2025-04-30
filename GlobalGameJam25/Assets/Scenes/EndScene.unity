@@ -285,7 +285,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startSceneName: StartMenu
-  restartSceneName: VinnySceneMikeRevised
+  restartSceneName: VinnyScenefinal
 --- !u!4 &80588543
 Transform:
   m_ObjectHideFlags: 0
