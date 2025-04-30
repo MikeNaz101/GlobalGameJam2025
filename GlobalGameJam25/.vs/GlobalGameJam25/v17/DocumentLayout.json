@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\vinjo\\Documents\\MyGitHub\\GlobalGameJam2025\\GlobalGameJam25\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\vinjo\\Documents\\MyGitHub\\GlobalGameJam2025\\GlobalGameJam25\\Assets\\Vinny\\HealingAura1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Vinny\\HealingAura1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\vinjo\\Documents\\MyGitHub\\GlobalGameJam2025\\GlobalGameJam25\\Assets\\Vinny\\Sun movement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Vinny\\Sun movement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -23,6 +27,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "HealingAura1.cs",
+              "DocumentMoniker": "C:\\Users\\vinjo\\Documents\\MyGitHub\\GlobalGameJam2025\\GlobalGameJam25\\Assets\\Vinny\\HealingAura1.cs",
+              "RelativeDocumentMoniker": "Assets\\Vinny\\HealingAura1.cs",
+              "ToolTip": "C:\\Users\\vinjo\\Documents\\MyGitHub\\GlobalGameJam2025\\GlobalGameJam25\\Assets\\Vinny\\HealingAura1.cs",
+              "RelativeToolTip": "Assets\\Vinny\\HealingAura1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T23:41:24.268Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "Sun movement.cs",
               "DocumentMoniker": "C:\\Users\\vinjo\\Documents\\MyGitHub\\GlobalGameJam2025\\GlobalGameJam25\\Assets\\Vinny\\Sun movement.cs",
               "RelativeDocumentMoniker": "Assets\\Vinny\\Sun movement.cs",
@@ -30,12 +47,11 @@
               "RelativeToolTip": "Assets\\Vinny\\Sun movement.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-07T23:17:57.087Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-07T23:17:57.087Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Lit.shader",
               "DocumentMoniker": "C:\\Users\\vinjo\\Documents\\MyGitHub\\GlobalGameJam2025\\GlobalGameJam25\\Library\\PackageCache\\com.unity.render-pipelines.universal\\Shaders\\Lit.shader",
               "RelativeDocumentMoniker": "Library\\PackageCache\\com.unity.render-pipelines.universal\\Shaders\\Lit.shader",
