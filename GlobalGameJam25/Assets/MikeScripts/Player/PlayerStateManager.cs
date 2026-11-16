@@ -32,6 +32,27 @@ public class PlayerStateManager : MonoBehaviour
     public float jumpForce = 20f; // Ground jump initial strength
     public float flapStrength = 10f; // Flying flap upward strength
     [HideInInspector] public Vector3 currentHorizontalVelocity = Vector3.zero;
+    [HideInInspector] public Vector3 targetHorizontalVelocity = Vector3.zero; // States set this; Update() accelerates toward it
+
+    [Header("Movement Feel")]
+    [Tooltip("Move relative to where the camera is looking (standard 3rd-person controls). Turn off to restore the old body-relative movement.")]
+    public bool cameraRelativeMovement = true;
+    [Tooltip("How quickly the player reaches full speed on the ground (units/sec^2).")]
+    public float groundAcceleration = 80f;
+    [Tooltip("How quickly the player stops on the ground (units/sec^2).")]
+    public float groundDeceleration = 100f;
+    [Tooltip("Acceleration while airborne. Lower = less air control.")]
+    public float airAcceleration = 30f;
+    [Tooltip("How fast the body turns to face the movement or aim direction (degrees/sec).")]
+    public float turnSpeed = 900f;
+    [Tooltip("Grace period after walking off a ledge during which a jump still works (seconds).")]
+    public float coyoteTime = 0.12f;
+    [Tooltip("A jump pressed this long before landing still fires on landing (seconds).")]
+    public float jumpBufferTime = 0.15f;
+    [Tooltip("Extra gravity while falling, for a snappier, less floaty jump arc.")]
+    public float fallGravityMultiplier = 1.7f;
+    [Tooltip("Terminal falling speed (units/sec).")]
+    public float maxFallSpeed = 45f;
 
     [Header("Physics & Ground Check")]
     public float gravity = -9.81f;
@@ -42,6 +63,11 @@ public class PlayerStateManager : MonoBehaviour
     [HideInInspector] public float verticalVelocity = 0f;
     private bool hasJumped = false;
     private bool wasGroundedLastFrame = false;
+    private float lastGroundedTime = float.NegativeInfinity;
+    private float lastJumpPressedTime = float.NegativeInfinity;
+    private float runStaminaAccumulator = 0f;
+    private Transform cameraTransform;
+    private PlayerShooting playerShooting;
 
     [Header("Shooting & Abilities")]
     public BulletSpawnerState bulletSpawner; // Assign your BulletSpawnerState component here
@@ -126,6 +152,8 @@ public class PlayerStateManager : MonoBehaviour
         if (groundCheck == null) Debug.LogError("GroundCheck Transform not assigned in the Inspector!");
         if (shellOrbitCenter == null) Debug.LogError("ShellOrbitCenter Transform not assigned in the Inspector!");
         if (shellPrefabs == null || shellPrefabs.Count == 0) Debug.LogWarning("Shell Prefabs list is empty or null in PlayerStateManager!");
+        playerShooting = GetComponent<PlayerShooting>();
+        if (playerShooting == null) playerShooting = GetComponentInChildren<PlayerShooting>();
 
         // Subscribe UpdateShellVisuals to the BulletSpawnerState's OnBulletTypeChanged event
         if (bulletSpawner != null)
@@ -184,7 +212,7 @@ public class PlayerStateManager : MonoBehaviour
     void OnFire(InputValue value)
     {
         if (PauseMenuController.GameIsPaused) return; // Assuming PauseMenuController exists
-        PlayerShooting shooter = GetComponent<PlayerShooting>(); // Consider caching this in Awake/Start if performance is critical
+        PlayerShooting shooter = playerShooting;
         if (shooter == null) return;
         if (value.isPressed) shooter.StartCharge();
         else shooter.EndCharge();
@@ -231,10 +259,14 @@ public class PlayerStateManager : MonoBehaviour
     void Update()
     {
         HandleGroundCheck();
+        if (isGrounded) lastGroundedTime = Time.time;
         ApplyGravity();
-        HandleMovement(); // This calls currentState.UpdateState()
+        HandleMovement(); // This calls currentState.UpdateState(), which sets targetHorizontalVelocity
+        TryConsumeBufferedJump();
+        UpdateHorizontalVelocity();
+        UpdateFacing();
 
-        // Apply final calculated movement
+        // Apply final calculated movement - the ONLY place the CharacterController is moved each frame
         Vector3 finalVelocity = currentHorizontalVelocity + (Vector3.up * verticalVelocity);
         controller.Move(finalVelocity * Time.deltaTime);
 
@@ -243,36 +275,125 @@ public class PlayerStateManager : MonoBehaviour
     }
 
     // --- Player Movement ---
+
+    /// <summary>
+    /// World-space direction the player wants to move in, from the Move input.
+    /// Camera-relative when cameraRelativeMovement is on, body-relative otherwise.
+    /// Magnitude is 0..1 so analog sticks can move slowly.
+    /// </summary>
+    public Vector3 GetDesiredMoveDirection()
+    {
+        Vector3 forward = transform.forward;
+        Vector3 right = transform.right;
+
+        if (cameraRelativeMovement)
+        {
+            if (cameraTransform == null && Camera.main != null) cameraTransform = Camera.main.transform;
+            if (cameraTransform != null)
+            {
+                forward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up);
+                if (forward.sqrMagnitude < 0.0001f) forward = Vector3.ProjectOnPlane(cameraTransform.up, Vector3.up);
+                forward.Normalize();
+                right = Vector3.Cross(Vector3.up, forward);
+            }
+        }
+
+        Vector3 direction = (forward * movement.y) + (right * movement.x);
+        direction.y = 0f;
+        return Vector3.ClampMagnitude(direction, 1f);
+    }
+
+    /// <summary>Called by movement states: move in the input direction at the given speed.</summary>
+    public void SetMoveSpeed(float speed)
+    {
+        targetHorizontalVelocity = GetDesiredMoveDirection() * speed;
+    }
+
+    /// <summary>Stop horizontal movement (with deceleration).</summary>
+    public void StopMoving()
+    {
+        targetHorizontalVelocity = Vector3.zero;
+    }
+
+    // Kept for older states (e.g. flying). Sets the target velocity; Update() does the actual move.
+    // (Previously this moved the controller directly, which double-applied gravity and stacked with
+    // the stale walk velocity, making run/sneak faster than intended.)
     public void MovePlayer(Vector3 horizontalDirection, float speed)
     {
         horizontalDirection.y = 0;
-        Vector3 finalMovement = (horizontalDirection.normalized * speed) + (Vector3.up * verticalVelocity);
-        controller.Move(finalMovement * Time.deltaTime);
+        targetHorizontalVelocity = Vector3.ClampMagnitude(horizontalDirection, 1f) * speed;
     }
 
+    /// <summary>Drains stamina while running. Returns false when the player is out of stamina.</summary>
+    public bool DrainRunStamina()
+    {
+        runStaminaAccumulator += runStaminaCostPerSecond * Time.deltaTime;
+        if (runStaminaAccumulator >= 1f)
+        {
+            int whole = Mathf.FloorToInt(runStaminaAccumulator);
+            runStaminaAccumulator -= whole;
+            UseStamina(whole);
+        }
+        return currentStamina > 0;
+    }
+
+    void UpdateHorizontalVelocity()
+    {
+        float rate;
+        if (!isGrounded) rate = airAcceleration;
+        else if (targetHorizontalVelocity.sqrMagnitude > currentHorizontalVelocity.sqrMagnitude) rate = groundAcceleration;
+        else rate = groundDeceleration;
+
+        currentHorizontalVelocity = Vector3.MoveTowards(currentHorizontalVelocity, targetHorizontalVelocity, rate * Time.deltaTime);
+    }
+
+    void UpdateFacing()
+    {
+        if (!cameraRelativeMovement) return; // Legacy mode: PlayerBodyRotator drives the body
+        if (cameraTransform == null && Camera.main != null) cameraTransform = Camera.main.transform;
+
+        Vector3 faceDirection = Vector3.zero;
+        bool isAiming = playerShooting != null && playerShooting.IsCharging;
+
+        if (isAiming && cameraTransform != null)
+        {
+            faceDirection = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up); // Face where we're aiming
+        }
+        else if (movement.sqrMagnitude > 0.01f && targetHorizontalVelocity.sqrMagnitude > 0.0001f)
+        {
+            faceDirection = targetHorizontalVelocity; // Face where we're going
+        }
+
+        if (faceDirection.sqrMagnitude < 0.0001f) return;
+        Quaternion targetRotation = Quaternion.LookRotation(faceDirection.normalized, Vector3.up);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+    }
 
     void HandleGroundCheck()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore);
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, groundLayer, QueryTriggerInteraction.Ignore)
+                     || (controller != null && controller.isGrounded);
     }
 
     void ApplyGravity()
     {
         bool justLanded = !wasGroundedLastFrame && isGrounded;
 
-        if (justLanded)
+        if (isGrounded && verticalVelocity <= 0f)
         {
-            verticalVelocity = -0.5f; // Stick slightly on landing
+            // Heavy landings get a small camera bump
+            if (justLanded && verticalVelocity < -15f)
+                Ishana.Combat.CombatFeedback.Shake(Mathf.InverseLerp(-15f, -maxFallSpeed, verticalVelocity) * 0.4f + 0.1f);
+
+            // Small constant push keeps the controller glued to slopes instead of skipping down them
+            verticalVelocity = -2f;
             hasJumped = false;
         }
-        else if (isGrounded)
+        else // Airborne (or moving upward from a jump)
         {
-            if (verticalVelocity < 0f) { verticalVelocity = 0f; }
-            hasJumped = false;
-        }
-        else // Airborne
-        {
-            verticalVelocity += gravity * Time.deltaTime;
+            float multiplier = verticalVelocity < 0f ? fallGravityMultiplier : 1f;
+            verticalVelocity += gravity * multiplier * Time.deltaTime;
+            verticalVelocity = Mathf.Max(verticalVelocity, -maxFallSpeed);
         }
     }
 
@@ -284,19 +405,23 @@ public class PlayerStateManager : MonoBehaviour
     // --- Jump Logic ---
     void OnJump()
     {
-        // Debug.Log("Jump Input Received");
-        if (isGrounded)
-        {
-            // Debug.Log("Performing Ground Jump");
-            hasJumped = true;
-            Jump(); // Calculate vertical velocity
-            animationManager?.TriggerJump();
-            PlaySoundOneShot(jumpSound);
-        }
-        else
-        {
-            // Debug.Log("Jump Input while airborne (no action defined)");
-        }
+        if (PauseMenuController.GameIsPaused) return;
+        // Buffer the press; TryConsumeBufferedJump() fires it as soon as it's allowed (coyote time + jump buffering)
+        lastJumpPressedTime = Time.time;
+    }
+
+    void TryConsumeBufferedJump()
+    {
+        bool jumpBuffered = Time.time - lastJumpPressedTime <= jumpBufferTime;
+        bool canJump = Time.time - lastGroundedTime <= coyoteTime && !hasJumped && currentState != hitState;
+        if (!jumpBuffered || !canJump) return;
+
+        lastJumpPressedTime = float.NegativeInfinity;
+        lastGroundedTime = float.NegativeInfinity; // Prevent a second coyote jump
+        hasJumped = true;
+        Jump(); // Calculate vertical velocity
+        animationManager?.TriggerJump();
+        PlaySoundOneShot(jumpSound);
     }
 
     public void Jump()
@@ -313,7 +438,9 @@ public class PlayerStateManager : MonoBehaviour
             // Debug.Log($"Attempting to call TriggerHit. animationManager is null? {animationManager == null}");
             animationManager?.TriggerHit();
             hitState.SetDamage(damage); // Pass damage amount to HitState if needed
+            StopMoving();
             SwitchState(hitState);
+            Ishana.Combat.CombatFeedback.ReportPlayerHit(this, damage);
 
             currentHealth -= damage;
             currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);

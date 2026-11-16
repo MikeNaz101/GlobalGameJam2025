@@ -47,6 +47,14 @@ public class PlayerShooting : MonoBehaviour
 
     // --- Internal State Variables ---
     private bool _isCharging = false;           // Is the player holding the fire button?
+    public bool IsCharging => _isCharging;      // Read by movement (face aim direction) and the camera (aim zoom)
+    /// <summary>0..1 charge progress while charging, 0 otherwise.</summary>
+    public float ChargeRatio => _isCharging ? Mathf.Clamp01((Time.time - chargeStartTime) / maxChargeTime) : 0f;
+    private bool _fullChargeSignalled = false;
+
+    [Header("Charge Feedback")]
+    [Tooltip("Pitch of the charge loop at zero and full charge. Rising pitch tells the player how charged the shot is.")]
+    public Vector2 chargeLoopPitchRange = new Vector2(0.9f, 1.5f);
     private GameObject currentBulletVisual;     // Visual representation while charging
     private float chargeStartTime;              // Time when charging started
     private Vector3 initialBulletScale;         // Store initial scale for visual charging
@@ -108,6 +116,18 @@ public class PlayerShooting : MonoBehaviour
             currentBulletVisual.transform.localScale = initialBulletScale * targetScaleMultiplier;
             // You could also update particle emission rates or colors here based on chargeRatio
         }
+
+        // --- Charge Feedback: rising pitch + a pulse when fully charged ---
+        if (_isCharging && player != null && player.audioSource != null)
+        {
+            float ratio = ChargeRatio;
+            player.audioSource.pitch = Mathf.Lerp(chargeLoopPitchRange.x, chargeLoopPitchRange.y, ratio);
+            if (ratio >= 1f && !_fullChargeSignalled)
+            {
+                _fullChargeSignalled = true;
+                Ishana.Combat.CombatFeedback.ChargeReady(firePoint != null ? firePoint.position : transform.position);
+            }
+        }
     }
 
 
@@ -152,6 +172,7 @@ public class PlayerShooting : MonoBehaviour
 
         // --- Start Charging State & Sound ---
         _isCharging = true;
+        _fullChargeSignalled = false;
         chargeStartTime = Time.time;
         player.PlayLoopingSound(player.chargeLoopSound); // Start the loop
 
@@ -165,6 +186,7 @@ public class PlayerShooting : MonoBehaviour
         // --- Stop Aiming/Charging Effects ---
         DeactivateTeleportVCamView();
         player.StopLoopingSound(); // Stop the charging sound loop
+        if (player.audioSource != null) player.audioSource.pitch = 1f;
 
         // --- Validate State ---
         if (!_isCharging || currentBulletVisual == null)
@@ -223,6 +245,7 @@ public class PlayerShooting : MonoBehaviour
             // --- Animation & Sound ---
             animationManager?.TriggerShoot();
             player.PlaySoundOneShot(player.shootSound);
+            Ishana.Combat.CombatFeedback.ShotFired(chargeRatio);
 
             // --- Calculate Fire Direction ---
             Vector3 fireDirection = CalculateFireDirection();
@@ -337,6 +360,7 @@ public class PlayerShooting : MonoBehaviour
         {
             Debug.Log("<color=orange>Charge Explicitly Cancelled.</color>");
             player.StopLoopingSound();
+            if (player.audioSource != null) player.audioSource.pitch = 1f;
             DeactivateTeleportVCamView();
             if (currentBulletVisual != null)
             {

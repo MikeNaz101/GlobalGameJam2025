@@ -12,7 +12,7 @@ public class PlayerIdleState : PlayerBaseState
     public override void UpdateState(PlayerStateManager player)
     {
         // Set horizontal velocity to zero when Idle
-        player.currentHorizontalVelocity = Vector3.zero;
+        player.StopMoving(); // Decelerates smoothly instead of stopping dead
         // Apply gravity only (MovePlayer(0) effectively does this if it includes verticalVelocity)
         // Or rely on PlayerStateManager.Update to handle gravity while idle
 

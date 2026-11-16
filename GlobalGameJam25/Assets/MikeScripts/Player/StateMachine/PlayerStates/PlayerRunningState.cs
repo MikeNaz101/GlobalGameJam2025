@@ -13,9 +13,14 @@ public class PlayerRunningState : PlayerBaseState
     {
         // --- Movement ---
         // Calculate movement direction based on input
-        Vector3 moveDirection = (player.transform.right * player.movement.x) + (player.transform.forward * player.movement.y);
-        // Call MovePlayer with the specific runSpeed
-        player.MovePlayer(moveDirection, player.runSpeed);
+        player.SetMoveSpeed(player.runSpeed);
+
+        // Running costs stamina; drop back to walking when it runs out
+        if (!player.DrainRunStamina())
+        {
+            player.SwitchState(player.walkState);
+            return;
+        }
 
         // Optional: Continue consuming stamina while in this state
         // if (player.currentStamina <= 0) { player.SwitchState(player.walkState); } // Example: Force walk if out of stamina

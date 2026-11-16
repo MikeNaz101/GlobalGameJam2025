@@ -12,11 +12,7 @@ public class PlayerSneakState : PlayerBaseState
         // --- Calculate Movement Direction ---
         // Get the desired direction based on input (player.movement)
         // relative to the player's current orientation (transform.right/forward)
-        Vector3 moveDirection = (player.transform.right * player.movement.x) + (player.transform.forward * player.movement.y);
-
-        // --- Call MovePlayer with Direction and Speed ---
-        // Pass BOTH the direction and the specific speed for sneaking
-        player.MovePlayer(moveDirection, player.sneakSpeed);
+        player.SetMoveSpeed(player.sneakSpeed);
 
         // --- Check for transitions ---
         if (player.movement.magnitude < 0.1f && player.isGrounded) // Transition to Idle if stopping

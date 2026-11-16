@@ -233,6 +233,7 @@ public abstract class BaseEnemy : MonoBehaviour
 
         Debug.Log($"{gameObject.name} took {damage} ({type}) damage. Health: {currentHealth}/{maxHealth}");
         UpdateHealthBar();
+        Ishana.Combat.CombatFeedback.ReportEnemyHit(this, damage, type, currentHealth <= 0);
 
         if (currentHealth <= 0)
         {

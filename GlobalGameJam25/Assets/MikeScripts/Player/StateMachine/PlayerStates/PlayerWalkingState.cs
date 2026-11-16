@@ -31,12 +31,8 @@ public class PlayerWalkingState : PlayerBaseState
             return;
         }
 
-        // --- Movement Calculation (same as before) ---
-        Vector2 input = player.movement;
-        Vector3 bodyForward = player.transform.forward;
-        Vector3 bodyRight = player.transform.right;
-        Vector3 desiredMoveDirection = (bodyForward * input.y) + (bodyRight * input.x);
-        player.currentHorizontalVelocity = desiredMoveDirection.normalized * player.walkSpeed; // Normalize direction
+        // --- Movement (camera-relative; PlayerStateManager handles acceleration and facing) ---
+        player.SetMoveSpeed(player.walkSpeed);
 
         // --- Footstep Sound ---
         footstepTimer -= Time.deltaTime;

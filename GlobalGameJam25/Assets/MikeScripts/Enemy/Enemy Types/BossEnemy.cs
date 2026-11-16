@@ -498,6 +498,7 @@ public class BossEnemy : BaseEnemy
 
         Debug.Log($"[{gameObject.name}] Took hit #{hitsTaken}. Health: {currentHealth}/{bossMaxHealth}");
         UpdateHealthBar();
+        Ishana.Combat.CombatFeedback.ReportEnemyHit(this, damage, type, currentHealth <= 0, isBoss: true);
 
         if (currentHealth <= 0)
         {

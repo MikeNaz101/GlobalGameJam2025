@@ -16,6 +16,9 @@ public class AreaCleansingManager : MonoBehaviour
     public int totalMonstersInArea = 10;
     private int monstersKilled = 0;
     private float currentBlightPotency = 1.0f; // 1.0 = fully blighted, 0.0 = clean
+    /// <summary>1 = fully blighted, 0 = fully cleansed. Read by BlightPostFX.</summary>
+    public float BlightPotency => currentBlightPotency;
+    public bool IsCleared => _areaHasBeenCleared;
 
     [Header("Local Environment Ingredients")]
     [Tooltip("A light source PRIMARILY affecting this local area.")]

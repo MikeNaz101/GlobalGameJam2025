@@ -18,6 +18,8 @@ public class GlobalAmbianceController : MonoBehaviour
 
     // --- Internal State ---
     private AreaCleansingManager currentActiveArea = null;
+    /// <summary>The grove the player is standing in, or null. Read by BlightPostFX.</summary>
+    public AreaCleansingManager ActiveArea => currentActiveArea;
     // Fog Targets
     private float targetFogDensity;
     private Color targetFogColor;

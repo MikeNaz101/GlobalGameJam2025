@@ -91,7 +91,10 @@ public class PlayerHitState : PlayerBaseState
         // It might fight gravity or other movement. Consider applying an impulse
         // via player.verticalVelocity and a temporary horizontal velocity if needed.
         // For now, using simple Move:
-        player.controller.Move(knockbackDirection * knockbackForce * Time.deltaTime); // Apply over one frame
+        // Impulse through the velocity system so it decelerates smoothly (PlayerStateManager.Update does the move)
+        player.currentHorizontalVelocity = knockbackDirection * knockbackForce * 6f;
+        player.StopMoving();
+        if (player.isGrounded) player.verticalVelocity = 3f; // Small hop sells the hit
 
          // Example alternative: Apply vertical/horizontal impulse
          // player.verticalVelocity += 2.0f; // Pop up slightly
