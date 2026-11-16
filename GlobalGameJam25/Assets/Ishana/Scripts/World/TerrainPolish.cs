@@ -39,10 +39,19 @@ namespace Ishana.World
         [Header("Painted Grass, Ferns and Weeds")]
         [Tooltip("Set the terrain's wind so painted grass sways.")]
         public bool windOnPaintedPlants = true;
-        [Tooltip("Experimental: also switch painted MESH plants (ferns, weeds) to the terrain's grass mode so they sway too. " +
-                 "Depends on how the plant meshes were made: on some meshes it stretches them into huge flickering triangles, " +
-                 "so it is off by default.")]
-        public bool windOnMeshPlants = false;
+        [Tooltip("Painted MESH plants (ferns, weeds, grass planes) sway too. They are drawn with the Ishana/Wind Plant shader " +
+                 "using GPU instancing, which is cheap. Your prefabs and materials are not changed: copies are made when the game starts. " +
+                 "Untick if a plant looks wrong.")]
+        public bool windOnMeshPlants = true;
+        [Tooltip("How far the top of a mesh plant sways, as a fraction of its height.")]
+        [Range(0f, 0.5f)] public float meshPlantSway = 0.12f;
+        [Tooltip("Brightness of mesh plants compared to the scene lighting.")]
+        [Range(0.2f, 2f)] public float meshPlantBrightness = 1f;
+
+        readonly System.Collections.Generic.Dictionary<GameObject, GameObject> _windCopies = new System.Collections.Generic.Dictionary<GameObject, GameObject>();
+        readonly System.Collections.Generic.List<Material> _windMaterials = new System.Collections.Generic.List<Material>();
+        Shader _windShader;
+        float _nextLightUpdate;
         [Range(0f, 1f)] public float windStrength = 0.45f;
         [Range(0f, 1f)] public float windSpeed = 0.4f;
         [Range(0f, 1f)] public float windBending = 0.5f;
@@ -115,21 +124,118 @@ namespace Ishana.World
                     data.wavingGrassAmount = windBending;
 
                     // Mesh plants only sway in "Grass" mode; that mode is also drawn in big batches
-                    DetailPrototype[] details = windOnMeshPlants ? data.detailPrototypes : new DetailPrototype[0];
-                    bool changed = false;
-                    for (int i = 0; i < details.Length; i++)
-                    {
-                        if (!details[i].usePrototypeMesh) continue;
-                        if (details[i].renderMode == DetailRenderMode.Grass && !details[i].useInstancing) continue;
-                        details[i].renderMode = DetailRenderMode.Grass;
-                        details[i].useInstancing = false;
-                        changed = true;
-                    }
-                    if (changed) data.detailPrototypes = details;
+                    if (windOnMeshPlants) ApplyWindToMeshPlants(data);
                 }
 
                 terrain.Flush();
             }
+        }
+
+        /// <summary>
+        /// Swap each painted mesh plant for a copy that uses the swaying, instanced plant shader.
+        /// A plant is left exactly as it was if anything about it doesn't fit.
+        /// </summary>
+        void ApplyWindToMeshPlants(TerrainData data)
+        {
+            if (_windShader == null) _windShader = Resources.Load<Shader>("IshanaWindPlant");
+            if (_windShader == null) _windShader = Shader.Find("Ishana/Wind Plant");
+            if (_windShader == null || !_windShader.isSupported)
+            {
+                Debug.LogWarning("TerrainPolish: wind plant shader missing or unsupported, painted mesh plants stay still.", this);
+                return;
+            }
+
+            DetailPrototype[] details = data.detailPrototypes;
+            bool changed = false;
+            for (int i = 0; i < details.Length; i++)
+            {
+                DetailPrototype original = details[i];
+                if (!original.usePrototypeMesh || original.prototype == null) continue;
+
+                GameObject copy = WindCopy(original.prototype);
+                if (copy == null) continue;
+
+                var swapped = new DetailPrototype(original)
+                {
+                    prototype = copy,
+                    renderMode = DetailRenderMode.VertexLit,
+                    useInstancing = true,
+                };
+                if (!swapped.Validate(out string problem))
+                {
+                    Debug.LogWarning($"TerrainPolish: '{original.prototype.name}' can't use the wind shader ({problem}); leaving it as it is.", this);
+                    continue;
+                }
+                details[i] = swapped;
+                changed = true;
+            }
+            if (changed) data.detailPrototypes = details;
+        }
+
+        GameObject WindCopy(GameObject prefab)
+        {
+            if (_windCopies.TryGetValue(prefab, out GameObject existing)) return existing;
+            _windCopies[prefab] = null; // Remember failures too
+
+            // The terrain needs the mesh and renderer on the top object of the plant
+            var sourceRenderer = prefab.GetComponent<MeshRenderer>();
+            var sourceFilter = prefab.GetComponent<MeshFilter>();
+            if (sourceRenderer == null || sourceFilter == null || sourceFilter.sharedMesh == null || sourceRenderer.sharedMaterial == null) return null;
+
+            Material source = sourceRenderer.sharedMaterial;
+            Texture texture = source.HasProperty("_BaseMap") ? source.GetTexture("_BaseMap") : null;
+            if (texture == null && source.HasProperty("_MainTex")) texture = source.GetTexture("_MainTex");
+            Color tint = source.HasProperty("_BaseColor") ? source.GetColor("_BaseColor")
+                       : source.HasProperty("_Color") ? source.GetColor("_Color") : Color.white;
+            bool cutout = source.HasProperty("_AlphaClip") && source.GetFloat("_AlphaClip") > 0.5f;
+            float cutoff = cutout && source.HasProperty("_Cutoff") ? source.GetFloat("_Cutoff") : 0f;
+
+            var material = new Material(_windShader) { name = source.name + " (wind)", enableInstancing = true };
+            material.SetTexture("_MainTex", texture);
+            material.SetColor("_Color", new Color(tint.r, tint.g, tint.b, 1f));
+            material.SetFloat("_Cutoff", cutoff);
+
+            var copy = new GameObject(prefab.name + " (wind copy)");
+            copy.hideFlags = HideFlags.HideAndDontSave;
+            copy.transform.SetParent(transform, false);
+            copy.transform.localPosition = Vector3.down * 10000f; // Out of sight; it only exists for the terrain to copy from
+            copy.transform.localRotation = prefab.transform.localRotation;
+            copy.transform.localScale = prefab.transform.localScale;
+            copy.AddComponent<MeshFilter>().sharedMesh = sourceFilter.sharedMesh;
+            var renderer = copy.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = material;
+
+            // Sway is measured against the plant's real height
+            float height = Mathf.Max(0.05f, renderer.bounds.size.y);
+            material.SetFloat("_BendHeight", height);
+            material.SetFloat("_WindStrength", height * meshPlantSway * Mathf.Lerp(0.3f, 1.5f, windStrength));
+            material.SetFloat("_WindSpeed", Mathf.Lerp(0.6f, 3f, windSpeed));
+            renderer.enabled = false;
+
+            _windMaterials.Add(material);
+            _windCopies[prefab] = copy;
+            return copy;
+        }
+
+        void Update()
+        {
+            // The plant shader is unlit to stay cheap, so feed it the scene's light a couple of times a second
+            if (_windMaterials.Count == 0 || Time.unscaledTime < _nextLightUpdate) return;
+            _nextLightUpdate = Time.unscaledTime + 0.5f;
+
+            Color light = RenderSettings.ambientLight;
+            Light sun = RenderSettings.sun;
+            if (sun != null && sun.isActiveAndEnabled) light += sun.color * Mathf.Min(sun.intensity, 2f) * 0.6f;
+            light *= meshPlantBrightness;
+            light = new Color(Mathf.Clamp(light.r, 0.05f, 1.6f), Mathf.Clamp(light.g, 0.05f, 1.6f), Mathf.Clamp(light.b, 0.05f, 1.6f), 1f);
+            foreach (Material m in _windMaterials)
+                if (m != null) m.SetColor("_PlantLight", light);
+        }
+
+        void OnDestroy()
+        {
+            foreach (Material m in _windMaterials) if (m != null) Destroy(m);
+            foreach (GameObject copy in _windCopies.Values) if (copy != null) Destroy(copy);
         }
     }
 }
