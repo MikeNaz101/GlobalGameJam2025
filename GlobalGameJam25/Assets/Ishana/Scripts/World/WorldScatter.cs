@@ -114,7 +114,7 @@ namespace Ishana.World
             public PaintedTree painted; // Set when this object stands in for a tree painted on the terrain
         }
 
-        class PaintedTree { public Terrain terrain; public int instanceIndex; public TreeInstance original; }
+        class PaintedTree { public Terrain terrain; public int instanceIndex; public TreeInstance original; public bool converted; }
 
         class Cell
         {
@@ -253,60 +253,142 @@ namespace Ishana.World
             }
         }
 
-        /// <summary>Swap the painted trees in a cell for real objects that can burn, be healed and grow.</summary>
+        // Painted trees are only swapped for real objects when magic or fire actually reaches them.
+        // Swapping every tree near the player made the whole forest redraw over and over (flicker).
+
+        void OnEnable()
+        {
+            ElementalObject.OnImpact += HandleImpact;
+            Flammable.OnSpreadTick += HandleSpread;
+            EarthBullet.OnBeam += HandleBeam;
+        }
+
+        void OnDisable()
+        {
+            ElementalObject.OnImpact -= HandleImpact;
+            Flammable.OnSpreadTick -= HandleSpread;
+            EarthBullet.OnBeam -= HandleBeam;
+        }
+
+        void HandleImpact(Element element, Vector3 point, float radius, float power)
+        {
+            if (element == Element.Fire || element == Element.Earth) ConvertPaintedNear(point, radius + 2f * _scale);
+        }
+
+        void HandleSpread(Flammable source) =>
+            ConvertPaintedNear(source.transform.position, source.reachRadius + source.spreadRadius + 2f * _scale);
+
+        // The earth beam is about to be fired: painted trees have nothing to hit, so make the ones along its path real first
+        void HandleBeam(Vector3 origin, Vector3 direction, float range)
+        {
+            if (!convertPaintedTrees || _painted.Count == 0) return;
+            float step = Cs * 0.5f;
+            bool any = false;
+            for (float d = 0f; d <= range; d += step)
+                any |= ConvertPaintedNear(origin + direction * d, step + 2f * _scale, true, origin, direction);
+            if (any) Physics.SyncTransforms();
+        }
+
+        bool ConvertPaintedNear(Vector3 point, float radius, bool alongRay = false, Vector3 rayOrigin = default, Vector3 rayDirection = default)
+        {
+            if (!convertPaintedTrees || _painted.Count == 0) return false;
+            float cs = Cs;
+            int reach = Mathf.Max(1, Mathf.CeilToInt(radius / cs));
+            var here = new Vector2Int(Mathf.FloorToInt(point.x / cs), Mathf.FloorToInt(point.z / cs));
+            bool any = false;
+
+            for (int dx = -reach; dx <= reach; dx++)
+                for (int dz = -reach; dz <= reach; dz++)
+                {
+                    var coord = new Vector2Int(here.x + dx, here.y + dz);
+                    if (!_painted.TryGetValue(coord, out List<PaintedTree> list)) continue;
+                    if (!_cells.TryGetValue(coord, out Cell cell) || !cell.objectsLoaded) continue;
+
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        PaintedTree painted = list[i];
+                        if (painted.converted || painted.terrain == null) continue;
+                        Vector3 world = painted.terrain.transform.position + Vector3.Scale(painted.original.position, painted.terrain.terrainData.size);
+
+                        if (alongRay)
+                        {
+                            // Distance from the tree's trunk line to the beam, ignoring height above the base
+                            Vector3 toTree = world - rayOrigin;
+                            float along = Vector3.Dot(toTree, rayDirection);
+                            if (along < 0f) continue;
+                            Vector3 closest = rayOrigin + rayDirection * along;
+                            float ddx = closest.x - world.x, ddz = closest.z - world.z;
+                            if (ddx * ddx + ddz * ddz > 4f * _scale * _scale || closest.y < world.y - _scale) continue;
+                        }
+                        else
+                        {
+                            float ddx = world.x - point.x, ddz = world.z - point.z;
+                            if (ddx * ddx + ddz * ddz > radius * radius) continue;
+                        }
+
+                        ConvertPainted(cell, painted, i);
+                        any = true;
+                    }
+                }
+            return any;
+        }
+
+        /// <summary>Swap one painted tree for a real object that can burn, be healed and grow.</summary>
+        void ConvertPainted(Cell cell, PaintedTree painted, int i)
+        {
+            TerrainData data = painted.terrain.terrainData;
+            TreePrototype[] prototypes = data.treePrototypes;
+            TreeInstance tree = painted.original;
+            painted.converted = true; // Even if it turns out it can't be converted, don't try again
+            if (tree.prototypeIndex < 0 || tree.prototypeIndex >= prototypes.Length || prototypes[tree.prototypeIndex].prefab == null) return;
+
+            GameObject prefab = prototypes[tree.prototypeIndex].prefab;
+            Vector3 world = painted.terrain.transform.position + Vector3.Scale(tree.position, data.size);
+            GameObject go = Instantiate(prefab, world, Quaternion.Euler(0f, tree.rotation * Mathf.Rad2Deg, 0f), _root);
+            go.transform.localScale = Vector3.Scale(prefab.transform.localScale, new Vector3(tree.widthScale, tree.heightScale, tree.widthScale));
+
+            var plant = go.GetComponent<Flammable>();
+            if (plant == null)
+            {
+                plant = go.AddComponent<Flammable>();
+                plant.AutoSize();
+                plant.burnDuration = 16f;
+                plant.flammability = 0.75f;
+                plant.spreadRadius = 3f * _scale;
+                plant.spreadInterval = 1.6f;
+            }
+
+            // A trunk to hit and to bump into, if the model has none
+            if (go.GetComponentInChildren<Collider>() == null)
+            {
+                float height = plant.centerHeight * 2f;
+                Vector3 ls = go.transform.lossyScale;
+                var trunk = go.AddComponent<CapsuleCollider>();
+                trunk.radius = Mathf.Max(0.05f, height * 0.05f) / Mathf.Max(0.0001f, Mathf.Abs(ls.x));
+                trunk.height = height * 0.85f / Mathf.Max(0.0001f, Mathf.Abs(ls.y));
+                trunk.center = Vector3.up * (height * 0.45f / Mathf.Max(0.0001f, Mathf.Abs(ls.y)));
+            }
+
+            // The same trees are growable every time
+            var roll = new System.Random(unchecked(seed * 31 + painted.instanceIndex * 7919));
+            if (roll.NextDouble() < paintedGrowableShare && go.GetComponent<GrowablePlant>() == null) go.AddComponent<GrowablePlant>();
+
+            // Hide the painted version while the real one stands in for it
+            TreeInstance hidden = tree;
+            hidden.widthScale = 0f;
+            hidden.heightScale = 0f;
+            data.SetTreeInstance(painted.instanceIndex, hidden);
+
+            Track(cell, cell.objects, 5000 + i, go);
+            cell.objects[cell.objects.Count - 1].painted = painted;
+        }
+
+        /// <summary>Painted trees the player changed earlier (burnt, grown) come back that way when the area reloads.</summary>
         void LoadPaintedTrees(Cell cell)
         {
             if (!_painted.TryGetValue(cell.coord, out List<PaintedTree> list)) return;
-
             for (int i = 0; i < list.Count; i++)
-            {
-                PaintedTree painted = list[i];
-                if (painted.terrain == null) continue;
-                TerrainData data = painted.terrain.terrainData;
-                TreePrototype[] prototypes = data.treePrototypes;
-                TreeInstance tree = painted.original;
-                if (tree.prototypeIndex < 0 || tree.prototypeIndex >= prototypes.Length || prototypes[tree.prototypeIndex].prefab == null) continue;
-
-                GameObject prefab = prototypes[tree.prototypeIndex].prefab;
-                Vector3 world = painted.terrain.transform.position + Vector3.Scale(tree.position, data.size);
-                GameObject go = Instantiate(prefab, world, Quaternion.Euler(0f, tree.rotation * Mathf.Rad2Deg, 0f), _root);
-                go.transform.localScale = Vector3.Scale(prefab.transform.localScale, new Vector3(tree.widthScale, tree.heightScale, tree.widthScale));
-
-                var plant = go.GetComponent<Flammable>();
-                if (plant == null)
-                {
-                    plant = go.AddComponent<Flammable>();
-                    plant.AutoSize();
-                    plant.burnDuration = 16f;
-                    plant.flammability = 0.75f;
-                    plant.spreadRadius = 3f * _scale;
-                    plant.spreadInterval = 1.6f;
-                }
-
-                // A trunk to hit and to bump into, if the model has none
-                if (go.GetComponentInChildren<Collider>() == null)
-                {
-                    float height = plant.centerHeight * 2f;
-                    Vector3 ls = go.transform.lossyScale;
-                    var trunk = go.AddComponent<CapsuleCollider>();
-                    trunk.radius = Mathf.Max(0.05f, height * 0.05f) / Mathf.Max(0.0001f, Mathf.Abs(ls.x));
-                    trunk.height = height * 0.85f / Mathf.Max(0.0001f, Mathf.Abs(ls.y));
-                    trunk.center = Vector3.up * (height * 0.45f / Mathf.Max(0.0001f, Mathf.Abs(ls.y)));
-                }
-
-                // The same trees are growable every time
-                var roll = new System.Random(unchecked(seed * 31 + painted.instanceIndex * 7919));
-                if (roll.NextDouble() < paintedGrowableShare && go.GetComponent<GrowablePlant>() == null) go.AddComponent<GrowablePlant>();
-
-                // Hide the painted version while the real one stands in for it
-                TreeInstance hidden = tree;
-                hidden.widthScale = 0f;
-                hidden.heightScale = 0f;
-                data.SetTreeInstance(painted.instanceIndex, hidden);
-
-                Track(cell, cell.objects, 5000 + i, go);
-                cell.objects[cell.objects.Count - 1].painted = painted;
-            }
+                if (!list[i].converted && _saved.ContainsKey(Key(cell.coord, 5000 + i))) ConvertPainted(cell, list[i], i);
         }
 
         // ------------------------------------------------------------------ streaming
@@ -378,7 +460,10 @@ namespace Ishana.World
                 long key = Key(cell.coord, t.index);
                 // Far away again: show the painted tree in its place
                 if (t.painted != null && t.painted.terrain != null)
+                {
                     t.painted.terrain.terrainData.SetTreeInstance(t.painted.instanceIndex, t.painted.original);
+                    t.painted.converted = false;
+                }
 
                 if (t.go == null) { _saved[key] = Removed; continue; }
 

@@ -46,6 +46,9 @@ public class EarthBullet : MonoBehaviour, PlayerShooting.IBulletChargeReceiver
 
     static readonly RaycastHit[] _hits = new RaycastHit[32];
 
+    /// <summary>Fired just before the beam is cast: origin, direction, range. Lets the world prepare things to be hit.</summary>
+    public static event System.Action<Vector3, Vector3, float> OnBeam;
+
     bool _fired;
     LineRenderer _line;
     float _fadeStart;
@@ -89,6 +92,7 @@ public class EarthBullet : MonoBehaviour, PlayerShooting.IBulletChargeReceiver
         }
 
         Vector3 direction = (target - origin).sqrMagnitude > 0.0001f ? (target - origin).normalized : transform.forward;
+        OnBeam?.Invoke(origin, direction, range);
         bool hitSomething = Cast(new Ray(origin, direction), range, 0f, playerRoot, out RaycastHit hit);
         Vector3 end = hitSomething ? hit.point : origin + direction * range;
 
