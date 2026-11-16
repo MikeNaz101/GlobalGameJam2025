@@ -33,12 +33,16 @@ namespace Ishana.World
         [Header("Shape")]
         [Tooltip("Lower = the terrain keeps its true shape further away (crisper silhouettes), at some CPU/GPU cost. Unity's default is 5.")]
         [Range(1f, 10f)] public float pixelError = 2f;
-        [Tooltip("Draw the terrain with GPU instancing (fewer draw calls).")]
-        public bool drawInstanced = true;
+        [Tooltip("Draw the terrain with GPU instancing (fewer draw calls). Off = leave each terrain's own setting alone.")]
+        public bool drawInstanced = false;
 
         [Header("Painted Grass, Ferns and Weeds")]
-        [Tooltip("Make painted plants sway in the wind.")]
+        [Tooltip("Set the terrain's wind so painted grass sways.")]
         public bool windOnPaintedPlants = true;
+        [Tooltip("Experimental: also switch painted MESH plants (ferns, weeds) to the terrain's grass mode so they sway too. " +
+                 "Depends on how the plant meshes were made: on some meshes it stretches them into huge flickering triangles, " +
+                 "so it is off by default.")]
+        public bool windOnMeshPlants = false;
         [Range(0f, 1f)] public float windStrength = 0.45f;
         [Range(0f, 1f)] public float windSpeed = 0.4f;
         [Range(0f, 1f)] public float windBending = 0.5f;
@@ -64,7 +68,7 @@ namespace Ishana.World
                 if (layered == null)
                 {
                     Shader shader = Shader.Find("Universal Render Pipeline/Terrain/Lit");
-                    if (shader != null) layered = new Material(shader) { name = "Ishana Terrain (runtime)" };
+                    if (shader != null) layered = new Material(shader) { name = "Ishana Terrain (runtime)", enableInstancing = true };
                     else Debug.LogWarning("TerrainPolish: URP terrain shader not found, keeping the current terrain material.", this);
                 }
             }
@@ -98,7 +102,7 @@ namespace Ishana.World
 
                 // --- Shape
                 terrain.heightmapPixelError = Mathf.Min(terrain.heightmapPixelError, pixelError);
-                terrain.drawInstanced = drawInstanced;
+                if (drawInstanced) terrain.drawInstanced = true;
 
                 // --- Painted plants
                 terrain.detailObjectDistance = Mathf.Min(250f, plantDistanceInPlayerHeights * playerHeight);
@@ -111,7 +115,7 @@ namespace Ishana.World
                     data.wavingGrassAmount = windBending;
 
                     // Mesh plants only sway in "Grass" mode; that mode is also drawn in big batches
-                    DetailPrototype[] details = data.detailPrototypes;
+                    DetailPrototype[] details = windOnMeshPlants ? data.detailPrototypes : new DetailPrototype[0];
                     bool changed = false;
                     for (int i = 0; i < details.Length; i++)
                     {
