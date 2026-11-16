@@ -99,6 +99,7 @@ namespace Ishana.Saving
         void ApplyToWorld()
         {
             _player.ApplySavedProgress(_data.level, _data.xp, _data.effectMultiplier, _data.unlockedBulletIndex);
+            if (_data.earthUnlocked) _player.UnlockEarth();
 
             // Groves
             var cleared = new HashSet<string>(_data.clearedGroves);
@@ -235,6 +236,7 @@ namespace Ishana.Saving
             _data.xp = _player.currentXP;
             _data.effectMultiplier = _player.bulletEffectMultiplier;
             _data.unlockedBulletIndex = _player.MaxUnlockedBulletIndex;
+            _data.earthUnlocked = _player.EarthUnlocked;
             _data.playSeconds += Time.unscaledTime - _sessionStart;
             _sessionStart = Time.unscaledTime;
 

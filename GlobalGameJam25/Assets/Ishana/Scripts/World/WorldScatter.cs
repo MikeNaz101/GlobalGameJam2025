@@ -52,6 +52,14 @@ namespace Ishana.World
         [Tooltip("Optional: your own tree prefabs. Empty = trees built in code.")]
         public GameObject[] treePrefabs;
 
+        [Header("Trees Painted On The Terrain")]
+        [Tooltip("Trees painted with Unity's terrain tool can't burn or grow on their own. With this on, painted trees " +
+                 "near the player are swapped for real objects that can (far ones stay as they are, so the forest looks the same). " +
+                 "Your terrain assets are never changed: the game works on a copy made when it starts.")]
+        public bool convertPaintedTrees = true;
+        [Tooltip("Share of converted painted trees that earth magic can grow.")]
+        [Range(0f, 1f)] public float paintedGrowableShare = 0.15f;
+
         [Header("Boulders")]
         public float bouldersPerCell = 0.5f;
         public Vector2 boulderRadius = new Vector2(0.8f, 2.2f);
@@ -100,7 +108,13 @@ namespace Ishana.World
         const int Removed = -1;      // Saved state of an object that no longer exists (broken boulder)
         const int GrownOffset = 10;  // Added to a plant's saved state when it has been grown
 
-        class Tracked { public int index; public GameObject go; public ElementalObject plant; public GrowablePlant growable; }
+        class Tracked
+        {
+            public int index; public GameObject go; public ElementalObject plant; public GrowablePlant growable;
+            public PaintedTree painted; // Set when this object stands in for a tree painted on the terrain
+        }
+
+        class PaintedTree { public Terrain terrain; public int instanceIndex; public TreeInstance original; }
 
         class Cell
         {
@@ -119,6 +133,7 @@ namespace Ishana.World
         readonly List<Vector3> _keepClear = new List<Vector3>();
         readonly Collider[] _overlap = new Collider[16];
         readonly Dictionary<Terrain, bool[]> _blockedLayers = new Dictionary<Terrain, bool[]>();
+        readonly Dictionary<Vector2Int, List<PaintedTree>> _painted = new Dictionary<Vector2Int, List<PaintedTree>>();
 
         Terrain[] _terrains;
         Transform _root;
@@ -184,6 +199,8 @@ namespace Ishana.World
                 }
                 _blockedLayers[t] = any ? blocked : null;
             }
+
+            if (convertPaintedTrees) IndexPaintedTrees();
             return true;
         }
 
@@ -206,6 +223,94 @@ namespace Ishana.World
             }
 
             for (int i = 0; i < Mathf.Max(1, cellsPerFrame) && _jobIndex < _jobs.Count; i++) Run(_jobs[_jobIndex++]);
+        }
+
+        // ------------------------------------------------------------------ painted terrain trees
+
+        void IndexPaintedTrees()
+        {
+            float cs = Cs;
+            foreach (Terrain t in _terrains)
+            {
+                if (t == null || t.terrainData == null || t.terrainData.treeInstanceCount == 0) continue;
+
+                // Work on a copy, so hiding trees while playing never alters the terrain asset on disk
+                TerrainData copy = Instantiate(t.terrainData);
+                copy.name = t.terrainData.name + " (runtime copy)";
+                t.terrainData = copy;
+                var terrainCollider = t.GetComponent<TerrainCollider>();
+                if (terrainCollider != null) terrainCollider.terrainData = copy;
+
+                TreeInstance[] instances = copy.treeInstances;
+                Vector3 origin = t.transform.position, size = copy.size;
+                for (int i = 0; i < instances.Length; i++)
+                {
+                    Vector3 world = origin + Vector3.Scale(instances[i].position, size);
+                    var coord = new Vector2Int(Mathf.FloorToInt(world.x / cs), Mathf.FloorToInt(world.z / cs));
+                    if (!_painted.TryGetValue(coord, out List<PaintedTree> list))
+                    {
+                        list = new List<PaintedTree>();
+                        _painted[coord] = list;
+                    }
+                    list.Add(new PaintedTree { terrain = t, instanceIndex = i, original = instances[i] });
+                }
+            }
+        }
+
+        /// <summary>Swap the painted trees in a cell for real objects that can burn, be healed and grow.</summary>
+        void LoadPaintedTrees(Cell cell)
+        {
+            if (!_painted.TryGetValue(cell.coord, out List<PaintedTree> list)) return;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                PaintedTree painted = list[i];
+                if (painted.terrain == null) continue;
+                TerrainData data = painted.terrain.terrainData;
+                TreePrototype[] prototypes = data.treePrototypes;
+                TreeInstance tree = painted.original;
+                if (tree.prototypeIndex < 0 || tree.prototypeIndex >= prototypes.Length || prototypes[tree.prototypeIndex].prefab == null) continue;
+
+                GameObject prefab = prototypes[tree.prototypeIndex].prefab;
+                Vector3 world = painted.terrain.transform.position + Vector3.Scale(tree.position, data.size);
+                GameObject go = Instantiate(prefab, world, Quaternion.Euler(0f, tree.rotation * Mathf.Rad2Deg, 0f), _root);
+                go.transform.localScale = Vector3.Scale(prefab.transform.localScale, new Vector3(tree.widthScale, tree.heightScale, tree.widthScale));
+
+                var plant = go.GetComponent<Flammable>();
+                if (plant == null)
+                {
+                    plant = go.AddComponent<Flammable>();
+                    plant.AutoSize();
+                    plant.burnDuration = 16f;
+                    plant.flammability = 0.75f;
+                    plant.spreadRadius = 3f * _scale;
+                    plant.spreadInterval = 1.6f;
+                }
+
+                // A trunk to hit and to bump into, if the model has none
+                if (go.GetComponentInChildren<Collider>() == null)
+                {
+                    float height = plant.centerHeight * 2f;
+                    Vector3 ls = go.transform.lossyScale;
+                    var trunk = go.AddComponent<CapsuleCollider>();
+                    trunk.radius = Mathf.Max(0.05f, height * 0.05f) / Mathf.Max(0.0001f, Mathf.Abs(ls.x));
+                    trunk.height = height * 0.85f / Mathf.Max(0.0001f, Mathf.Abs(ls.y));
+                    trunk.center = Vector3.up * (height * 0.45f / Mathf.Max(0.0001f, Mathf.Abs(ls.y)));
+                }
+
+                // The same trees are growable every time
+                var roll = new System.Random(unchecked(seed * 31 + painted.instanceIndex * 7919));
+                if (roll.NextDouble() < paintedGrowableShare && go.GetComponent<GrowablePlant>() == null) go.AddComponent<GrowablePlant>();
+
+                // Hide the painted version while the real one stands in for it
+                TreeInstance hidden = tree;
+                hidden.widthScale = 0f;
+                hidden.heightScale = 0f;
+                data.SetTreeInstance(painted.instanceIndex, hidden);
+
+                Track(cell, cell.objects, 5000 + i, go);
+                cell.objects[cell.objects.Count - 1].painted = painted;
+            }
         }
 
         // ------------------------------------------------------------------ streaming
@@ -275,6 +380,10 @@ namespace Ishana.World
             foreach (Tracked t in list)
             {
                 long key = Key(cell.coord, t.index);
+                // Far away again: show the painted tree in its place
+                if (t.painted != null && t.painted.terrain != null)
+                    t.painted.terrain.terrainData.SetTreeInstance(t.painted.instanceIndex, t.painted.original);
+
                 if (t.go == null) { _saved[key] = Removed; continue; }
 
                 int state = t.plant != null ? t.plant.StateId : 0;
@@ -315,6 +424,7 @@ namespace Ishana.World
         void LoadObjects(Cell cell)
         {
             cell.objectsLoaded = true;
+            LoadPaintedTrees(cell);
             System.Random rng = Rng(cell.coord, 1);
             float cs = Cs;
             var origin = new Vector3(cell.coord.x * cs, 0f, cell.coord.y * cs);

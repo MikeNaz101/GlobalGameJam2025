@@ -163,6 +163,31 @@ public class PlayerStateManager : MonoBehaviour
     // Optional: Public getter if other systems need to know the unlock level
     public int MaxUnlockedBulletIndex => maxUnlockedBulletIndex;
 
+    [SerializeField]
+    [Tooltip("Earth magic is unlocked on its own (from clearing the first grove), independent of the freeze/teleport pickups. Tick to test it straight away.")]
+    private bool earthUnlocked = false;
+    public bool EarthUnlocked => earthUnlocked;
+    private const int EarthBulletIndex = (int)BulletType.Type4;
+
+    /// <summary>Unlock the earth beam. Returns true if it was newly unlocked.</summary>
+    public bool UnlockEarth()
+    {
+        if (earthUnlocked) return false;
+        earthUnlocked = true;
+        Debug.Log("<color=lime>ABILITY UNLOCKED! Earth magic.</color>");
+        return true;
+    }
+
+    // The earth shot sits last in the list but is unlocked separately, so the "highest index" never includes it
+    private void NormalizeUnlocks()
+    {
+        if (maxUnlockedBulletIndex >= EarthBulletIndex)
+        {
+            earthUnlocked = true;
+            maxUnlockedBulletIndex = EarthBulletIndex - 1;
+        }
+    }
+
 
     void Awake()
     {
@@ -251,7 +276,8 @@ public class PlayerStateManager : MonoBehaviour
     void OnChangeWeaponVector2(InputValue scrollVal)
     {
         // Check if switching is allowed at all based on unlocks
-        if (maxUnlockedBulletIndex <= 0)
+        NormalizeUnlocks();
+        if (maxUnlockedBulletIndex <= 0 && !earthUnlocked)
         {
             // Debug.Log("Bullet switching locked (only basic unlocked)."); // Optional debug
             return; // Exit if only the first bullet (index 0) is unlocked
@@ -273,7 +299,7 @@ public class PlayerStateManager : MonoBehaviour
 
             // Call the modified ChangeBulletType method on the BulletSpawnerState,
             // passing the direction AND the maximum allowed index based on unlocks.
-            bulletSpawner.ChangeBulletType(changeDirection, maxUnlockedBulletIndex);
+            bulletSpawner.ChangeBulletType(changeDirection, maxUnlockedBulletIndex, earthUnlocked);
 
             // Note: UpdateShellVisuals() is now called automatically via the event listener set up in Awake()
             // UpdateShellVisuals(); // No longer needed here if event listener is working
@@ -830,6 +856,7 @@ public class PlayerStateManager : MonoBehaviour
         int totalBulletTypes = bulletSpawner != null ? bulletSpawner.GetTotalBulletTypes() : 0;
         int highestIndex = totalBulletTypes > 0 ? totalBulletTypes - 1 : unlockedBulletIndex;
         maxUnlockedBulletIndex = Mathf.Clamp(unlockedBulletIndex, 0, highestIndex);
+        NormalizeUnlocks();
 
         OnXPChanged?.Invoke(currentXP, xpToNextLevel);
         OnLevelChanged?.Invoke(currentLevel);
@@ -886,6 +913,8 @@ public class PlayerStateManager : MonoBehaviour
             Debug.LogWarning($"Tried to unlock invalid or default index: {indexToUnlock}. Only indices > 0 can be unlocked via trigger.");
             return false;
         }
+
+        if (indexToUnlock == EarthBulletIndex) return UnlockEarth(); // Earth is unlocked on its own track
 
         // Optional: Validate against the actual number of bullet types defined
         int totalBulletTypes = bulletSpawner?.GetTotalBulletTypes() ?? 0; // Requires GetTotalBulletTypes() in BulletSpawnerState

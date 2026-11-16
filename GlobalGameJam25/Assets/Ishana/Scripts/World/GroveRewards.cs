@@ -17,11 +17,9 @@ namespace Ishana.World
         public int bonusXP = 50;
 
         [Header("Earth Magic")]
-        [Tooltip("Grant the earth shot (regrows burnt plants) once this many groves are cleansed. " +
-                 "It is only granted after the shots before it (freeze, teleport) are unlocked, so their pickups still matter. " +
-                 "Set to -1 to never grant it here.")]
+        [Tooltip("Grant earth magic once this many groves are cleansed (1 = after the first group of enemies is defeated). " +
+                 "It is separate from the freeze and teleport pickups. Set to -1 to never grant it here.")]
         public int earthShotAfterGroves = 1;
-        const int EarthShotIndex = 3;
         float _nextEarthCheck;
 
         PlayerStateManager _player;
@@ -41,22 +39,24 @@ namespace Ishana.World
 
         void Update()
         {
-            // Cheap periodic check, so it also catches loading a save and picking up the teleport shot later
+            // Cheap periodic check, so it also catches loading a save where groves are already cleansed
             if (earthShotAfterGroves < 0 || Time.time < _nextEarthCheck) return;
             _nextEarthCheck = Time.time + 2f;
 
             if (_player == null) _player = FindFirstObjectByType<PlayerStateManager>();
             if (_player == null) return;
-            if (_player.MaxUnlockedBulletIndex >= EarthShotIndex) { earthShotAfterGroves = -1; return; }
-            if (_player.MaxUnlockedBulletIndex < EarthShotIndex - 1) return;
+            if (_player.EarthUnlocked) return;
 
             int cleansed = 0;
             foreach (var grove in FindObjectsByType<AreaCleansingManager>(FindObjectsSortMode.None))
                 if (grove != null && grove.IsCleared) cleansed++;
             if (cleansed < earthShotAfterGroves) return;
 
-            if (_player.UnlockBulletType(EarthShotIndex))
-                Ishana.UI.ObjectiveHUD.Toast("Earth shot unlocked!  It regrows burnt plants");
+            if (_player.UnlockEarth())
+            {
+                Ishana.UI.ObjectiveHUD.Toast("Earth magic unlocked!  Scroll to switch shots");
+                if (Ishana.Saving.SaveManager.Instance != null) Ishana.Saving.SaveManager.Instance.RequestSave(false, false);
+            }
         }
     }
 }

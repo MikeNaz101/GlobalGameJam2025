@@ -21,6 +21,7 @@ namespace Ishana.Saving
         public int xp;
         public float effectMultiplier = 1f;
         public int unlockedBulletIndex;
+        public bool earthUnlocked;
 
         // Checkpoint
         public bool hasCheckpoint;

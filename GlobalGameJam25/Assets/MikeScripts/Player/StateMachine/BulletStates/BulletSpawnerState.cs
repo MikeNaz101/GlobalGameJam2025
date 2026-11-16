@@ -52,31 +52,26 @@ public class BulletSpawnerState : MonoBehaviour
     /// </summary>
     /// <param name="changeAmount">1 for next, -1 for previous.</param>
     /// <param name="maxAllowedIndex">The highest index (enum value) the player is allowed to select.</param>
-    public void ChangeBulletType(int changeAmount, int maxAllowedIndex) // Added maxAllowedIndex parameter
+    public void ChangeBulletType(int changeAmount, int maxAllowedIndex, bool earthUnlocked = false)
     {
-        // Validate maxAllowedIndex against the actual number of defined bullet types
-        int totalDefinedTypes = Enum.GetValues(typeof(BulletType)).Length;
-        int actualMaxIndex = Mathf.Clamp(maxAllowedIndex, 0, totalDefinedTypes - 1);
+        // The shots the player can cycle through: basic, then freeze/teleport up to the unlocked index,
+        // then earth if it has been unlocked (it is unlocked separately from the others).
+        int earthIndex = (int)BulletType.Type4;
+        int actualMaxIndex = Mathf.Clamp(maxAllowedIndex, 0, earthIndex - 1);
+        var allowed = new System.Collections.Generic.List<int>();
+        for (int i = 0; i <= actualMaxIndex; i++) allowed.Add(i);
+        if (earthUnlocked) allowed.Add(earthIndex);
 
-        // If only index 0 is allowed, we cannot switch
-        if (actualMaxIndex <= 0)
-        {
-            // Debug.Log("ChangeBulletType: Only one type (Index 0) is unlocked. No change.");
-            return;
-        }
+        // If only one shot is allowed, we cannot switch
+        if (allowed.Count <= 1) return;
 
-        int currentTypeIndex = (int)CurrentBulletType;
         BulletType previousType = CurrentBulletType; // Store previous type
+        int position = allowed.IndexOf((int)CurrentBulletType);
+        if (position < 0) position = 0;
 
-        // Calculate the number of types the player can currently cycle through
-        int numUnlockedTypes = actualMaxIndex + 1;
+        int step = changeAmount > 0 ? 1 : -1;
+        int nextIndexInUnlockedRange = allowed[((position + step) % allowed.Count + allowed.Count) % allowed.Count];
 
-        // Calculate the next index within the *unlocked range* using modulo arithmetic
-        // Add numUnlockedTypes before modulo to handle negative changeAmount correctly
-        int nextIndexInUnlockedRange = (currentTypeIndex + changeAmount % numUnlockedTypes + numUnlockedTypes) % numUnlockedTypes;
-
-        // The result 'nextIndexInUnlockedRange' is guaranteed to be between 0 and actualMaxIndex (inclusive)
-        // because it's the index within the subset of unlocked types.
         BulletType newType = (BulletType)nextIndexInUnlockedRange; // Cast the valid index back to the enum type
 
         // Update the current bullet type only if it actually changed
