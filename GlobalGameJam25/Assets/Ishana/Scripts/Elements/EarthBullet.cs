@@ -17,6 +17,7 @@ using UnityEngine;
 public class EarthBullet : MonoBehaviour, PlayerShooting.IBulletChargeReceiver
 {
     public static readonly Color EarthColor = new Color(0.4f, 0.85f, 0.3f);
+    public static readonly Color SoilColor = new Color(0.45f, 0.31f, 0.18f);
 
     [Header("Beam")]
     [Tooltip("How far the beam reaches, in player heights.")]

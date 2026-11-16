@@ -40,6 +40,9 @@ namespace Ishana.Elements
         /// </summary>
         public static void Impact(Element element, Vector3 point, float radius, float power, GameObject directHit = null)
         {
+            // Lets other systems react first (e.g. painted terrain plants become burnable where fire lands)
+            OnImpact?.Invoke(element, point, radius, power);
+
             ElementalObject direct = directHit != null ? directHit.GetComponentInParent<ElementalObject>() : null;
             if (direct != null) direct.ApplyElement(element, power, point);
 
@@ -61,5 +64,8 @@ namespace Ishana.Elements
         }
 
         static readonly List<ElementalObject> _scratch = new List<ElementalObject>();
+
+        /// <summary>Fired at the start of every magic impact: element, point, radius, power.</summary>
+        public static event System.Action<Element, Vector3, float, float> OnImpact;
     }
 }

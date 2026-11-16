@@ -734,6 +734,14 @@ public class PlayerStateManager : MonoBehaviour
              if (tintShells)
              {
                  Color shellColor = bulletSpawner.GetCurrentBulletColor();
+                 if (bulletSpawner.CurrentBulletType == BulletType.Type4)
+                 {
+                     // Earth magic: the orbiting particles become bits of ground, alternating soil and green
+                     shellColor = i % 2 == 0 ? EarthBullet.SoilColor : EarthBullet.EarthColor;
+                     MeshFilter shellMesh = shell.GetComponent<MeshFilter>();
+                     if (shellMesh != null) shellMesh.sharedMesh = Ishana.Elements.ProceduralMeshes.Chunk(i);
+                     shell.transform.rotation = UnityEngine.Random.rotation;
+                 }
                  foreach (Renderer r in shell.GetComponentsInChildren<Renderer>())
                  {
                      if (r is ParticleSystemRenderer) continue;

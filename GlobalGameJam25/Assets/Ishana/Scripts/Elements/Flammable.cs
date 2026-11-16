@@ -28,6 +28,8 @@ namespace Ishana.Elements
         public static int MaxSimultaneousFires = 40;
         public static int BurningCount { get; private set; }
         public static event Action<Flammable, PlantState> OnStateChanged;
+        /// <summary>Fired each time a burning plant tries to spread, before it looks for neighbours.</summary>
+        public static event Action<Flammable> OnSpreadTick;
 
         [Header("Burning")]
         [Tooltip("Seconds of burning before the plant is completely burnt.")]
@@ -321,6 +323,7 @@ namespace Ishana.Elements
 
         void Spread()
         {
+            OnSpreadTick?.Invoke(this);
             IReadOnlyList<ElementalObject> all = All;
             Vector3 here = transform.position;
             // Fire gets better at spreading as it takes hold

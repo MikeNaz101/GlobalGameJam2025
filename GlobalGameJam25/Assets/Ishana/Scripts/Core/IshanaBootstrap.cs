@@ -59,7 +59,9 @@ namespace Ishana.Core
                 Ensure<GroveRewards>("[GroveRewards]");
                 Ensure<ObjectiveHUD>("[ObjectiveHUD]");
                 Ensure<SaveManager>("[SaveManager]"); // After the HUD, so load can refresh it
+                Ensure<TerrainPolish>("[TerrainPolish]"); // Crisper ground, wind on painted plants
                 Ensure<WorldScatter>("[WorldScatter]"); // Procedural trees, boulders, bushes and grass
+                Ensure<TerrainDetailFire>("[TerrainDetailFire]"); // Painted grass, ferns and weeds can burn
             }
         }
 

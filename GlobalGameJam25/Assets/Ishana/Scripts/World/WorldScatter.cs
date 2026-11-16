@@ -235,11 +235,7 @@ namespace Ishana.World
                 if (t == null || t.terrainData == null || t.terrainData.treeInstanceCount == 0) continue;
 
                 // Work on a copy, so hiding trees while playing never alters the terrain asset on disk
-                TerrainData copy = Instantiate(t.terrainData);
-                copy.name = t.terrainData.name + " (runtime copy)";
-                t.terrainData = copy;
-                var terrainCollider = t.GetComponent<TerrainCollider>();
-                if (terrainCollider != null) terrainCollider.terrainData = copy;
+                TerrainData copy = TerrainRuntime.Writable(t);
 
                 TreeInstance[] instances = copy.treeInstances;
                 Vector3 origin = t.transform.position, size = copy.size;
