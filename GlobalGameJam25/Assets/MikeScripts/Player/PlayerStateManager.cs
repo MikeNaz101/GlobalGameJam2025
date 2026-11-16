@@ -652,16 +652,17 @@ public class PlayerStateManager : MonoBehaviour
 
         // Get the index corresponding to the current bullet type enum
         int currentTypeIndex = (int)bulletSpawner.CurrentBulletType;
+        bool tintShells = false;
 
         // Validate the index against the shellPrefabs list
         if (currentTypeIndex < 0 || currentTypeIndex >= shellPrefabs.Count || shellPrefabs[currentTypeIndex] == null)
         {
-             Debug.LogError($"Invalid shell prefab index {currentTypeIndex} derived from BulletType {bulletSpawner.CurrentBulletType}. Check shellPrefabs list order/assignment in PlayerStateManager Inspector. Make sure it matches the BulletType enum.", this);
-             // Fallback to index 0 if possible
+             // No shell prefab for this type (e.g. the earth shot): reuse the first one, tinted to the shot's colour
              if (shellPrefabs.Count > 0 && shellPrefabs[0] != null) {
                  currentTypeIndex = 0;
-                 Debug.LogWarning("Falling back to shell prefab index 0.");
+                 tintShells = true;
              } else {
+                 Debug.LogError($"Invalid shell prefab index {currentTypeIndex} derived from BulletType {bulletSpawner.CurrentBulletType}. Check shellPrefabs list order/assignment in PlayerStateManager Inspector. Make sure it matches the BulletType enum.", this);
                  return; // Cannot proceed if even index 0 is invalid
              }
         }
@@ -704,6 +705,16 @@ public class PlayerStateManager : MonoBehaviour
             // Instantiate the new shell and parent it to the orbit center for rotation
              GameObject shell = Instantiate(shellPrefabToSpawn, spawnPosition, Quaternion.identity, shellOrbitCenter);
              orbitingShells.Add(shell); // Add to our tracking list
+             if (tintShells)
+             {
+                 Color shellColor = bulletSpawner.GetCurrentBulletColor();
+                 foreach (Renderer r in shell.GetComponentsInChildren<Renderer>())
+                 {
+                     if (r is ParticleSystemRenderer) continue;
+                     if (r.material.HasProperty("_BaseColor")) r.material.SetColor("_BaseColor", shellColor);
+                     if (r.material.HasProperty("_Color")) r.material.SetColor("_Color", shellColor);
+                 }
+             }
 
             // --- Set Initial Visibility ---
             // Enable/disable the renderer based on whether it's within the currentShells count

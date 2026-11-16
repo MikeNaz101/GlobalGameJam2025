@@ -150,7 +150,7 @@ public class BasicBullet : MonoBehaviour, PlayerShooting.IBulletChargeReceiver
             }
             else // If it's not an enemy, check if it's a breakable boulder
             {
-                BreakableBoulder boulder = hitObject.GetComponent<BreakableBoulder>(); // Check on the hit object itself
+                BreakableBoulder boulder = hitObject.GetComponentInParent<BreakableBoulder>(); // On the hit object or its parent
                 if (boulder != null)
                 {
                     Debug.Log($"Applying {finalDamage} damage to BreakableBoulder: {boulder.gameObject.name}");
@@ -166,6 +166,9 @@ public class BasicBullet : MonoBehaviour, PlayerShooting.IBulletChargeReceiver
             // --- Apply Splash Damage ---
             // Example radius scales with bullet size
             float splashRadius = finalScale * 0.75f; // Adjust multiplier as needed
+
+            // The basic shot is fire magic: it can set plants alight (more likely when charged)
+            Ishana.Elements.ElementalObject.Impact(Ishana.Elements.Element.Fire, position, splashRadius, finalScale, hitObject);
             Collider[] hitColliders = Physics.OverlapSphere(position, splashRadius);
             foreach (var hitCollider in hitColliders)
             {

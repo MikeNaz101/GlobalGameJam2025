@@ -44,6 +44,8 @@ public class PlayerShooting : MonoBehaviour
     public int freezeManaCostInitial = 10;
     [Tooltip("Base mana cost for a non-charged teleport shot.")]
     public int teleportManaCost = 20;
+    [Tooltip("Base mana cost of the earth (regrow) shot.")]
+    public int earthManaCostInitial = 10;
 
     // --- Internal State Variables ---
     private bool _isCharging = false;           // Is the player holding the fire button?
@@ -153,6 +155,7 @@ public class PlayerShooting : MonoBehaviour
         if (player.bulletSpawner.bulletPrefab == null) { Debug.LogError($"StartCharge Error: Bullet Prefab for {currentType} is null!"); return; }
         currentBulletVisual = Instantiate(player.bulletSpawner.bulletPrefab, firePoint.position, firePoint.rotation);
         if (currentBulletVisual == null) { Debug.LogError($"StartCharge Error: Failed to Instantiate bullet prefab for {currentType}"); return; }
+        if (!currentBulletVisual.activeSelf) currentBulletVisual.SetActive(true); // Runtime-built bullet templates are kept inactive
 
         // --- Store initial scale for visual charging ---
         initialBulletScale = currentBulletVisual.transform.localScale;
@@ -295,6 +298,7 @@ public class PlayerShooting : MonoBehaviour
             case BulletType.Type1: return this.basicManaCostInitial; // Or just basicManaCostInitial
             case BulletType.Type2: return this.freezeManaCostInitial; // Or just freezeManaCostInitial
             case BulletType.Type3: return this.teleportManaCost;     // Or just teleportManaCost
+            case BulletType.Type4: return this.earthManaCostInitial;
             default:
                 Debug.LogError($"GetBaseManaCost Error: Unhandled BulletType: {type}");
                 return 9999; // Return high cost on error

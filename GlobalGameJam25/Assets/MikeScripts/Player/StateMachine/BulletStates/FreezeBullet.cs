@@ -162,6 +162,10 @@ public class FreezeBullet : MonoBehaviour, PlayerShooting.IBulletChargeReceiver
 
         // --- Handle Splash Damage & Freeze in an Area ---
         float splashRadius = finalScale * 0.75f; // Example: Splash radius scales with bullet size
+
+        // Ice magic puts out burning plants over a wider area than it damages
+        Ishana.Elements.ElementalObject.Impact(Ishana.Elements.Element.Ice, hitPoint, splashRadius * 3f + 2f, finalScale, hitObject);
+        Ishana.Elements.ElementFX.Steam(hitPoint, Mathf.Max(0.5f, splashRadius));
         Collider[] hitColliders = Physics.OverlapSphere(hitPoint, splashRadius); // Use hitPoint as center
 
         foreach (var hitCollider in hitColliders)

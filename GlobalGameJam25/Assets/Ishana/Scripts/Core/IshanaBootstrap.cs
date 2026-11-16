@@ -15,7 +15,8 @@ namespace Ishana.Core
     /// - ThirdPersonCameraController on the player (if the prefab doesn't already have one)
     /// - CombatFeedback service (hit-stop, shake, hit flash, damage numbers)
     /// - RuntimeNavMesh (pathfinding for enemies)
-    /// - In scenes that use the grove cleansing system: BlightPostFX, GroveRewards, ObjectiveHUD, SaveManager
+    /// - In scenes that use the grove cleansing system: BlightPostFX, GroveRewards, ObjectiveHUD, SaveManager,
+    ///   WorldScatter (procedural trees, boulders, bushes and grass that react to fire, ice and earth magic)
     /// - MainMenuSaveOptions (Continue / New Game) in the start menu
     ///
     /// A scene only counts as a gameplay scene if it contains a PlayerStateManager.
@@ -58,6 +59,7 @@ namespace Ishana.Core
                 Ensure<GroveRewards>("[GroveRewards]");
                 Ensure<ObjectiveHUD>("[ObjectiveHUD]");
                 Ensure<SaveManager>("[SaveManager]"); // After the HUD, so load can refresh it
+                Ensure<WorldScatter>("[WorldScatter]"); // Procedural trees, boulders, bushes and grass
             }
         }
 

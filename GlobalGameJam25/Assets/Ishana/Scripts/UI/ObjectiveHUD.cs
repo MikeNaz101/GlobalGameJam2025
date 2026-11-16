@@ -110,6 +110,7 @@ namespace Ishana.UI
         {
             string ability = trigger != null && trigger.bulletIndexToUnlock == 1 ? "Freeze shot"
                            : trigger != null && trigger.bulletIndexToUnlock == 2 ? "Teleport shot"
+                           : trigger != null && trigger.bulletIndexToUnlock == 3 ? "Earth shot"
                            : "New ability";
             Toast($"{ability} unlocked!  Scroll to switch shots");
         }

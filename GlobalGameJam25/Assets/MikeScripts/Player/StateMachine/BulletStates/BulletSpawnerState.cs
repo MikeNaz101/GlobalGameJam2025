@@ -8,7 +8,8 @@ public enum BulletType
 {
     Type1, // Index 0 (Basic Bullet)
     Type2, // Index 1 (Freeze Bullet)
-    Type3  // Index 2 (Teleport Bullet)
+    Type3, // Index 2 (Teleport Bullet)
+    Type4  // Index 3 (Earth Bullet: regrows burnt plants)
 }
 
 public class BulletSpawnerState : MonoBehaviour
@@ -17,6 +18,8 @@ public class BulletSpawnerState : MonoBehaviour
     public GameObject basicBullet; // Assign Basic Bullet Prefab in Inspector (Index 0)
     public GameObject freezeBullet; // Assign Freeze Bullet Prefab in Inspector (Index 1)
     public GameObject teleportBullet; // Assign Teleport Bullet Prefab in Inspector (Index 2)
+    [Tooltip("Optional. If empty, a green copy of the basic bullet is built at runtime.")]
+    public GameObject earthBullet; // Earth Bullet Prefab (Index 3)
 
     [Header("State")]
     // Readonly property to see current type
@@ -110,6 +113,10 @@ public class BulletSpawnerState : MonoBehaviour
             case BulletType.Type3:
                 bulletPrefab = teleportBullet;
                 break;
+            case BulletType.Type4:
+                if (earthBullet == null) earthBullet = EarthBullet.CreateTemplate(basicBullet, transform);
+                bulletPrefab = earthBullet;
+                break;
             default:
                 // This case should ideally not be reachable if CurrentBulletType is always valid
                 Debug.LogError($"Unhandled BulletType '{CurrentBulletType}' in UpdateBulletPrefab!");
@@ -138,6 +145,7 @@ public class BulletSpawnerState : MonoBehaviour
                case BulletType.Type1: return Color.red; // Example color
                case BulletType.Type2: return Color.blue; // Example color
                case BulletType.Type3: return Color.green; // Example color
+               case BulletType.Type4: return EarthBullet.EarthColor;
                default: return Color.white;
           }
      }
