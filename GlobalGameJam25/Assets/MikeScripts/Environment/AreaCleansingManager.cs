@@ -19,6 +19,31 @@ public class AreaCleansingManager : MonoBehaviour
     /// <summary>1 = fully blighted, 0 = fully cleansed. Read by BlightPostFX.</summary>
     public float BlightPotency => currentBlightPotency;
     public bool IsCleared => _areaHasBeenCleared;
+    public int MonstersKilled => monstersKilled;
+    public int MonstersRemaining => Mathf.Max(0, totalMonstersInArea - monstersKilled);
+
+    /// <summary>Called by the spawner so the kill target always matches what was actually spawned.</summary>
+    public void SetTotalMonsters(int total)
+    {
+        if (_areaHasBeenCleared || total <= 0) return;
+        totalMonstersInArea = total;
+        UpdateBlightPotency();
+        ApplyLocalAmbiance(currentBlightPotency);
+    }
+
+    /// <summary>
+    /// Puts the grove straight into its cleansed state when loading a save.
+    /// Does not fire OnAreaCleared, so no celebration, reward or re-save happens.
+    /// </summary>
+    public void RestoreCleared()
+    {
+        _areaHasBeenCleared = true;
+        monstersKilled = totalMonstersInArea;
+        UpdateBlightPotency();
+        ApplyLocalAmbiance(currentBlightPotency);
+        if (isPlayerCurrentlyInArea && globalAmbianceController != null)
+            globalAmbianceController.UpdateActiveAreaTargets(this);
+    }
 
     [Header("Local Environment Ingredients")]
     [Tooltip("A light source PRIMARILY affecting this local area.")]

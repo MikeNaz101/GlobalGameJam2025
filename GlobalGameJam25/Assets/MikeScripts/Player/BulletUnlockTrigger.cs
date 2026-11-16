@@ -4,6 +4,9 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class BulletUnlockTrigger : MonoBehaviour
 {
+    /// <summary>Fired when this trigger unlocks an ability for the player (used by the save system and HUD).</summary>
+    public static event System.Action<BulletUnlockTrigger> OnAbilityUnlocked;
+
     [Header("Unlock Settings")]
     [Tooltip("The index (BulletType enum value) this trigger unlocks. e.g., 1 for the second type (Freeze), 2 for the third (Teleport). Index 0 is default.")]
     [Min(1)] // Enforce unlocking index 1 or higher via triggers.
@@ -62,6 +65,7 @@ public class BulletUnlockTrigger : MonoBehaviour
 
                     // Play optional visual and audio feedback.
                     PlayUnlockEffects(playerManager);
+                    OnAbilityUnlocked?.Invoke(this);
 
                     // If configured, disable the trigger to prevent it from firing again.
                     if (disableAfterUnlock)

@@ -223,6 +223,11 @@ namespace Ishana.CameraSystem
             if (forward.sqrMagnitude < 0.0001f) return;
             _yaw = Quaternion.LookRotation(forward).eulerAngles.y;
             _pitch = startPitch;
+            if (cameraTarget != null) cameraTarget.rotation = Quaternion.Euler(_pitch, _yaw, 0f);
+
+            // Tell Cinemachine the target jumped, so the camera cuts instead of sweeping across the map
+            if (gameplayCamera != null) gameplayCamera.PreviousStateIsValid = false;
+            if (aimCamera != null) aimCamera.PreviousStateIsValid = false;
         }
     }
 }

@@ -778,6 +778,48 @@ public class PlayerStateManager : MonoBehaviour
         // OnStaminaChanged?.Invoke(currentStamina, maxStamina);
     }
 
+    // ----- Save / Load Support -----
+
+    /// <summary>Restores progression from a save file. Call after Start() has run.</summary>
+    public void ApplySavedProgress(int level, int xp, float effectMultiplier, int unlockedBulletIndex)
+    {
+        currentLevel = Mathf.Max(1, level);
+        bulletEffectMultiplier = Mathf.Max(1f, effectMultiplier);
+        CalculateXPForNextLevel();
+        currentXP = Mathf.Clamp(xp, 0, Mathf.Max(0, xpToNextLevel - 1));
+
+        int totalBulletTypes = bulletSpawner != null ? bulletSpawner.GetTotalBulletTypes() : 0;
+        int highestIndex = totalBulletTypes > 0 ? totalBulletTypes - 1 : unlockedBulletIndex;
+        maxUnlockedBulletIndex = Mathf.Clamp(unlockedBulletIndex, 0, highestIndex);
+
+        OnXPChanged?.Invoke(currentXP, xpToNextLevel);
+        OnLevelChanged?.Invoke(currentLevel);
+        OnMultiplierChanged?.Invoke(bulletEffectMultiplier);
+    }
+
+    /// <summary>Moves the player instantly (respawn / load). A CharacterController must be disabled to be moved.</summary>
+    public void TeleportTo(Vector3 position, float yawDegrees)
+    {
+        bool wasEnabled = controller != null && controller.enabled;
+        if (controller != null) controller.enabled = false;
+        transform.SetPositionAndRotation(position, Quaternion.Euler(0f, yawDegrees, 0f));
+        if (controller != null) controller.enabled = wasEnabled;
+
+        currentHorizontalVelocity = Vector3.zero;
+        targetHorizontalVelocity = Vector3.zero;
+        verticalVelocity = 0f;
+    }
+
+    /// <summary>Refills health, mana and stamina (e.g. as a reward for cleansing a grove).</summary>
+    public void RestoreAllStats()
+    {
+        if (currentHealth <= 0) return; // Don't revive a dead player
+        currentHealth = maxHealth;
+        currentMana = maxMana;
+        currentStamina = maxStamina;
+        UpdateShellCountVisuals();
+    }
+
     // --- NEW Method for Teleport Bullet to Call ---
     public void TriggerTeleportAnimation()
     {

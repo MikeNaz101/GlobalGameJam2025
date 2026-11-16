@@ -77,6 +77,16 @@ public class EnemySpawner : MonoBehaviour
         // --- End Checks ---
 
 
+        // A grove that was already cleansed (e.g. loaded from a save) stays empty
+        if (currentArea.areaManager.IsCleared)
+        {
+            currentArea.enemiesHaveSpawned = true;
+            return;
+        }
+
+        // The grove is cleansed when everything spawned here is dead - keep the target in sync with the spawn counts
+        currentArea.areaManager.SetTotalMonsters(currentArea.numSludgeToSpawn + currentArea.numGasToSpawn);
+
         Debug.Log($"EnemySpawner: Spawning ALL enemies for Area {areaIndex + 1}.");
 
         // Spawn Sludge enemies if count > 0

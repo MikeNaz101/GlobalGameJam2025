@@ -59,6 +59,18 @@ public abstract class BaseEnemy : MonoBehaviour
     protected float freezeTimer = 0f;
     protected float fleeHealthThreshold;
 
+    // Pathfinding: turns "walk straight at the target" into "walk around what's in the way"
+    private readonly Ishana.AI.EnemyPathFollower pathFollower = new Ishana.AI.EnemyPathFollower();
+
+    /// <summary>
+    /// The point to move toward right now in order to reach <paramref name="destination"/>.
+    /// Follows a NavMesh path when one is available, otherwise returns the destination unchanged.
+    /// </summary>
+    protected Vector3 SteerTowards(Vector3 destination)
+    {
+        return pathFollower.GetSteerTarget(transform.position, destination);
+    }
+
     // --- Abstract Methods ---
     protected abstract void Patrol();
     protected abstract void Chase();

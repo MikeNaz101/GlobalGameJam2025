@@ -3,6 +3,9 @@ using System.Collections; // Required for Coroutines
 
 public class ChestInteraction : MonoBehaviour
 {
+    /// <summary>Fired when a chest is opened (used by the save system and HUD).</summary>
+    public static event System.Action<ChestInteraction> OnChestOpened;
+
     [Header("Chest Settings")]
     [Tooltip("The Transform of the chest lid object that will rotate.")]
     public Transform lidTransform;
@@ -147,6 +150,7 @@ public class ChestInteraction : MonoBehaviour
         }
 
         // 5. Schedule Chest Destruction
+        OnChestOpened?.Invoke(this);
         Destroy(gameObject, destroyDelay);
     }
 

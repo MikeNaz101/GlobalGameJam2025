@@ -547,6 +547,7 @@ public class BossEnemy : BaseEnemy
     void MoveTowards(Vector3 target)
     {
         if (_isFrozen || isChangingPhase) return;
+        target = SteerTowards(target); // Go around obstacles when a NavMesh is available
         Vector3 direction = (target - transform.position).normalized;
         direction.y = 0; // Keep movement horizontal
         transform.position += direction * currentMoveSpeed * Time.deltaTime;

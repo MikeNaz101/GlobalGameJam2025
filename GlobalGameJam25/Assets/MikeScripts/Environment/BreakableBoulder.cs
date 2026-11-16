@@ -4,6 +4,9 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class BreakableBoulder : MonoBehaviour
 {
+    /// <summary>Fired when a boulder breaks (used by the save system).</summary>
+    public static event System.Action<BreakableBoulder> OnBoulderBroken;
+
     [Header("Breaking Mechanics")]
     [Tooltip("The minimum amount of damage from a single hit required to break this boulder.")]
     public int damageThreshold = 50; // Set this value in the Unity Inspector
@@ -64,6 +67,8 @@ public class BreakableBoulder : MonoBehaviour
             Instantiate(breakEffectPrefab, transform.position, transform.rotation);
             // Ensure the prefab cleans itself up (e.g., Particle System 'Stop Action' set to Destroy)
         }
+
+        OnBoulderBroken?.Invoke(this);
 
         // 3. Destroy the Boulder GameObject
         Destroy(gameObject);

@@ -188,6 +188,7 @@ public class SludgeEnemy : BaseEnemy
 
     void MoveTowards(Vector3 target)
     {
+        target = SteerTowards(target); // Go around obstacles when a NavMesh is available
         Vector3 direction = (target - transform.position).normalized;
         direction.y = 0;
         transform.position += direction * moveSpeed * Time.deltaTime;

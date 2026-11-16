@@ -188,6 +188,7 @@ public class GasEnemy : BaseEnemy
     // Moves the enemy towards a target position.
     void MoveTowards(Vector3 target)
     {
+        target = SteerTowards(target); // Go around obstacles when a NavMesh is available
         Vector3 direction = (target - transform.position).normalized;
         // Move the enemy in that direction based on moveSpeed
         // Note: This implementation ignores obstacles and verticality.
