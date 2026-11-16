@@ -20,7 +20,7 @@ public class PlayerIdleState : PlayerBaseState
         if (player.movement.magnitude > 0.1f)
         {
             // Prioritize Run > Sneak > Walk
-            if (player.isRunning && !player.isSneaking) // Run if holding run AND NOT sneaking
+            if (player.CanStartSprint) // Run if holding run, not sneaking, and there is stamina for it
             {
                 player.SwitchState(player.runState);
             }

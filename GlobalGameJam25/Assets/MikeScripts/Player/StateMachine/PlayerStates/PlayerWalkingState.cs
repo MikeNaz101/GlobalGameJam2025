@@ -20,7 +20,7 @@ public class PlayerWalkingState : PlayerBaseState
             return;
         }
         // Transition to Run: Check shift key AND if player HAS STAMINA
-        if (player.isRunning && !player.isSneaking && player.currentStamina > 0)
+        if (player.CanStartSprint)
         {
             player.SwitchState(player.runState);
             return;

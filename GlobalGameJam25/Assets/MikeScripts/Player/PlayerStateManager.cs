@@ -54,6 +54,29 @@ public class PlayerStateManager : MonoBehaviour
     [Tooltip("Terminal falling speed (units/sec).")]
     public float maxFallSpeed = 45f;
 
+    [Header("Sprinting")]
+    [Tooltip("Stamina needed to start sprinting. Stops sprint from stuttering on and off at 1 stamina.")]
+    public int minStaminaToSprint = 10;
+    /// <summary>True after stamina ran out mid-sprint. Cleared when the run key is released.</summary>
+    [HideInInspector] public bool sprintExhausted = false;
+
+    /// <summary>The run key is held and the player is allowed to start (or keep) sprinting.</summary>
+    public bool CanStartSprint => isRunning && !isSneaking && !sprintExhausted && currentStamina >= minStaminaToSprint;
+    /// <summary>Actually sprinting right now (not just holding the key).</summary>
+    public bool IsSprinting => currentState == runState;
+    /// <summary>In the air: off the ground, or just launched by a jump.</summary>
+    public bool IsAirborne => !isGrounded || verticalVelocity > 0.5f;
+    /// <summary>How long a jump from flat ground stays in the air, from the jump and gravity settings.</summary>
+    public float PredictedJumpAirTime
+    {
+        get
+        {
+            float g = Mathf.Max(0.01f, Mathf.Abs(gravity));
+            float launchSpeed = Mathf.Sqrt(jumpForce * 2f * g);
+            return launchSpeed / g * (1f + 1f / Mathf.Sqrt(Mathf.Max(0.01f, fallGravityMultiplier)));
+        }
+    }
+
     [Header("Physics & Ground Check")]
     public float gravity = -9.81f;
     public Transform groundCheck;
@@ -207,7 +230,11 @@ public class PlayerStateManager : MonoBehaviour
     // --- Input System Handlers ---
     void OnMove(InputValue value) { movement = value.Get<Vector2>(); }
     void OnSprint(InputValue value) { if (value.isPressed) isSneaking = !isSneaking; }
-    void OnRun(InputValue value) { isRunning = value.isPressed; }
+    void OnRun(InputValue value)
+    {
+        isRunning = value.isPressed;
+        if (!isRunning) sprintExhausted = false; // Letting go of the run key resets exhaustion
+    }
 
     void OnFire(InputValue value)
     {
@@ -334,6 +361,7 @@ public class PlayerStateManager : MonoBehaviour
             runStaminaAccumulator -= whole;
             UseStamina(whole);
         }
+        if (currentStamina <= 0) sprintExhausted = true; // Stay out of sprint until the run key is released
         return currentStamina > 0;
     }
 

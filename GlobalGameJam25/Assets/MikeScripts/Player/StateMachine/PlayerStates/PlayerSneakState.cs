@@ -22,7 +22,7 @@ public class PlayerSneakState : PlayerBaseState
         else if (!player.isSneaking) // If sneak is toggled off...
         {
             // Check if Run is held, otherwise go to Walk
-            if (player.isRunning)
+            if (player.CanStartSprint)
             {
                 player.SwitchState(player.runState);
             }
