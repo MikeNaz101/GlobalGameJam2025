@@ -374,9 +374,11 @@ namespace Ishana.World
             if (roll.NextDouble() < paintedGrowableShare && go.GetComponent<GrowablePlant>() == null) go.AddComponent<GrowablePlant>();
 
             // Hide the painted version while the real one stands in for it
+            // Shrunk to almost nothing rather than exactly zero: a zero-sized tree gives the renderer
+            // invalid numbers, which the bloom effect smears into huge flickering white and black shapes.
             TreeInstance hidden = tree;
-            hidden.widthScale = 0f;
-            hidden.heightScale = 0f;
+            hidden.widthScale = 0.001f;
+            hidden.heightScale = 0.001f;
             data.SetTreeInstance(painted.instanceIndex, hidden);
 
             Track(cell, cell.objects, 5000 + i, go);

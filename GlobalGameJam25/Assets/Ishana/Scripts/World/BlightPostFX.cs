@@ -122,7 +122,10 @@ namespace Ishana.World
             var cam = Camera.main;
             if (cam == null) return;
             var data = cam.GetUniversalAdditionalCameraData();
-            if (data != null && !data.renderPostProcessing) data.renderPostProcessing = true;
+            if (data == null) return;
+            if (!data.renderPostProcessing) data.renderPostProcessing = true;
+            // Safety net: one bad pixel can otherwise be smeared across the screen by bloom
+            if (!data.stopNaN) data.stopNaN = true;
         }
 
         Volume CreateVolume(string name, VolumeProfile profile)
