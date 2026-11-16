@@ -41,8 +41,9 @@ namespace Ishana.World
         public bool windOnPaintedPlants = true;
         [Tooltip("Painted MESH plants (ferns, weeds, grass planes) sway too. They are drawn with the Ishana/Wind Plant shader " +
                  "using GPU instancing, which is cheap. Your prefabs and materials are not changed: copies are made when the game starts. " +
-                 "Untick if a plant looks wrong.")]
-        public bool windOnMeshPlants = true;
+                 "Off by default: on a densely painted terrain, drawing every plant as its own instance was far slower than " +
+                 "the terrain's normal batched drawing and dropped the frame rate badly. Only turn on for sparse plants.")]
+        public bool windOnMeshPlants = false;
         [Tooltip("How far the top of a mesh plant sways, as a fraction of its height.")]
         [Range(0f, 0.5f)] public float meshPlantSway = 0.12f;
         [Tooltip("Brightness of mesh plants compared to the scene lighting.")]
@@ -55,8 +56,8 @@ namespace Ishana.World
         [Range(0f, 1f)] public float windStrength = 0.45f;
         [Range(0f, 1f)] public float windSpeed = 0.4f;
         [Range(0f, 1f)] public float windBending = 0.5f;
-        [Tooltip("Painted plants are drawn out to this many player heights away. Lower = cheaper.")]
-        public float plantDistanceInPlayerHeights = 60f;
+        [Tooltip("Painted plants are drawn out to this many player heights away. Lower = cheaper. 0 = keep each terrain's own distance.")]
+        public float plantDistanceInPlayerHeights = 0f;
         [Tooltip("How many of the painted plants are drawn (1 = all). Lower = cheaper.")]
         [Range(0.1f, 1f)] public float plantDensity = 1f;
 
@@ -114,7 +115,8 @@ namespace Ishana.World
                 if (drawInstanced) terrain.drawInstanced = true;
 
                 // --- Painted plants
-                terrain.detailObjectDistance = Mathf.Min(250f, plantDistanceInPlayerHeights * playerHeight);
+                if (plantDistanceInPlayerHeights > 0f)
+                    terrain.detailObjectDistance = Mathf.Min(250f, plantDistanceInPlayerHeights * playerHeight);
                 terrain.detailObjectDensity = plantDensity;
 
                 if (windOnPaintedPlants)
