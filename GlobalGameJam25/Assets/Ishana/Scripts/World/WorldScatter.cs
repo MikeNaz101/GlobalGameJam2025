@@ -36,9 +36,9 @@ namespace Ishana.World
         [Header("Streaming (in units for a 2-unit-tall character)")]
         public float cellSize = 24f;
         [Tooltip("Trees, boulders and bushes exist within this distance of the player.")]
-        public float objectDistance = 130f;
+        public float objectDistance = 85f;
         [Tooltip("Grass and weeds exist within this distance of the player.")]
-        public float grassDistance = 48f;
+        public float grassDistance = 36f;
         [Tooltip("How many cells may be filled in per frame. Higher = less pop-in, more stutter.")]
         public int cellsPerFrame = 1;
 
@@ -72,7 +72,7 @@ namespace Ishana.World
         public GameObject[] bushPrefabs;
 
         [Header("Grass and Weeds")]
-        public float grassPerCell = 60f;
+        public float grassPerCell = 28f;
         [Range(0f, 1f)] public float weedShare = 0.2f;
         [Tooltip("Burnt grass grows back by itself after this many seconds (0 = only earth magic).")]
         public float grassRegrowsAfter = 0f;
@@ -204,6 +204,15 @@ namespace Ishana.World
             return true;
         }
 
+        /// <summary>Show or hide everything this component has grown (used by the performance panel).</summary>
+        public void SetShown(bool shown)
+        {
+            enabled = shown;
+            if (_root != null) _root.gameObject.SetActive(shown);
+        }
+
+        public int ObjectCount => _root != null ? _root.childCount : 0;
+
         void Update()
         {
             if (!Prepare()) return;
@@ -217,7 +226,7 @@ namespace Ishana.World
                 {
                     // Fill in the area right around the player before the first frame is shown
                     _firstScan = false;
-                    float near = grassDistance * _scale * 1.5f;
+                    float near = Cs * 1.5f;
                     while (_jobIndex < _jobs.Count && _jobs[_jobIndex].distance <= near) Run(_jobs[_jobIndex++]);
                 }
             }
@@ -718,7 +727,7 @@ namespace Ishana.World
             float trunkHeight = pine ? height * 0.4f : height * 0.62f;
 
             Part(root.transform, "Trunk", ProceduralMeshes.Trunk(), ProceduralMeshes.Matte("Bark", barkColor),
-                 Vector3.zero, new Vector3(trunkRadius * 2f, trunkHeight, trunkRadius * 2f));
+                 Vector3.zero, new Vector3(trunkRadius * 2f, trunkHeight, trunkRadius * 2f), shadows: false);
 
             GameObject crown;
             float crownRadius;
@@ -768,8 +777,10 @@ namespace Ishana.World
             GameObject root = NewObject("Bush", point, yaw);
             root.transform.localScale = Vector3.one * size;
             root.AddComponent<MeshFilter>().sharedMesh = ProceduralMeshes.Bush(variant);
-            root.AddComponent<MeshRenderer>().sharedMaterial =
+            var bushRenderer = root.AddComponent<MeshRenderer>();
+            bushRenderer.sharedMaterial =
                 ProceduralMeshes.Matte("Leaves " + variant % Mathf.Max(1, leafColors.Length), leafColors.Length > 0 ? leafColors[variant % leafColors.Length] : Color.green);
+            bushRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
             var plant = root.AddComponent<Flammable>();
             plant.reachRadius = size * 0.9f;
