@@ -25,7 +25,10 @@ namespace Ishana.Elements
     public class Flammable : ElementalObject
     {
         /// <summary>How many plants may burn at once. Protects the frame rate and stops the whole map going up.</summary>
-        public static int MaxSimultaneousFires = 40;
+        public static int MaxSimultaneousFires = 30;
+        /// <summary>How many fires may carry a real light at once. Each light is costly when many plants are in view.</summary>
+        public static int MaxFireLights = 4;
+        static int _fireLights;
         public static int BurningCount { get; private set; }
         public static event Action<Flammable, PlantState> OnStateChanged;
         /// <summary>Fired each time a burning plant tries to spread, before it looks for neighbours.</summary>
@@ -61,6 +64,8 @@ namespace Ishana.Elements
         public Color charredColor = new Color(0.07f, 0.06f, 0.055f);
         [Tooltip("Size of the flames compared to the plant.")]
         public float flameScale = 1f;
+        [Tooltip("Keep a thin trail of smoke for a few seconds after burning out. Off for grass and ground patches: many of them burn at once.")]
+        public bool smoulders = true;
 
         public PlantState State { get; private set; } = PlantState.Healthy;
         /// <summary>0 = untouched, 1 = completely burnt.</summary>
@@ -284,7 +289,7 @@ namespace Ishana.Elements
                 if (_burn >= 1f)
                 {
                     BurningCount = Mathf.Max(0, BurningCount - 1);
-                    StopFire(smolder: true);
+                    StopFire(smolder: smoulders && !collapsesWhenBurnt);
                     _burntAt = Time.time;
                     SetState(PlantState.Burnt);
                 }
@@ -309,7 +314,7 @@ namespace Ishana.Elements
 
             // Scorched or burnt: wait for the smoke to finish, then for auto-regrow (if any), otherwise sleep
             bool smoking = _smoke != null;
-            if (smoking && Time.time > _burntAt + 8f) { StopFire(false); smoking = false; }
+            if (smoking && Time.time > _burntAt + 4f) { StopFire(false); smoking = false; }
 
             if (autoRegrowAfter > 0f && State != PlantState.Healthy)
             {
@@ -361,14 +366,17 @@ namespace Ishana.Elements
             Vector3 ls = transform.lossyScale;
             _fxRoot.localScale = new Vector3(Inv(ls.x), Inv(ls.y), Inv(ls.z));
 
-            _flames = ElementFX.Flames(_fxRoot, radius, height);
-            _smoke = ElementFX.Smoke(_fxRoot, radius, height);
+            // The more fires there are, the fewer particles each one gets: a wide fire still reads as a wide fire
+            float thin = Mathf.Lerp(1f, 0.45f, Mathf.InverseLerp(4f, 24f, BurningCount));
+            _flames = ElementFX.Flames(_fxRoot, radius, height, thin);
+            _smoke = ElementFX.Smoke(_fxRoot, radius, height, 3f * thin);
             _flames.Play();
             _smoke.Play();
 
             // Lights are expensive: only bigger fires get one
-            if (height > 2.5f)
+            if (height > 2.5f && _fireLights < MaxFireLights)
             {
+                _fireLights++;
                 var lightGo = new GameObject("Fire Light");
                 lightGo.transform.SetParent(_fxRoot, false);
                 lightGo.transform.localPosition = Vector3.up * height * 0.5f;
@@ -392,7 +400,7 @@ namespace Ishana.Elements
             {
                 // Keep a thin trail of smoke for a while
                 if (_flames != null) _flames.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-                if (_light != null) Destroy(_light.gameObject);
+                if (_light != null) { Destroy(_light.gameObject); _fireLights = Mathf.Max(0, _fireLights - 1); }
                 var emission = _smoke.emission;
                 emission.rateOverTime = 1.5f;
                 _flames = null;
@@ -400,6 +408,7 @@ namespace Ishana.Elements
                 return;
             }
 
+            if (_light != null) _fireLights = Mathf.Max(0, _fireLights - 1);
             Destroy(_fxRoot.gameObject);
             _fxRoot = null;
             _flames = null;
@@ -444,6 +453,7 @@ namespace Ishana.Elements
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            if (_light != null) _fireLights = Mathf.Max(0, _fireLights - 1);
             // Clear tints so shared renderers aren't left with stale blocks (matters for pooled objects)
             for (int i = 0; i < _slots.Count; i++)
                 if (_slots[i].renderer != null) _slots[i].renderer.SetPropertyBlock(null, _slots[i].index);

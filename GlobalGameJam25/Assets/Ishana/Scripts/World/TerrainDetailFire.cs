@@ -31,6 +31,7 @@ namespace Ishana.World
         readonly HashSet<Vector2Int> _nothingToBurn = new HashSet<Vector2Int>();
         float _patchSize = 3f, _playerHeight = 2f;
         bool _sized;
+        readonly Dictionary<TerrainData, int> _layerCounts = new Dictionary<TerrainData, int>();
 
         void OnEnable()
         {
@@ -94,7 +95,11 @@ namespace Ishana.World
             Terrain terrain = TerrainRuntime.At(center);
             if (terrain == null) return null;
             TerrainData data = terrain.terrainData;
-            int layers = data.detailPrototypes.Length;
+            if (!_layerCounts.TryGetValue(data, out int layers))
+            {
+                layers = data.detailPrototypes.Length; // Copies the whole list, so only ask once per terrain
+                _layerCounts[data] = layers;
+            }
             if (layers == 0 || data.detailWidth <= 0) return null;
 
             // The block of the terrain's plant map that this patch covers
@@ -105,14 +110,20 @@ namespace Ishana.World
             int y0 = Mathf.Clamp(Mathf.FloorToInt((center.z - half - origin.z) / data.size.z * data.detailHeight), 0, data.detailHeight - 1);
             int y1 = Mathf.Clamp(Mathf.CeilToInt((center.z + half - origin.z) / data.size.z * data.detailHeight), y0 + 1, data.detailHeight);
 
-            var originals = new int[layers][,];
-            long total = 0;
+            // Only remember the kinds of plant that actually grow here: every kind that has to be
+            // redrawn while burning costs time, and most patches only hold one or two
+            var indices = new List<int>();
+            var originals = new List<int[,]>();
             for (int l = 0; l < layers; l++)
             {
-                originals[l] = data.GetDetailLayer(x0, y0, x1 - x0, y1 - y0, l);
-                foreach (int v in originals[l]) total += v;
+                int[,] values = data.GetDetailLayer(x0, y0, x1 - x0, y1 - y0, l);
+                bool any = false;
+                foreach (int v in values) if (v != 0) { any = true; break; }
+                if (!any) continue;
+                indices.Add(l);
+                originals.Add(values);
             }
-            if (total == 0) return null; // Bare ground: nothing to burn
+            if (indices.Count == 0) return null; // Bare ground: nothing to burn
 
             center.y = terrain.SampleHeight(center) + origin.y;
             var go = new GameObject("Burnable Ground Patch");
@@ -129,9 +140,10 @@ namespace Ishana.World
             plant.spreadChance = spreadChance;
             plant.autoRegrowAfter = regrowAfter;
             plant.regrowTime = 2.5f;
+            plant.smoulders = false;
 
             var patch = go.AddComponent<DetailPatch>();
-            patch.Init(terrain, plant, x0, y0, originals);
+            patch.Init(terrain, plant, x0, y0, indices.ToArray(), originals.ToArray());
             return patch;
         }
     }

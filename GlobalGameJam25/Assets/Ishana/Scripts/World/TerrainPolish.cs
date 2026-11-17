@@ -69,8 +69,9 @@ namespace Ishana.World
         [Range(0f, 1f)] public float windBending = 0.5f;
         [Tooltip("Painted plants are drawn out to this many player heights away. Lower = cheaper. 0 = keep each terrain's own distance.")]
         public float plantDistanceInPlayerHeights = 0f;
-        [Tooltip("How many of the painted plants are drawn (1 = all). Lower = cheaper.")]
-        [Range(0.1f, 1f)] public float plantDensity = 1f;
+        [Tooltip("How many of the painted plants are drawn (1 = all). Lower = cheaper. The painted grass is made of large " +
+                 "see-through planes that overlap heavily, which is expensive to draw, so a bit less of it goes a long way.")]
+        [Range(0.1f, 1f)] public float plantDensity = 0.65f;
 
         void Start()
         {

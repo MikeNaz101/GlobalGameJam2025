@@ -72,7 +72,7 @@ namespace Ishana.World
         public GameObject[] bushPrefabs;
 
         [Header("Grass and Weeds")]
-        public float grassPerCell = 28f;
+        public float grassPerCell = 16f;
         [Range(0f, 1f)] public float weedShare = 0.2f;
         [Tooltip("Burnt grass grows back by itself after this many seconds (0 = only earth magic).")]
         public float grassRegrowsAfter = 0f;
@@ -92,7 +92,7 @@ namespace Ishana.World
 
         [Header("Fire")]
         [Tooltip("Most plants that can burn at the same time.")]
-        public int maxFires = 40;
+        public int maxFires = 30;
 
         [Header("Colours")]
         public Color barkColor = new Color(0.33f, 0.24f, 0.17f);
