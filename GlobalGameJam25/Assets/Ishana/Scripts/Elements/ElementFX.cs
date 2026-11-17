@@ -66,7 +66,7 @@ namespace Ishana.Elements
         }
 
         /// <summary>Looping flames filling a radius/height. Call Play() on the result.</summary>
-        public static ParticleSystem Flames(Transform parent, float radius, float height)
+        public static ParticleSystem Flames(Transform parent, float radius, float height, float amount = 1f)
         {
             var ps = Create("Flames", parent, Vector3.zero);
             var main = ps.main;
@@ -75,10 +75,10 @@ namespace Ishana.Elements
             main.startSpeed = new ParticleSystem.MinMaxCurve(height * 0.6f, height * 1.3f);
             main.startSize = new ParticleSystem.MinMaxCurve(radius * 0.5f, radius * 1.1f);
             main.startRotation = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
-            main.maxParticles = 60;
+            main.maxParticles = 32;
 
             var emission = ps.emission;
-            emission.rateOverTime = 26f;
+            emission.rateOverTime = 18f * Mathf.Clamp(amount, 0.2f, 1f);
 
             var shape = ps.shape;
             shape.shapeType = ParticleSystemShapeType.Cone;
@@ -96,7 +96,7 @@ namespace Ishana.Elements
         }
 
         /// <summary>Looping smoke. Call Play() on the result.</summary>
-        public static ParticleSystem Smoke(Transform parent, float radius, float height, float rate = 5f)
+        public static ParticleSystem Smoke(Transform parent, float radius, float height, float rate = 3f)
         {
             var ps = Create("Smoke", parent, Vector3.up * height * 0.5f);
             var main = ps.main;
@@ -105,7 +105,7 @@ namespace Ishana.Elements
             main.startSpeed = new ParticleSystem.MinMaxCurve(height * 0.5f, height * 0.9f);
             main.startSize = new ParticleSystem.MinMaxCurve(radius * 1.2f, radius * 2.2f);
             main.startRotation = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
-            main.maxParticles = 30;
+            main.maxParticles = 14;
 
             var emission = ps.emission;
             emission.rateOverTime = rate;
