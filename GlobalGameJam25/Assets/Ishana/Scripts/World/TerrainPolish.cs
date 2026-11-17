@@ -28,11 +28,12 @@ namespace Ishana.World
         [Tooltip("How large one repeat of a ground texture is, in player heights. Smaller = finer detail but more visible repetition. 0 = leave as painted.")]
         public float textureTileInPlayerHeights = 3f;
         [Tooltip("Ground textures stay fully detailed out to this distance.")]
-        public float fullDetailTextureDistance = 2000f;
+        public float fullDetailTextureDistance = 300f;
 
         [Header("Shape")]
-        [Tooltip("Lower = the terrain keeps its true shape further away (crisper silhouettes), at some CPU/GPU cost. Unity's default is 5.")]
-        [Range(1f, 10f)] public float pixelError = 2f;
+        [Tooltip("Lower = the terrain keeps its true shape further away (crisper silhouettes), but many more triangles. Unity's default is 5. " +
+                 "A terrain is never made coarser than it already is.")]
+        [Range(1f, 10f)] public float pixelError = 5f;
         [Tooltip("Draw the terrain with GPU instancing (fewer draw calls). Off = leave each terrain's own setting alone.")]
         public bool drawInstanced = false;
 
@@ -52,6 +53,16 @@ namespace Ishana.World
         readonly System.Collections.Generic.Dictionary<GameObject, GameObject> _windCopies = new System.Collections.Generic.Dictionary<GameObject, GameObject>();
         readonly System.Collections.Generic.List<Material> _windMaterials = new System.Collections.Generic.List<Material>();
         Shader _windShader;
+        readonly System.Collections.Generic.Dictionary<Terrain, Material> _originalMaterials = new System.Collections.Generic.Dictionary<Terrain, Material>();
+        readonly System.Collections.Generic.Dictionary<Terrain, Material> _layeredMaterials = new System.Collections.Generic.Dictionary<Terrain, Material>();
+
+        /// <summary>Switch between the layered ground and the terrain's original material (used by the performance panel).</summary>
+        public void SetLayered(bool layered)
+        {
+            foreach (var pair in layered ? _layeredMaterials : _originalMaterials)
+                if (pair.Key != null) pair.Key.materialTemplate = pair.Value;
+        }
+
         float _nextLightUpdate;
         [Range(0f, 1f)] public float windStrength = 0.45f;
         [Range(0f, 1f)] public float windSpeed = 0.4f;
@@ -91,7 +102,12 @@ namespace Ishana.World
                 // --- Ground textures
                 TerrainLayer[] layers = data.terrainLayers;
                 bool hasLayers = layers != null && layers.Length > 0 && layers[0] != null;
-                if (layered != null && hasLayers) terrain.materialTemplate = layered;
+                if (layered != null && hasLayers)
+                {
+                    _originalMaterials[terrain] = terrain.materialTemplate;
+                    _layeredMaterials[terrain] = layered;
+                    terrain.materialTemplate = layered;
+                }
 
                 if (hasLayers && textureTileInPlayerHeights > 0f)
                 {
@@ -108,7 +124,8 @@ namespace Ishana.World
                     data.terrainLayers = copies;
                 }
 
-                terrain.basemapDistance = Mathf.Max(terrain.basemapDistance, fullDetailTextureDistance);
+                // Past this distance the terrain is drawn from one pre-mixed texture, which is much cheaper
+                if (_layeredMaterials.ContainsKey(terrain)) terrain.basemapDistance = fullDetailTextureDistance;
 
                 // --- Shape
                 terrain.heightmapPixelError = Mathf.Min(terrain.heightmapPixelError, pixelError);

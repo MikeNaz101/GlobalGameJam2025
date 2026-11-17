@@ -51,6 +51,7 @@ namespace Ishana.Core
 
             Ensure<CombatFeedback>("[CombatFeedback]");
             Ensure<RuntimeNavMesh>("[RuntimeNavMesh]");
+            Ensure<PerformancePanel>("[PerformancePanel]"); // F3: frame rate and switches to find what is slow
 
             bool usesGroves = Object.FindFirstObjectByType<AreaCleansingManager>() != null;
             if (usesGroves)

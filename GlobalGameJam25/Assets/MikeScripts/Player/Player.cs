@@ -88,7 +88,6 @@ public class Player : MonoBehaviour
     }
     void Update()
     {
-        Debug.Log("Your currentHealth is: " + currentHealth);
         UpdateShellPositions();
         // Call the Attack method to handle mouse input
         Attck();

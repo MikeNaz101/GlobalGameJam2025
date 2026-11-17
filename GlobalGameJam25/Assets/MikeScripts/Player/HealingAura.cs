@@ -178,7 +178,7 @@ public class HealingAura : MonoBehaviour
             int healthToRestore = Mathf.FloorToInt(healthAccumulator);
             playerStateManager.currentHealth = Mathf.Min(playerStateManager.currentHealth + healthToRestore, playerStateManager.maxHealth);
             healthAccumulator -= healthToRestore; // Subtract the whole number part applied
-             Debug.Log($"Restored {healthToRestore} health. Current: {playerStateManager.currentHealth}", this); // Optional debug
+             // Debug.Log($"Restored {healthToRestore} health. Current: {playerStateManager.currentHealth}", this); // Optional debug
         }
 
         // Apply mana restoration in whole numbers when accumulator reaches >= 1
@@ -188,7 +188,7 @@ public class HealingAura : MonoBehaviour
             playerStateManager.currentMana = Mathf.Min(playerStateManager.currentMana + manaToRestore, playerStateManager.maxMana);
             playerStateManager.UpdateShellCountVisuals(); // IMPORTANT: Update shells after mana changes!
             manaAccumulator -= manaToRestore; // Subtract the whole number part applied
-             Debug.Log($"Restored {manaToRestore} mana. Current: {playerStateManager.currentMana}", this); // Optional debug
+             // Debug.Log($"Restored {manaToRestore} mana. Current: {playerStateManager.currentMana}", this); // Optional debug
         }
     }
 
